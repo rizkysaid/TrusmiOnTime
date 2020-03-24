@@ -1,11 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/ui/widget/CircleButton.dart';
-import 'package:login_absen/core/ui/widget/CircleButtonOut.dart';
-import 'package:login_absen/core/ui/widget/primary_button.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
@@ -23,20 +21,37 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static String nama;
   static String jabatan;
   static String clockin;
+  static String clockout;
   static String imageUrl;
   static String message;
+  static String total_work;
   static String _status;
   static bool statusPhoto = false;
   static bool statusIcon = true;
+  static bool _visibleButton = true;
+  static bool _statusTotalWork = false;
   static Color _colorButton = Colors.blue;
+  static Timer timer;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   static String _toolTip = "Check In";
+  String photo_profile;
+
+  String _timeString;
+  String _hariTanggal;
 
   @override
   void initState() {
     super.initState();
     getPref();
+    _timeString = _formatDateTime(DateTime.now());
+    _hariTanggal = _formatHariTanggal(DateTime.now());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+  }
+
+  @override
+  void dispose(){
+    timer.cancel();
   }
 
 
@@ -46,20 +61,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String dataNama = response.data.nama.toString();
     String dataJabatan = response.data.jabatan.toString();
     String dataClockIn = response.data.clockIn.toString();
+    String dataClockOut = response.data.clockOut.toString();
     String dataImageUrl = response.data.photoIn.toString();
     message = response.message.toString();
+    total_work = response.data.totalWork.toString();
+    photo_profile = response.data.fotoProfil.toString();
 
     if (dataClockIn == "--:--"){
       statusPhoto = false;
       statusIcon = true;
       imageUrl = "";
       _colorButton = Colors.blue;
-    } else{
+      clockout = dataClockOut;
       clockin = dataClockIn;
+      _statusTotalWork = false;
+      _visibleButton = true;
+      _status = "checkin";
+    }else if (dataClockOut == "--:--"){
+      clockin = dataClockIn;
+      clockout = dataClockOut;
       statusPhoto = true;
       statusIcon = false;
       imageUrl = dataImageUrl;
       _colorButton = Colors.deepOrange;
+      _statusTotalWork = false;
+      _visibleButton = true;
+      _status = "checkout";
+    }else{
+      statusPhoto = true;
+      statusIcon = false;
+      clockin = dataClockIn;
+      clockout = dataClockOut;
+      imageUrl = dataImageUrl;
+      _visibleButton = false;
+      _statusTotalWork = true;
+      _status = null;
     }
 
     try {
@@ -97,15 +133,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
       clockin = "--:--";
     }
 
+    if(clockout == null){
+      clockout = "--:--";
+    }
+
     if(imageUrl == "-"){
       imageUrl = "";
     }
 
     if(_status == null){
       _status = "checkin";
-    }else{
-      _status = "checkout";
     }
+//    else if (_status == "checkout"){
+//      _status = "checkin";
+//    }else if (_status == "checkin"){
+//      _status = "checkout";
+//    }
 
 
     print("_status : "+_status);
@@ -114,8 +157,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
+        brightness: Brightness.dark,
         title : Text("onTime",
           style: TextStyle(color: Colors.white),
         ),
@@ -141,7 +186,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: EdgeInsets.zero,
           children: <Widget>[
             DrawerHeader(
-              child: new CircleAvatar(),
+              child: new CircleAvatar(
+                radius: 20.0,
+                child: ClipOval(
+                  child: Image.network(photo_profile.toString()),
+                ),
+//                backgroundImage: NetworkImage(photo_profile.toString()),
+                backgroundColor: Colors.transparent,
+              ),
               decoration: BoxDecoration(
                 color: Colors.blue
               ),
@@ -160,9 +212,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         builder: (BuildContext context, BoxConstraints viewportConstraints){
           return SingleChildScrollView(
             child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: viewportConstraints.maxHeight
-          ),
+              constraints: BoxConstraints(
+                minHeight: viewportConstraints.maxHeight
+              ),
               child: Column(
                 children: <Widget>[
                   // bagian header
@@ -227,12 +279,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               Text(jabatan.toString(),
                                   style: TextStyle(color: Colors.white)),
                               SizedBox(height: 20),
-                              Text(date.toString(),
+                              Text(_timeString.toString(),
                                   style: TextStyle(
                                       color: Colors.white,
                                       fontSize: 25,
                                       fontWeight: FontWeight.bold)),
-                              Text("Jumat, 17-12-2020",
+                              Text(_hariTanggal.toString(),
                                   style: TextStyle(color: Colors.white, fontSize: 12))
                             ],
                           ),
@@ -250,7 +302,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                   //bagian field
                   Padding(
-                    padding: EdgeInsets.only(left: 20, right: 20, top: 20),
+                    padding: EdgeInsets.only(left: 20, right: 20, top: 30),
                     child: Column(
                       children: <Widget>[
                         Row(
@@ -270,11 +322,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 )),
                             Column(children: <Widget>[
                               Text("End Time", style: TextStyle(fontSize: 18)),
-                              Text("--:--",
+                              Text(clockout.toString(),
                                   style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold)),
                             ]),
                           ],
+                        ),
+                        SizedBox(height: 25),
+                        Visibility(
+                          visible: _statusTotalWork,
+                          child: Column(children: <Widget>[
+                            Text("Total Work", style: TextStyle(fontSize: 18)),
+                            Text(total_work.toString(),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                          ]),
                         ),
                       ],
                     ),
@@ -291,24 +353,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: Container(height: 50.0),
       ),
       floatingActionButton:
-      Container(
-        height: 80,
-        width: 80,
-        child: FloatingActionButton(
-          onPressed: () => {
-          Navigator.pushNamed(context, "/camera",
-                arguments: ScreenArguments(userID, _status)
-            )
-          },
-          tooltip: _toolTip,
-          backgroundColor: _colorButton,
-          child: Icon(Icons.alarm_on, color: Colors.white, size: 40),
-        )
+      Visibility(
+        visible: _visibleButton,
+        child: Container(
+          height: 80,
+          width: 80,
+          child: FloatingActionButton(
+            onPressed: () => {
+            Navigator.pushNamed(context, "/camera",
+                  arguments: ScreenArguments(userID, _status)
+              )
+            },
+            tooltip: _toolTip,
+            backgroundColor: _colorButton,
+            child: Icon(Icons.alarm_on, color: Colors.white, size: 40),
+          )
+        ),
       ),
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
+  }
 
+  void _getTime(){
+    final DateTime now = DateTime.now();
+    final DateTime HTnow = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    final String formattedHariTanggal = _formatHariTanggal(HTnow);
+    setState(() {
+      _timeString = formattedDateTime;
+      _hariTanggal = formattedHariTanggal;
+    });
+  }
+
+  String _formatDateTime(DateTime dateTime){
+    return DateFormat('HH:mm').format(dateTime);
+  }
+  String _formatHariTanggal(DateTime dateTime){
+    return DateFormat('EEE, dd MMM yyyy').format(dateTime);
   }
 
   logout() {
@@ -327,6 +409,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       pref.remove('username');
       pref.remove('clock_in');
+//      pref.remove('_status');
     });
   }
 }

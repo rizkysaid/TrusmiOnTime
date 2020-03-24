@@ -44,7 +44,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
         ),
       ),
       titleStyle: TextStyle(
-        color: Colors.red
+        color: Colors.green
       )
     );
 
@@ -79,31 +79,60 @@ class _PreviewScreenState extends State<PreviewScreen>{
                           getBytesFromFile().then((bytes){
                             String clock_in = widget.clockIn.substring(0,19);
                             String usrId = basename(widget.userID);
-                            if(prosesCheckin(usrId, clock_in, File(widget.imgPath)) != null){
-                              savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
-                              Alert(
-                                context: context,
-                                style: alertStyle,
-                                type: AlertType.success,
-                                title: "Success Check In",
-                                desc: "You have been Preseent, have a nice Day",
-                                buttons: [
-                                  DialogButton(
-                                    child: Text(
-                                        "OK",
-                                      style: TextStyle(color: Colors.white, fontSize: 20),
-                                    ),
-                                    onPressed: ()=> {
-                                      Future.delayed(const Duration(microseconds: 2000),(){
-                                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                                      })
-                                    },
-                                    width: 120,
-                                  )
-                                ]
-                              ).show();
 
-                            };
+                            if(widget.status == "checkin"){
+                              if(prosesCheckin(usrId, clock_in, File(widget.imgPath)) != null){
+                                savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
+                                Alert(
+                                    context: context,
+                                    style: alertStyle,
+                                    type: AlertType.success,
+                                    title: "Success Check In",
+//                                    desc: "You have been Preseent, have a nice Day",
+                                    buttons: [
+                                      DialogButton(
+                                        child: Text(
+                                          "OK",
+                                          style: TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: ()=> {
+                                          Future.delayed(const Duration(microseconds: 5000),(){
+                                            Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                                          })
+                                        },
+                                        width: 120,
+                                      )
+                                    ]
+                                ).show();
+                              }
+                            }else{
+
+                              if(prosesCheckout(usrId, clock_in, File(widget.imgPath)) != null){
+                                savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
+                                Alert(
+                                    context: context,
+                                    style: alertStyle,
+                                    type: AlertType.success,
+                                    title: "Success Check Out",
+//                                    desc: "Thank you for your efforts, Your dedication is imperative for the growth of our company",
+                                    buttons: [
+                                      DialogButton(
+                                        child: Text(
+                                          "OK",
+                                          style: TextStyle(color: Colors.white, fontSize: 20),
+                                        ),
+                                        onPressed: ()=> {
+                                          Future.delayed(const Duration(microseconds: 2000),(){
+                                            Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                                          })
+                                        },
+                                        width: 120,
+                                      )
+                                    ]
+                                ).show();
+                              }
+                            }
+
                           });
                         },
                       ),
@@ -121,7 +150,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
   savePref(String clock_in, bool isCheckin, String imageUrl, String status) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
-      pref.setString('clock_in', clock_in);
+//      pref.setString('clock_in', clock_in);
       pref.setBool('isCheckin', isCheckin);
       pref.setString('imageUrl', imageUrl);
       pref.setString('status', status);
@@ -167,6 +196,43 @@ class _PreviewScreenState extends State<PreviewScreen>{
      print(response.statusCode);
      return null;
    }
+  }
+
+
+  Future prosesCheckout(String usrId, String clock_in, File imageFile) async{
+
+    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
+    var length = await imageFile.length();
+    var uri = Uri.parse(Endpoint.checkout);
+    var request = new http.MultipartRequest("POST", uri);
+
+    var multiPartFile = new http.MultipartFile("foto", stream, length, filename: basename(imageFile.path));
+    String date = new DateTime.now().toIso8601String().substring(0, 10);
+
+    request.files.add(multiPartFile);
+    request.fields['employee_id'] = usrId;
+    request.fields['clock_out'] = clock_in;
+
+    var response = await request.send();
+
+    if(response.statusCode == 201){
+//     return true;
+      ApiServices services = ApiServices();
+      var response = await services.Profil(usrId, date);
+      try {
+        if (response.status == true) {
+          setState(() {
+            return true;
+          });
+        }
+      } catch (err) {
+        print("Cannot read");
+      }
+
+    }else{
+      print(response.statusCode);
+      return null;
+    }
 
   }
 

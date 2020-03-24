@@ -7,11 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-      ),
-      child: Scaffold(body: SingleChildScrollView(child: LoginBody())),
+
+    return Scaffold(
+        body: SingleChildScrollView(child: LoginBody()),
     );
   }
 }
@@ -33,6 +31,7 @@ class _LoginBodyState extends State<LoginBody> {
     super.initState();
      getPref();
   }
+
 
   savePref(String username, String userID) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -95,7 +94,7 @@ class _LoginBodyState extends State<LoginBody> {
                 Icon(Icons.alarm_on, size: 60, color: Colors.white),
                 SizedBox(height: 10),
                 Text(
-                  "onTime",
+                  "Trusmi OnTime",
                   style: TextStyle(
                       fontSize: 35,
                       color: Colors.white,

@@ -35,20 +35,20 @@ class ProfileModel {
 class Data {
   String userId;
   String nama;
+  String fotoProfil;
   String jabatan;
   String photoIn;
   String clockIn;
-  String photoOut;
   String clockOut;
   String totalWork;
 
   Data({
     this.userId,
     this.nama,
+    this.fotoProfil,
     this.jabatan,
     this.photoIn,
     this.clockIn,
-    this.photoOut,
     this.clockOut,
     this.totalWork,
   });
@@ -56,10 +56,10 @@ class Data {
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     userId: json["user_id"],
     nama: json["nama"],
+    fotoProfil: json["foto_profil"],
     jabatan: json["jabatan"],
     photoIn: json["photo_in"],
     clockIn: json["clock_in"],
-    photoOut: json["photo_out"],
     clockOut: json["clock_out"],
     totalWork: json["total_work"],
   );
@@ -67,10 +67,10 @@ class Data {
   Map<String, dynamic> toJson() => {
     "user_id": userId,
     "nama": nama,
+    "foto_profil": fotoProfil,
     "jabatan": jabatan,
     "photo_in": photoIn,
     "clock_in": clockIn,
-    "photo_out": photoOut,
     "clock_out": clockOut,
     "total_work": totalWork,
   };
