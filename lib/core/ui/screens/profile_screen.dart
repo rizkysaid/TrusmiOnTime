@@ -170,8 +170,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: new BoxDecoration(
           gradient: new LinearGradient(
             colors: [
-              const Color(0xFF3366FF),
-              const Color(0xFF00CCFF)
+              const Color(0xFFFF1744),
+              const Color(0xFFF44336)
             ],
             begin: const FractionalOffset(0.0, 0.0),
             end: const FractionalOffset(1.0, 0.0),
@@ -195,7 +195,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.transparent,
               ),
               decoration: BoxDecoration(
-                color: Colors.blue
+                color: Colors.redAccent
               ),
             ),
             Card(
@@ -222,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: MediaQuery.of(context).size.width,
                     height: (MediaQuery.of(context).size.height / 2) +
                         (MediaQuery.of(context).size.height / 16),
-                    color: Colors.blue,
+                    color: Colors.red[900],
 //            child: SafeArea(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -317,7 +317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             Container(
                                 height: 30,
                                 child: VerticalDivider(
-                                  color: Colors.lightBlue,
+                                  color: Colors.redAccent,
                                   thickness: 3,
                                 )),
                             Column(children: <Widget>[
