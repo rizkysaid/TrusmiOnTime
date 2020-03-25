@@ -1,6 +1,6 @@
-# login_absen
+# Trusmi OnTime
 
-A new Flutter project.
+Aplikasi absensi karyawan Trusmi Group berbasis Android & IOS.
 
 ## Getting Started
 
