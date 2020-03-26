@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
@@ -213,7 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 backgroundColor: Colors.transparent,
               ),
               decoration: BoxDecoration(
-                color: Colors.redAccent
+                color: Colors.red[700]
               ),
             ),
             Card(

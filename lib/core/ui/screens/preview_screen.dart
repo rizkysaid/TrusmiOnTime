@@ -49,7 +49,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
     );
 
     return Container(
-      color: Colors.lightBlue,
+      color: Colors.red[700],
       child: SafeArea(
         child: Scaffold(
           appBar: AppBar(

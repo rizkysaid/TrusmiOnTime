@@ -20,7 +20,8 @@ class ApiServices{
         AuthModel responseRequest = AuthModel.fromJson(jsonDecode(response.body));
         return responseRequest;
       } else {
-        return null;
+        AuthModel responseRequest = AuthModel.fromJson(jsonDecode(response.body));
+        return responseRequest;
       }
 
     }catch(e){

@@ -57,6 +57,7 @@ class _LoginBodyState extends State<LoginBody> {
       ApiServices services = ApiServices();
       var response = await services.Login(usernameController.text, passwordController.text);
       String usrId = response.data[0].userId.toString();
+      String messageLogin = response.message.toString();
 
 
       if(response.status == true){
@@ -65,7 +66,7 @@ class _LoginBodyState extends State<LoginBody> {
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
       }else{
-        print("error ");
+        ToastUtils.show(messageLogin);
       }
 
     }else{
@@ -134,10 +135,13 @@ Widget _username(BuildContext context){
           },
           key: Key('username'),
           decoration: InputDecoration(
-            hintText: 'username', labelText: 'username'
+            hintText: 'username', labelText: 'username',
+            labelStyle: TextStyle(color: Colors.red[900]),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
+            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
           ),
           style: TextStyle(
-            fontSize: 20.0, color: Colors.black
+            fontSize: 20.0, color: Colors.black,
           ),
         ),
       );
@@ -153,7 +157,10 @@ Widget _username(BuildContext context){
         },
         key: Key('password'),
         decoration: InputDecoration(
-          hintText: 'password', labelText: 'password'
+          hintText: 'password', labelText: 'password',
+          labelStyle: TextStyle(color: Colors.red[900]),
+          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
+          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
         ),
         style: TextStyle(
           fontSize: 20.0, color: Colors.black

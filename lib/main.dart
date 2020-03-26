@@ -14,8 +14,8 @@ class MyApp extends StatelessWidget {
       title: "Login",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.lightBlue,
-        accentColor: Colors.lightBlueAccent
+        primaryColor: Colors.red[700],
+        accentColor: Colors.redAccent
       ),
 //      home: _cekLogin(),
       home: ProfileScreen(),
@@ -67,7 +67,7 @@ class __cekLoginState extends State<_cekLogin> {
     return Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: Colors.lightBlue,
+          color: Colors.red[700],
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
