@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -53,11 +52,12 @@ class _LoginBodyState extends State<LoginBody> {
     
     if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
 
-      ToastUtils.show("Check Login ...");
+//      ToastUtils.show("Check Login ...");
 
       ApiServices services = ApiServices();
       var response = await services.Login(usernameController.text, passwordController.text);
       String usrId = response.data[0].userId.toString();
+
 
       if(response.status == true){
         savePref(usernameController.text.toString(), usrId);
@@ -85,20 +85,23 @@ class _LoginBodyState extends State<LoginBody> {
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 4,
-          color: Colors.lightBlue,
+//          color: Colors.red,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/background_login.png'),
+              fit: BoxFit.cover
+            )
+          ),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Icon(Icons.alarm_on, size: 60, color: Colors.white),
-                SizedBox(height: 10),
-                Text(
-                  "Trusmi OnTime",
-                  style: TextStyle(
-                      fontSize: 35,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
+                Image(
+                  alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.width / 4,
+                    width: MediaQuery.of(context).size.width / 2,
+                    image: AssetImage("assets/logo_png_ontime.png")
                 )
               ],
             ),
@@ -168,7 +171,7 @@ Widget _username(BuildContext context){
         child: new Container(
           height: 50.0,
           decoration: new BoxDecoration(
-            color: Colors.blueAccent,
+            color: Colors.red[800],
             border: new Border.all(color: Colors.white, width: 2.0),
             borderRadius: new BorderRadius.circular(10.0),
           ),

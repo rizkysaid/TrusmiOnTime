@@ -30,7 +30,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   static bool statusIcon = true;
   static bool _visibleButton = true;
   static bool _statusTotalWork = false;
-  static Color _colorButton = Colors.blue;
+  static Color _colorButton = Colors.red[700];
   static Timer timer;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
@@ -39,6 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _timeString;
   String _hariTanggal;
+
+  bool _loading = true;
 
   @override
   void initState() {
@@ -71,7 +73,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       statusPhoto = false;
       statusIcon = true;
       imageUrl = "";
-      _colorButton = Colors.blue;
+      _colorButton = Colors.red[700];
       clockout = dataClockOut;
       clockin = dataClockIn;
       _statusTotalWork = false;
@@ -120,6 +122,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       clockin = pref.get('clock_in');
       imageUrl = pref.getString('imageUrl');
       _status = pref.getString('status');
+      _loading = false;
     });
 
     if (username != null) {
@@ -158,11 +161,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
 
+    if(_loading){
+      return CircularProgressIndicator();
+    }
+
     return Scaffold(
       appBar: AppBar(
         brightness: Brightness.dark,
-        title : Text("onTime",
-          style: TextStyle(color: Colors.white),
+//        title : Text("onTime",
+//          style: TextStyle(color: Colors.white),
+//        ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset('assets/logo_png_ontime.png',
+              fit: BoxFit.contain,
+              width: MediaQuery.of(context).size.width/4,
+              height: MediaQuery.of(context).size.height/14,
+            ),
+            Container(padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),)
+          ]
         ),
       iconTheme: new IconThemeData(color: Colors.white),
 //        backgroundColor: Colors.blue,
@@ -222,7 +240,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     width: MediaQuery.of(context).size.width,
                     height: (MediaQuery.of(context).size.height / 2) +
                         (MediaQuery.of(context).size.height / 16),
-                    color: Colors.red[900],
+//                    color: Colors.red[900],
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage('assets/background.png'),
+                        fit: BoxFit.cover
+                      )
+                    ),
+
 //            child: SafeArea(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -394,11 +419,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   logout() {
-    ToastUtils.show("waiting logout...");
     savePref();
 
     Future.delayed(const Duration(microseconds: 2000), () {
-      ToastUtils.show("Success logout...");
       Navigator.pushNamedAndRemoveUntil(
           context, "/login", (Route<dynamic> routes) => false);
     });
