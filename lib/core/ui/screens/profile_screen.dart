@@ -7,13 +7,14 @@ import 'package:login_absen/core/services/ApiService.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
+import 'package:connectivity/connectivity.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _ProfileScreenState extends State<ProfileScreen>{
 
   String username;
   String userID;
@@ -43,20 +44,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
+
     super.initState();
-    getPref();
-    _timeString = _formatDateTime(DateTime.now());
-    _hariTanggal = _formatHariTanggal(DateTime.now());
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) => _getTime());
+    if(this.mounted){
+      getPref();
+    }
+
   }
 
   @override
   void dispose(){
+    super.dispose();
     timer.cancel();
   }
 
 
   Future<void> getProfil(userID, date) async {
+
     ApiServices services = ApiServices();
     var response = await services.Profil(userID, date);
     String dataNama = response.data.nama.toString();
@@ -113,39 +117,77 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   getPref() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
 
-    setState(() {
-      username = pref.getString('username');
-      userID = pref.getString('userID');
-      clockin = pref.get('clock_in');
-      imageUrl = pref.getString('imageUrl');
-      _status = pref.getString('status');
-      _loading = false;
-    });
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
 
-    if (username != null) {
-      getProfil(userID, date);
-    } else {
       Navigator.pushNamedAndRemoveUntil(
-          context, "/login", (Route<dynamic> routes) => false);
+          context, "/no_connection", (Route<dynamic> routes) => false);
+
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+
+      SharedPreferences pref = await SharedPreferences.getInstance();
+
+      _timeString = _formatDateTime(DateTime.now());
+      _hariTanggal = _formatHariTanggal(DateTime.now());
+      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        final DateTime now = DateTime.now();
+        final DateTime HTnow = DateTime.now();
+        final String formattedDateTime = _formatDateTime(now);
+        final String formattedHariTanggal = _formatHariTanggal(HTnow);
+//        _timeString = formattedDateTime;
+        _hariTanggal = formattedHariTanggal;
+        if(this.mounted){
+          setState(() {
+            _timeString = formattedDateTime;
+//          _hariTanggal = formattedHariTanggal;
+          });
+        }
+
+      });
+
+      setState(() {
+        username = pref.getString('username');
+        userID = pref.getString('userID');
+        clockin = pref.get('clock_in');
+        imageUrl = pref.getString('imageUrl');
+        _status = pref.getString('status');
+        _loading = false;
+      });
+
+      if (username != null) {
+        getProfil(userID, date);
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic> routes) => false);
+      }
+
+      if(clockin == null){
+        clockin = "--:--";
+      }
+
+      if(clockout == null){
+        clockout = "--:--";
+      }
+
+      if(imageUrl == "-"){
+        imageUrl = "";
+      }
+
+      if(_status == null){
+        _status = "checkin";
+      }
+
+      print("_status : "+_status);
+
+    }else{
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/no_connection", (Route<dynamic> routes) => false);
     }
 
-    if(clockin == null){
-      clockin = "--:--";
-    }
 
-    if(clockout == null){
-      clockout = "--:--";
-    }
-
-    if(imageUrl == "-"){
-      imageUrl = "";
-    }
-
-    if(_status == null){
-      _status = "checkin";
-    }
 //    else if (_status == "checkout"){
 //      _status = "checkin";
 //    }else if (_status == "checkin"){
@@ -153,16 +195,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //    }
 
 
-    print("_status : "+_status);
+
 
   }
 
   @override
   Widget build(BuildContext context) {
 
-    if(_loading){
-      return CircularProgressIndicator();
-    }
+//    if(_loading){
+//      return CircularProgressIndicator();
+//    }
 
     return Scaffold(
       appBar: AppBar(
@@ -399,16 +441,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  void _getTime(){
-    final DateTime now = DateTime.now();
-    final DateTime HTnow = DateTime.now();
-    final String formattedDateTime = _formatDateTime(now);
-    final String formattedHariTanggal = _formatHariTanggal(HTnow);
-    setState(() {
-      _timeString = formattedDateTime;
-      _hariTanggal = formattedHariTanggal;
-    });
-  }
+//  void _getTime(){
+//    final DateTime now = DateTime.now();
+//    final DateTime HTnow = DateTime.now();
+//    final String formattedDateTime = _formatDateTime(now);
+//    final String formattedHariTanggal = _formatHariTanggal(HTnow);
+//    setState(() {
+//      _timeString = formattedDateTime;
+//      _hariTanggal = formattedHariTanggal;
+//    });
+//  }
 
   String _formatDateTime(DateTime dateTime){
     return DateFormat('HH:mm').format(dateTime);

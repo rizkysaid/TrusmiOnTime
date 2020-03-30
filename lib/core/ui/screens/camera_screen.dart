@@ -38,6 +38,8 @@ class _CameraScreenState extends State<CameraScreen> {
     });
   }
 
+
+
   Future _initCameraController(CameraDescription cameraDescription) async {
     if (controller != null) {
       await controller.dispose();
@@ -221,5 +223,12 @@ class _CameraScreenState extends State<CameraScreen> {
     selectedCameraIndex < cameras.length - 1 ? selectedCameraIndex + 1 : 0;
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
     _initCameraController(selectedCamera);
+  }
+
+  @override
+  void dispose() {
+    // Dispose of the controller when the widget is disposed.
+    controller.dispose();
+    super.dispose();
   }
 }
