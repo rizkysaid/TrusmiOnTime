@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
@@ -53,6 +52,24 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
     checkConnection();
 
+    _timeString = _formatDateTime(DateTime.now());
+    _hariTanggal = _formatHariTanggal(DateTime.now());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      final DateTime now = DateTime.now();
+      final DateTime HTnow = DateTime.now();
+      final String formattedDateTime = _formatDateTime(now);
+      final String formattedHariTanggal = _formatHariTanggal(HTnow);
+//        _timeString = formattedDateTime;
+      _hariTanggal = formattedHariTanggal;
+      if(this.mounted){
+        setState(() {
+          _timeString = formattedDateTime;
+//          _hariTanggal = formattedHariTanggal;
+        });
+      }
+
+    });
+
   }
 
   @override
@@ -65,16 +82,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
-//      ToastUtils.show("No office Wifi connection");
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
       });
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//      });
+
     }
   }
 
@@ -176,35 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   getPref() async {
 
-//    var connectivityResult = await (Connectivity().checkConnectivity());
-//    if (connectivityResult == ConnectivityResult.mobile) {
-//      // I am connected to a mobile network.
-//
-//      Navigator.pushNamedAndRemoveUntil(
-//          context, "/no_connection", (Route<dynamic> routes) => false);
-//
-//    } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
-
       SharedPreferences pref = await SharedPreferences.getInstance();
-
-      _timeString = _formatDateTime(DateTime.now());
-      _hariTanggal = _formatHariTanggal(DateTime.now());
-      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-        final DateTime now = DateTime.now();
-        final DateTime HTnow = DateTime.now();
-        final String formattedDateTime = _formatDateTime(now);
-        final String formattedHariTanggal = _formatHariTanggal(HTnow);
-//        _timeString = formattedDateTime;
-        _hariTanggal = formattedHariTanggal;
-        if(this.mounted){
-          setState(() {
-            _timeString = formattedDateTime;
-//          _hariTanggal = formattedHariTanggal;
-          });
-        }
-
-      });
 
       setState(() {
         username = pref.getString('username');
@@ -239,294 +225,275 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       print("_status : "+_status);
 
-//    }else{
-//      Navigator.pushNamedAndRemoveUntil(
-//          context, "/no_connection", (Route<dynamic> routes) => false);
-//    }
-
-
-//    else if (_status == "checkout"){
-//      _status = "checkin";
-//    }else if (_status == "checkin"){
-//      _status = "checkout";
-//    }
-
-
-
-
   }
 
   @override
   Widget build(BuildContext context) {
 
-//    if(_loading){
-//      return CircularProgressIndicator();
-//    }
-
-    return Scaffold(
-      appBar: AppBar(
-        brightness: Brightness.dark,
-//        title : Text("onTime",
-//          style: TextStyle(color: Colors.white),
-//        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/logo_png_ontime.png',
-              fit: BoxFit.contain,
-              width: MediaQuery.of(context).size.width/4,
-              height: MediaQuery.of(context).size.height/14,
-            ),
-            Container(padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),)
-          ]
-        ),
-      iconTheme: new IconThemeData(color: Colors.white),
+    return SmartRefresher(
+      enablePullDown: true,
+      enablePullUp: false,
+      header: WaterDropMaterialHeader(),
+      footer: CustomFooter(
+        builder: (BuildContext context,LoadStatus mode){
+          Widget body ;
+          if(mode==LoadStatus.idle){
+            body =  Text("pull up load");
+          }
+          else if(mode==LoadStatus.loading){
+            body =  CupertinoActivityIndicator();
+          }
+          else if(mode == LoadStatus.failed){
+            body = Text("Load Failed!Click retry!");
+          }
+          else if(mode == LoadStatus.canLoading){
+            body = Text("release to load more");
+          }
+          else{
+            body = Text("No more Data");
+          }
+          return Container(
+            height: 55.0,
+            child: Center(child:body),
+          );
+        },
+      ),
+      controller: _refreshController,
+      onRefresh: _onRefresh,
+      onLoading: _onLoading,
+      child: Scaffold(
+        appBar: AppBar(
+          brightness: Brightness.dark,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/logo_png_ontime.png',
+                fit: BoxFit.contain,
+                width: MediaQuery.of(context).size.width/4,
+                height: MediaQuery.of(context).size.height/14,
+              ),
+              Container(padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),)
+            ]
+          ),
+        iconTheme: new IconThemeData(color: Colors.white),
 //        backgroundColor: Colors.blue,
-      flexibleSpace: Container(
-        decoration: new BoxDecoration(
-          gradient: new LinearGradient(
-            colors: [
-              const Color(0xFFFF1744),
-              const Color(0xFFF44336)
-            ],
-            begin: const FractionalOffset(0.0, 0.0),
-            end: const FractionalOffset(1.0, 0.0),
-            stops: [0.0, 1.0],
-            tileMode: TileMode.clamp
-          )
+        flexibleSpace: Container(
+          decoration: new BoxDecoration(
+            gradient: new LinearGradient(
+              colors: [
+                const Color(0xFFFF1744),
+                const Color(0xFFF44336)
+              ],
+              begin: const FractionalOffset(0.0, 0.0),
+              end: const FractionalOffset(1.0, 0.0),
+              stops: [0.0, 1.0],
+              tileMode: TileMode.clamp
+            )
+          ),
         ),
-      ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: <Widget>[
-            DrawerHeader(
-              child: new CircleAvatar(
-                radius: 20.0,
-                child: ClipOval(
-                  child: Image.network(photo_profile.toString()),
-                ),
-//                backgroundImage: NetworkImage(photo_profile.toString()),
-                backgroundColor: Colors.transparent,
-              ),
-              decoration: BoxDecoration(
-                color: Colors.red[700]
-              ),
-            ),
-            Card(
-              child: ListTile(
-                leading: Icon(Icons.exit_to_app),
-                title: Text('Log Out'),
-                onTap: () => logout()
-              ),
-            ),
-          ],
         ),
-      ),
-      body: SmartRefresher(
-        enablePullDown: true,
-        enablePullUp: true,
-        header: WaterDropHeader(),
-        footer: CustomFooter(
-          builder: (BuildContext context,LoadStatus mode){
-            Widget body ;
-            if(mode==LoadStatus.idle){
-              body =  Text("pull up load");
-            }
-            else if(mode==LoadStatus.loading){
-              body =  CupertinoActivityIndicator();
-            }
-            else if(mode == LoadStatus.failed){
-              body = Text("Load Failed!Click retry!");
-            }
-            else if(mode == LoadStatus.canLoading){
-              body = Text("release to load more");
-            }
-            else{
-              body = Text("No more Data");
-            }
-            return Container(
-              height: 55.0,
-              child: Center(child:body),
-            );
-          },
-        ),
-        controller: _refreshController,
-        onRefresh: _onRefresh,
-        onLoading: _onLoading,
-        child: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints){
-            return SingleChildScrollView(
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  minHeight: viewportConstraints.maxHeight
-                ),
-                child: Column(
-                  children: <Widget>[
-                    // bagian header
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: (MediaQuery.of(context).size.height / 2) +
-                          (MediaQuery.of(context).size.height / 16),
-//                    color: Colors.red[900],
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/background.png'),
-                          fit: BoxFit.cover
-                        )
+        drawer: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: <Widget>[
+              DrawerHeader(
+                child: new CircleAvatar(
+                  radius: 20.0,
+                    child: ClipOval(
+                      child: Image.network(photo_profile.toString(),
+                        width: 125,
+                        height: 125,
+                        fit: BoxFit.cover
                       ),
+                    ),
+                  backgroundColor: Colors.transparent,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.red[700]
+                ),
+              ),
+              Card(
+                child: ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: Text('Log Out'),
+                  onTap: () => logout()
+                ),
+              ),
+            ],
+          ),
+        ),
+        body: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints viewportConstraints){
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: viewportConstraints.maxHeight
+                  ),
+                  child: Column(
+                    children: <Widget>[
+                      // bagian header
+                      Container(
+                        width: MediaQuery.of(context).size.width,
+                        height: (MediaQuery.of(context).size.height / 2) +
+                            (MediaQuery.of(context).size.height / 16),
+//                    color: Colors.red[900],
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: AssetImage('assets/background.png'),
+                            fit: BoxFit.cover
+                          )
+                        ),
 
 //            child: SafeArea(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          SizedBox(height: 20),
-                          Container(
-                            width: 300.0,
-                            height: 300.0,
-                            decoration: new BoxDecoration(
-                              color: Colors.lightBlue[50].withOpacity(0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Column(
-                              children: <Widget>[
-                                SizedBox(height: 20),
-                                Visibility(
-                                  visible: statusPhoto,
-                                  child: Container(
-                                    width: 160.0,
-                                    height: 160.0,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[300],
-                                      shape: BoxShape.circle,
-                                      image: new DecorationImage(
-                                        fit: BoxFit.cover,
-                                        image: new NetworkImage(imageUrl.toString()),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            SizedBox(height: 20),
+                            Container(
+                              width: 300.0,
+                              height: 300.0,
+                              decoration: new BoxDecoration(
+                                color: Colors.lightBlue[50].withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Column(
+                                children: <Widget>[
+                                  SizedBox(height: 20),
+                                  Visibility(
+                                    visible: statusPhoto,
+                                    child: Container(
+                                      width: 160.0,
+                                      height: 160.0,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        shape: BoxShape.circle,
+                                        image: new DecorationImage(
+                                          fit: BoxFit.cover,
+                                          image: new NetworkImage(imageUrl.toString()),
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Visibility(
-                                  visible: statusIcon,
-                                  child: Container(
-                                    width: 160.0,
-                                    height: 160.0,
-                                    decoration: new BoxDecoration(
-                                      color: Colors.grey[300],
-                                      shape: BoxShape.circle,
-                                    ),
-                                    child: Icon(
-                                      Icons.person_outline,
-                                      color: Colors.white,
-                                      size: 120.0,
+                                  Visibility(
+                                    visible: statusIcon,
+                                    child: Container(
+                                      width: 160.0,
+                                      height: 160.0,
+                                      decoration: new BoxDecoration(
+                                        color: Colors.grey[300],
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Icon(
+                                        Icons.person_outline,
+                                        color: Colors.white,
+                                        size: 120.0,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                SizedBox(height: 10),
-                                Text(nama.toString(),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold)),
-                                Text(jabatan.toString(),
-                                    style: TextStyle(color: Colors.white)),
-                                SizedBox(height: 20),
-                                Text(_timeString.toString(),
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 25,
-                                        fontWeight: FontWeight.bold)),
-                                Text(_hariTanggal.toString(),
-                                    style: TextStyle(color: Colors.white, fontSize: 12))
+                                  SizedBox(height: 10),
+                                  Text(nama.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold)),
+                                  Text(jabatan.toString(),
+                                      style: TextStyle(color: Colors.white)),
+                                  SizedBox(height: 20),
+                                  Text(_timeString.toString(),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 25,
+                                          fontWeight: FontWeight.bold)),
+                                  Text(_hariTanggal.toString(),
+                                      style: TextStyle(color: Colors.white, fontSize: 12))
+                                ],
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Text(
+                              message.toString(),
+                              style: TextStyle(
+                                  color: Colors.white
+                              ),                )
+                          ],
+                        ),
+//            ),
+                      ),
+
+                      //bagian field
+                      Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20, top: 30),
+                        child: Column(
+                          children: <Widget>[
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: <Widget>[
+                                Column(children: <Widget>[
+                                  Text("Start Time", style: TextStyle(fontSize: 18)),
+                                  Text(clockin.toString(),
+                                      style: TextStyle(
+                                          fontSize: 18, fontWeight: FontWeight.bold)),
+                                ]),
+                                Container(
+                                    height: 30,
+                                    child: VerticalDivider(
+                                      color: Colors.redAccent,
+                                      thickness: 3,
+                                    )),
+                                Column(children: <Widget>[
+                                  Text("End Time", style: TextStyle(fontSize: 18)),
+                                  Text(clockout.toString(),
+                                      style: TextStyle(
+                                          fontSize: 18, fontWeight: FontWeight.bold)),
+                                ]),
                               ],
                             ),
-                          ),
-                          SizedBox(height: 20),
-                          Text(
-                            message.toString(),
-                            style: TextStyle(
-                                color: Colors.white
-                            ),                )
-                        ],
-                      ),
-//            ),
-                    ),
-
-                    //bagian field
-                    Padding(
-                      padding: EdgeInsets.only(left: 20, right: 20, top: 30),
-                      child: Column(
-                        children: <Widget>[
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              Column(children: <Widget>[
-                                Text("Start Time", style: TextStyle(fontSize: 18)),
-                                Text(clockin.toString(),
+                            SizedBox(height: 25),
+                            Visibility(
+                              visible: _statusTotalWork,
+                              child: Column(children: <Widget>[
+                                Text("Total Work", style: TextStyle(fontSize: 18)),
+                                Text(total_work.toString(),
                                     style: TextStyle(
                                         fontSize: 18, fontWeight: FontWeight.bold)),
                               ]),
-                              Container(
-                                  height: 30,
-                                  child: VerticalDivider(
-                                    color: Colors.redAccent,
-                                    thickness: 3,
-                                  )),
-                              Column(children: <Widget>[
-                                Text("End Time", style: TextStyle(fontSize: 18)),
-                                Text(clockout.toString(),
-                                    style: TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold)),
-                              ]),
-                            ],
-                          ),
-                          SizedBox(height: 25),
-                          Visibility(
-                            visible: _statusTotalWork,
-                            child: Column(children: <Widget>[
-                              Text("Total Work", style: TextStyle(fontSize: 18)),
-                              Text(total_work.toString(),
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
-                            ]),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                            ),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            );
-          }
+              );
+            }
+          ),
+        bottomNavigationBar:
+        BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          child: Container(height: 50.0),
         ),
-      ),
-      bottomNavigationBar:
-      BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        child: Container(height: 50.0),
-      ),
-      floatingActionButton:
-      Visibility(
-        visible: _visibleButton,
-        child: Container(
-          height: 80,
-          width: 80,
-          child: FloatingActionButton(
-            onPressed: () => {
-            Navigator.pushNamed(context, "/camera",
-                  arguments: ScreenArguments(userID, _status)
-              )
-            },
-            tooltip: _toolTip,
-            backgroundColor: _colorButton,
-            child: Icon(Icons.alarm_on, color: Colors.white, size: 40),
-          )
+        floatingActionButton:
+        Visibility(
+          visible: _visibleButton,
+          child: Container(
+            height: 80,
+            width: 80,
+            child: FloatingActionButton(
+              onPressed: () => {
+              Navigator.pushNamed(context, "/camera",
+                    arguments: ScreenArguments(userID, _status)
+                )
+              },
+              tooltip: _toolTip,
+              backgroundColor: _colorButton,
+              child: Icon(Icons.alarm_on, color: Colors.white, size: 40),
+            )
+          ),
         ),
-      ),
 
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      ),
     );
   }
 

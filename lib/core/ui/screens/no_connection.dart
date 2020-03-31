@@ -29,6 +29,12 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     checkConnection();
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+
+  }
+
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
@@ -68,8 +74,8 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   Widget build(BuildContext context) {
     return SmartRefresher(
       enablePullDown: true,
-      enablePullUp: true,
-      header: WaterDropHeader(),
+      enablePullUp: false,
+      header: WaterDropMaterialHeader(),
       footer: CustomFooter(
         builder: (BuildContext context,LoadStatus mode){
           Widget body ;

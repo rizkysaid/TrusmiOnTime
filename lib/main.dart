@@ -69,23 +69,23 @@ class __cekLoginState extends State<_cekLogin> {
     return Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height,
-          color: Colors.red[700],
+          decoration: BoxDecoration(
+              image: DecorationImage(
+                  image: AssetImage('assets/background.png'),
+                  fit: BoxFit.cover
+              )
+          ),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
 
-                Icon(Icons.timer,size: 60,color: Colors.white,),
-                SizedBox(height: 10,),
-
-                Text(
-                  "onTime",
-                  style: TextStyle(
-                    fontSize: 35,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold
-                  ),
+                Image(
+                    alignment: Alignment.center,
+                    height: MediaQuery.of(context).size.height / 4,
+                    width: MediaQuery.of(context).size.width / 2,
+                    image: AssetImage("assets/logo_png_ontime.png")
                 )
               ],
             ),
