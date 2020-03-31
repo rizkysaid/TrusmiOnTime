@@ -4,6 +4,7 @@ import 'package:login_absen/core/ui/screens/no_connection.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
+import 'dart:async';
 
 void main() => runApp(MyApp());
 
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.redAccent
       ),
 //      home: _cekLogin(),
-      home: ProfileScreen(),
+      home: _cekLogin(),
       routes: {
         "/login": (context) => LoginScreen(),
         // "/register": (context) => LoginScreen(),

@@ -1,13 +1,15 @@
 import 'dart:async';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -40,15 +42,16 @@ class _ProfileScreenState extends State<ProfileScreen>{
   String _timeString;
   String _hariTanggal;
 
-  bool _loading = true;
-
   @override
   void initState() {
 
     super.initState();
     if(this.mounted){
       getPref();
+      checkConnection();
     }
+
+    checkConnection();
 
   }
 
@@ -58,74 +61,129 @@ class _ProfileScreenState extends State<ProfileScreen>{
     timer.cancel();
   }
 
+  Future<void>checkConnection() async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
+//      ToastUtils.show("No office Wifi connection");
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+      });
+
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//      });
+    }
+  }
+
+  RefreshController _refreshController = RefreshController(initialRefresh: false);
+
+
+  void _onRefresh() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use refreshFailed()
+    _refreshController.refreshCompleted();
+    checkConnection();
+  }
+
+  void _onLoading() async{
+    // monitor network fetch
+    await Future.delayed(Duration(milliseconds: 1000));
+    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
+    _refreshController.loadComplete();
+  }
 
   Future<void> getProfil(userID, date) async {
 
-    ApiServices services = ApiServices();
-    var response = await services.Profil(userID, date);
-    String dataNama = response.data.nama.toString();
-    String dataJabatan = response.data.jabatan.toString();
-    String dataClockIn = response.data.clockIn.toString();
-    String dataClockOut = response.data.clockOut.toString();
-    String dataImageUrl = response.data.photoIn.toString();
-    message = response.message.toString();
-    total_work = response.data.totalWork.toString();
-    photo_profile = response.data.fotoProfil.toString();
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
+      print('Mobile');
+//      Navigator.push(
+//        context,
+//        MaterialPageRoute(builder: (context) => NoConnection()),
+//      );
 
-    if (dataClockIn == "--:--"){
-      statusPhoto = false;
-      statusIcon = true;
-      imageUrl = "";
-      _colorButton = Colors.red[700];
-      clockout = dataClockOut;
-      clockin = dataClockIn;
-      _statusTotalWork = false;
-      _visibleButton = true;
-      _status = "checkin";
-    }else if (dataClockOut == "--:--"){
-      clockin = dataClockIn;
-      clockout = dataClockOut;
-      statusPhoto = true;
-      statusIcon = false;
-      imageUrl = dataImageUrl;
-      _colorButton = Colors.deepOrange;
-      _statusTotalWork = false;
-      _visibleButton = true;
-      _status = "checkout";
-    }else{
-      statusPhoto = true;
-      statusIcon = false;
-      clockin = dataClockIn;
-      clockout = dataClockOut;
-      imageUrl = dataImageUrl;
-      _visibleButton = false;
-      _statusTotalWork = true;
-      _status = null;
-    }
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+      });
 
-    try {
-      if (response.status == true) {
-        setState(() {
-          nama = dataNama;
-          jabatan = dataJabatan;
-        });
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+      print('Wifi Connected');
+
+      ApiServices services = ApiServices();
+      var response = await services.Profil(userID, date);
+      String dataNama = response.data.nama.toString();
+      String dataJabatan = response.data.jabatan.toString();
+      String dataClockIn = response.data.clockIn.toString();
+      String dataClockOut = response.data.clockOut.toString();
+      String dataImageUrl = response.data.photoIn.toString();
+      message = response.message.toString();
+      total_work = response.data.totalWork.toString();
+      photo_profile = response.data.fotoProfil.toString();
+
+      if (dataClockIn == "--:--"){
+        statusPhoto = false;
+        statusIcon = true;
+        imageUrl = "";
+        _colorButton = Colors.red[700];
+        clockout = dataClockOut;
+        clockin = dataClockIn;
+        _statusTotalWork = false;
+        _visibleButton = true;
+        _status = "checkin";
+      }else if (dataClockOut == "--:--"){
+        clockin = dataClockIn;
+        clockout = dataClockOut;
+        statusPhoto = true;
+        statusIcon = false;
+        imageUrl = dataImageUrl;
+        _colorButton = Colors.deepOrange;
+        _statusTotalWork = false;
+        _visibleButton = true;
+        _status = "checkout";
+      }else{
+        statusPhoto = true;
+        statusIcon = false;
+        clockin = dataClockIn;
+        clockout = dataClockOut;
+        imageUrl = dataImageUrl;
+        _visibleButton = false;
+        _statusTotalWork = true;
+        _status = null;
       }
-    } catch (err) {
-      print("Cannot read");
+
+      try {
+        if (response.status == true) {
+          setState(() {
+            nama = dataNama;
+            jabatan = dataJabatan;
+          });
+        }
+      } catch (err) {
+        print("Cannot read");
+      }
+
+
     }
 
   }
 
   getPref() async {
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
-
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/no_connection", (Route<dynamic> routes) => false);
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
+//    var connectivityResult = await (Connectivity().checkConnectivity());
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//      // I am connected to a mobile network.
+//
+//      Navigator.pushNamedAndRemoveUntil(
+//          context, "/no_connection", (Route<dynamic> routes) => false);
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
 
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -154,7 +212,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
         clockin = pref.get('clock_in');
         imageUrl = pref.getString('imageUrl');
         _status = pref.getString('status');
-        _loading = false;
       });
 
       if (username != null) {
@@ -182,10 +239,10 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       print("_status : "+_status);
 
-    }else{
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/no_connection", (Route<dynamic> routes) => false);
-    }
+//    }else{
+//      Navigator.pushNamedAndRemoveUntil(
+//          context, "/no_connection", (Route<dynamic> routes) => false);
+//    }
 
 
 //    else if (_status == "checkout"){
@@ -267,151 +324,183 @@ class _ProfileScreenState extends State<ProfileScreen>{
           ],
         ),
       ),
-      body: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints){
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.maxHeight
-              ),
-              child: Column(
-                children: <Widget>[
-                  // bagian header
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    height: (MediaQuery.of(context).size.height / 2) +
-                        (MediaQuery.of(context).size.height / 16),
+      body: SmartRefresher(
+        enablePullDown: true,
+        enablePullUp: true,
+        header: WaterDropHeader(),
+        footer: CustomFooter(
+          builder: (BuildContext context,LoadStatus mode){
+            Widget body ;
+            if(mode==LoadStatus.idle){
+              body =  Text("pull up load");
+            }
+            else if(mode==LoadStatus.loading){
+              body =  CupertinoActivityIndicator();
+            }
+            else if(mode == LoadStatus.failed){
+              body = Text("Load Failed!Click retry!");
+            }
+            else if(mode == LoadStatus.canLoading){
+              body = Text("release to load more");
+            }
+            else{
+              body = Text("No more Data");
+            }
+            return Container(
+              height: 55.0,
+              child: Center(child:body),
+            );
+          },
+        ),
+        controller: _refreshController,
+        onRefresh: _onRefresh,
+        onLoading: _onLoading,
+        child: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints){
+            return SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: viewportConstraints.maxHeight
+                ),
+                child: Column(
+                  children: <Widget>[
+                    // bagian header
+                    Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: (MediaQuery.of(context).size.height / 2) +
+                          (MediaQuery.of(context).size.height / 16),
 //                    color: Colors.red[900],
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/background.png'),
-                        fit: BoxFit.cover
-                      )
-                    ),
+                      decoration: BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/background.png'),
+                          fit: BoxFit.cover
+                        )
+                      ),
 
 //            child: SafeArea(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        SizedBox(height: 20),
-                        Container(
-                          width: 300.0,
-                          height: 300.0,
-                          decoration: new BoxDecoration(
-                            color: Colors.lightBlue[50].withOpacity(0.2),
-                            shape: BoxShape.circle,
-                          ),
-                          child: Column(
-                            children: <Widget>[
-                              SizedBox(height: 20),
-                              Visibility(
-                                visible: statusPhoto,
-                                child: Container(
-                                  width: 160.0,
-                                  height: 160.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    shape: BoxShape.circle,
-                                    image: new DecorationImage(
-                                      fit: BoxFit.cover,
-                                      image: new NetworkImage(imageUrl.toString()),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          SizedBox(height: 20),
+                          Container(
+                            width: 300.0,
+                            height: 300.0,
+                            decoration: new BoxDecoration(
+                              color: Colors.lightBlue[50].withOpacity(0.2),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                SizedBox(height: 20),
+                                Visibility(
+                                  visible: statusPhoto,
+                                  child: Container(
+                                    width: 160.0,
+                                    height: 160.0,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey[300],
+                                      shape: BoxShape.circle,
+                                      image: new DecorationImage(
+                                        fit: BoxFit.cover,
+                                        image: new NetworkImage(imageUrl.toString()),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              Visibility(
-                                visible: statusIcon,
-                                child: Container(
-                                  width: 160.0,
-                                  height: 160.0,
-                                  decoration: new BoxDecoration(
-                                    color: Colors.grey[300],
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.person_outline,
-                                    color: Colors.white,
-                                    size: 120.0,
+                                Visibility(
+                                  visible: statusIcon,
+                                  child: Container(
+                                    width: 160.0,
+                                    height: 160.0,
+                                    decoration: new BoxDecoration(
+                                      color: Colors.grey[300],
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.person_outline,
+                                      color: Colors.white,
+                                      size: 120.0,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(height: 10),
-                              Text(nama.toString(),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
-                              Text(jabatan.toString(),
-                                  style: TextStyle(color: Colors.white)),
-                              SizedBox(height: 20),
-                              Text(_timeString.toString(),
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 25,
-                                      fontWeight: FontWeight.bold)),
-                              Text(_hariTanggal.toString(),
-                                  style: TextStyle(color: Colors.white, fontSize: 12))
+                                SizedBox(height: 10),
+                                Text(nama.toString(),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold)),
+                                Text(jabatan.toString(),
+                                    style: TextStyle(color: Colors.white)),
+                                SizedBox(height: 20),
+                                Text(_timeString.toString(),
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 25,
+                                        fontWeight: FontWeight.bold)),
+                                Text(_hariTanggal.toString(),
+                                    style: TextStyle(color: Colors.white, fontSize: 12))
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Text(
+                            message.toString(),
+                            style: TextStyle(
+                                color: Colors.white
+                            ),                )
+                        ],
+                      ),
+//            ),
+                    ),
+
+                    //bagian field
+                    Padding(
+                      padding: EdgeInsets.only(left: 20, right: 20, top: 30),
+                      child: Column(
+                        children: <Widget>[
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: <Widget>[
+                              Column(children: <Widget>[
+                                Text("Start Time", style: TextStyle(fontSize: 18)),
+                                Text(clockin.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18, fontWeight: FontWeight.bold)),
+                              ]),
+                              Container(
+                                  height: 30,
+                                  child: VerticalDivider(
+                                    color: Colors.redAccent,
+                                    thickness: 3,
+                                  )),
+                              Column(children: <Widget>[
+                                Text("End Time", style: TextStyle(fontSize: 18)),
+                                Text(clockout.toString(),
+                                    style: TextStyle(
+                                        fontSize: 18, fontWeight: FontWeight.bold)),
+                              ]),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          message.toString(),
-                          style: TextStyle(
-                              color: Colors.white
-                          ),                )
-                      ],
-                    ),
-//            ),
-                  ),
-
-                  //bagian field
-                  Padding(
-                    padding: EdgeInsets.only(left: 20, right: 20, top: 30),
-                    child: Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Column(children: <Widget>[
-                              Text("Start Time", style: TextStyle(fontSize: 18)),
-                              Text(clockin.toString(),
+                          SizedBox(height: 25),
+                          Visibility(
+                            visible: _statusTotalWork,
+                            child: Column(children: <Widget>[
+                              Text("Total Work", style: TextStyle(fontSize: 18)),
+                              Text(total_work.toString(),
                                   style: TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold)),
                             ]),
-                            Container(
-                                height: 30,
-                                child: VerticalDivider(
-                                  color: Colors.redAccent,
-                                  thickness: 3,
-                                )),
-                            Column(children: <Widget>[
-                              Text("End Time", style: TextStyle(fontSize: 18)),
-                              Text(clockout.toString(),
-                                  style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold)),
-                            ]),
-                          ],
-                        ),
-                        SizedBox(height: 25),
-                        Visibility(
-                          visible: _statusTotalWork,
-                          child: Column(children: <Widget>[
-                            Text("Total Work", style: TextStyle(fontSize: 18)),
-                            Text(total_work.toString(),
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                          ]),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-          );
-        }
+            );
+          }
+        ),
       ),
       bottomNavigationBar:
       BottomAppBar(
@@ -477,3 +566,5 @@ class _ProfileScreenState extends State<ProfileScreen>{
     });
   }
 }
+
+
