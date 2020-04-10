@@ -45,37 +45,35 @@ class _ProfileScreenState extends State<ProfileScreen>{
   void initState() {
 
     super.initState();
-    if(this.mounted){
-      getPref();
-      checkConnection();
-    }
 
     checkConnection();
 
-    _timeString = _formatDateTime(DateTime.now());
-    _hariTanggal = _formatHariTanggal(DateTime.now());
-    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      final DateTime now = DateTime.now();
-      final DateTime HTnow = DateTime.now();
-      final String formattedDateTime = _formatDateTime(now);
-      final String formattedHariTanggal = _formatHariTanggal(HTnow);
-//        _timeString = formattedDateTime;
-      _hariTanggal = formattedHariTanggal;
-      if(this.mounted){
-        setState(() {
-          _timeString = formattedDateTime;
-//          _hariTanggal = formattedHariTanggal;
-        });
-      }
+      getPref();
 
-    });
+      _timeString = _formatDateTime(DateTime.now());
+      _hariTanggal = _formatHariTanggal(DateTime.now());
+      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+        final DateTime now = DateTime.now();
+        final DateTime HTnow = DateTime.now();
+        final String formattedDateTime = _formatDateTime(now);
+        final String formattedHariTanggal = _formatHariTanggal(HTnow);
+
+        _hariTanggal = formattedHariTanggal;
+        _timeString = formattedDateTime;
+        if(this.mounted) {
+          setState(() {
+            _timeString = formattedDateTime;
+          });
+        }
+      });
+
 
   }
 
   @override
   void dispose(){
     super.dispose();
-    timer.cancel();
+//    timer.cancel();
   }
 
   Future<void>checkConnection() async{
@@ -497,19 +495,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
     );
   }
 
-//  void _getTime(){
-//    final DateTime now = DateTime.now();
-//    final DateTime HTnow = DateTime.now();
-//    final String formattedDateTime = _formatDateTime(now);
-//    final String formattedHariTanggal = _formatHariTanggal(HTnow);
-//    setState(() {
-//      _timeString = formattedDateTime;
-//      _hariTanggal = formattedHariTanggal;
-//    });
-//  }
-
   String _formatDateTime(DateTime dateTime){
-    return DateFormat('HH:mm').format(dateTime);
+    return DateFormat('HH:mm:ss').format(dateTime);
   }
   String _formatHariTanggal(DateTime dateTime){
     return DateFormat('EEE, dd MMM yyyy').format(dateTime);

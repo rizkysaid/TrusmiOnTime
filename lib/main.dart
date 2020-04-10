@@ -1,3 +1,4 @@
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
@@ -18,8 +19,8 @@ class MyApp extends StatelessWidget {
         primaryColor: Colors.red[700],
         accentColor: Colors.redAccent
       ),
-//      home: _cekLogin(),
       home: _cekLogin(),
+//      home: LoginScreen(),
       routes: {
         "/login": (context) => LoginScreen(),
         // "/register": (context) => LoginScreen(),
@@ -39,9 +40,15 @@ class _cekLogin extends StatefulWidget {
 class __cekLoginState extends State<_cekLogin> {
 
   @override
-  void initState() { 
+  void initState() {
     super.initState();
-    getPref();
+//    getPref();
+    checkConnection();
+  }
+
+  @override
+  void dispose(){
+    super.dispose();
   }
 
   getPref()async{
@@ -49,15 +56,30 @@ class __cekLoginState extends State<_cekLogin> {
     final username = pref.getString('username');
 
     if(username != null){
-        Future.delayed(const Duration(microseconds: 2000),(){
+//        Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-        });
+//        });
     }else{
-        Future.delayed(const Duration(microseconds: 2000),(){
+//        Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
-        });
+//        });
     }
   }
+
+  Future<void>checkConnection() async{
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      // I am connected to a mobile network.
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+      });
+
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      // I am connected to a wifi network.
+      getPref();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

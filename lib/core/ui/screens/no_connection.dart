@@ -25,7 +25,6 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   @override
   initState() {
     super.initState();
-
     checkConnection();
   }
 
@@ -45,6 +44,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
       Future.delayed(const Duration(microseconds: 2000),(){
+        ToastUtils.show("Connected");
         Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
       });
     }
