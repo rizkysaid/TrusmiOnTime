@@ -43,9 +43,10 @@ class ApiServices{
       }
 
     }catch(e){
-      print("Error: "+e.toString());
+      print("Error get profile: "+e.toString());
 
-      ToastUtils.show("Error Profile");
+      return null;
+
     }
   }
 

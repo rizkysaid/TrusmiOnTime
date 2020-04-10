@@ -1,8 +1,10 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NoConnection extends StatelessWidget {
   @override
@@ -22,16 +24,43 @@ class BodyNoConnection extends StatefulWidget {
 
 class _BodyNoConnectionState extends State<BodyNoConnection> {
 
+  String userID;
+  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+
   @override
   initState() {
     super.initState();
-    checkConnection();
+//    checkConnection();
   }
 
   @override
   void dispose() {
     super.dispose();
 
+  }
+
+  getPref()async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    final username = pref.getString('username');
+    userID = pref.getString('userID');
+
+    ApiServices services = ApiServices();
+    var response = await services.Profil(userID, date);
+    if (response == null) {
+      ToastUtils.show("Error Connecting To Server");
+    } else {
+      if (username != null) {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/profile", (Route<dynamic>routes) => false);
+        });
+      } else {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/login", (Route<dynamic>routes) => false);
+        });
+      }
+    }
   }
 
 
@@ -43,10 +72,12 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
-      Future.delayed(const Duration(microseconds: 2000),(){
-        ToastUtils.show("Connected");
-        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-      });
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        ToastUtils.show("Connected to server");
+//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//      });
+
+      getPref();
     }
   }
 

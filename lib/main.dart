@@ -1,11 +1,14 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
+
+import 'core/utils/toast_util.dart';
 
 void main() => runApp(MyApp());
 
@@ -39,11 +42,14 @@ class _cekLogin extends StatefulWidget {
 
 class __cekLoginState extends State<_cekLogin> {
 
+  String userID;
+  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+
   @override
   void initState() {
     super.initState();
-//    getPref();
-    checkConnection();
+    getPref();
+//    checkConnection();
   }
 
   @override
@@ -52,21 +58,37 @@ class __cekLoginState extends State<_cekLogin> {
   }
 
   getPref()async{
+
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
+    userID = pref.getString('userID');
 
-    if(username != null){
-//        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//        });
+    ApiServices services = ApiServices();
+    var response = await services.Profil(userID, date);
+    if(response == null){
+      ToastUtils.show("Error Connecting To Server");
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+      });
     }else{
-//        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
-//        });
+
+      if(username != null){
+        Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+        });
+      }else{
+        Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+        });
+      }
+
     }
+
+
   }
 
   Future<void>checkConnection() async{
+
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
       // I am connected to a mobile network.
@@ -75,7 +97,6 @@ class __cekLoginState extends State<_cekLogin> {
       });
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
       getPref();
     }
   }

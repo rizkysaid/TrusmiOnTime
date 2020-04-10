@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
@@ -86,7 +87,16 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
+      ApiServices services = ApiServices();
+      var response = await services.Profil(userID, date);
+      if(response == null){
+        ToastUtils.show("Error Connecting To Server");
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+        });
+      }else{
 
+      }
     }
   }
 
@@ -111,78 +121,72 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   Future<void> getProfil(userID, date) async {
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
-      print('Mobile');
-//      Navigator.push(
-//        context,
-//        MaterialPageRoute(builder: (context) => NoConnection()),
-//      );
-
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-      });
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
-      print('Wifi Connected');
-
       ApiServices services = ApiServices();
       var response = await services.Profil(userID, date);
-      String dataNama = response.data.nama.toString();
-      String dataJabatan = response.data.jabatan.toString();
-      String dataClockIn = response.data.clockIn.toString();
-      String dataClockOut = response.data.clockOut.toString();
-      String dataImageUrl = response.data.photoIn.toString();
-      message = response.message.toString();
-      total_work = response.data.totalWork.toString();
-      photo_profile = response.data.fotoProfil.toString();
 
-      if (dataClockIn == "--:--"){
-        statusPhoto = false;
-        statusIcon = true;
-        imageUrl = "";
-        _colorButton = Colors.red[700];
-        clockout = dataClockOut;
-        clockin = dataClockIn;
-        _statusTotalWork = false;
-        _visibleButton = true;
-        _status = "checkin";
-      }else if (dataClockOut == "--:--"){
-        clockin = dataClockIn;
-        clockout = dataClockOut;
-        statusPhoto = true;
-        statusIcon = false;
-        imageUrl = dataImageUrl;
-        _colorButton = Colors.deepOrange;
-        _statusTotalWork = false;
-        _visibleButton = true;
-        _status = "checkout";
+      if(response == null){
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+        });
       }else{
-        statusPhoto = true;
-        statusIcon = false;
-        clockin = dataClockIn;
-        clockout = dataClockOut;
-        imageUrl = dataImageUrl;
-        _visibleButton = false;
-        _statusTotalWork = true;
-        _status = null;
-      }
+        print('Ini responsnya : '+response.toString());
+        String dataNama = response.data.nama.toString();
+        String dataJabatan = response.data.jabatan.toString();
+        String dataClockIn = response.data.clockIn.toString();
+        String dataClockOut = response.data.clockOut.toString();
+        String dataImageUrl = response.data.photoIn.toString();
+        message = response.message.toString();
+        total_work = response.data.totalWork.toString();
+        photo_profile = response.data.fotoProfil.toString();
 
-      try {
-        if (response.status == true) {
-          setState(() {
-            nama = dataNama;
-            jabatan = dataJabatan;
-          });
+        if (dataClockIn == "--:--"){
+          statusPhoto = false;
+          statusIcon = true;
+          imageUrl = "";
+          _colorButton = Colors.red[700];
+          clockout = dataClockOut;
+          clockin = dataClockIn;
+          _statusTotalWork = false;
+          _visibleButton = true;
+          _status = "checkin";
+        }else if (dataClockOut == "--:--"){
+          clockin = dataClockIn;
+          clockout = dataClockOut;
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = dataImageUrl;
+          _colorButton = Colors.deepOrange;
+          _statusTotalWork = false;
+          _visibleButton = true;
+          _status = "checkout";
+        }else{
+          statusPhoto = true;
+          statusIcon = false;
+          clockin = dataClockIn;
+          clockout = dataClockOut;
+          imageUrl = dataImageUrl;
+          _visibleButton = false;
+          _statusTotalWork = true;
+          _status = null;
         }
-      } catch (err) {
-        print("Cannot read");
+
+        try {
+          if (response.status == true) {
+            setState(() {
+              nama = dataNama;
+              jabatan = dataJabatan;
+            });
+          }else{
+            Future.delayed(const Duration(microseconds: 2000),(){
+              Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+            });
+          }
+        } catch (err) {
+          print("Cannot read");
+        }
       }
 
-
-    }
+//    }
 
   }
 
