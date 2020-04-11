@@ -66,9 +66,12 @@ class __cekLoginState extends State<_cekLogin> {
     ApiServices services = ApiServices();
     var response = await services.Profil(userID, date);
     if(response == null){
-      ToastUtils.show("Error Connecting To Server");
+//      ToastUtils.show("Error !");
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+//      });
       Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
       });
     }else{
 
