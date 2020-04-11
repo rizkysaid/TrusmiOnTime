@@ -161,9 +161,9 @@ class _LoginBodyState extends State<LoginBody> {
       ToastUtils.show("Please Input All Fields");
     }
 
-    Future.delayed(const Duration(microseconds: 2000),(){
-      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-    });
+//    Future.delayed(const Duration(microseconds: 2000),(){
+//      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//    });
   }
 
   @override

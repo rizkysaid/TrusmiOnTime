@@ -47,7 +47,11 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     ApiServices services = ApiServices();
     var response = await services.Profil(userID, date);
     if (response == null) {
-      ToastUtils.show("Error Connecting To Server");
+//      ToastUtils.show("Error Connecting To Server");
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic>routes) => false);
+      });
     } else {
       if (username != null) {
         Future.delayed(const Duration(microseconds: 2000), () {
