@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:path/path.dart';
@@ -177,11 +178,16 @@ class _PreviewScreenState extends State<PreviewScreen>{
    request.fields['clock_in'] = clock_in;
 
    var response = await request.send();
+   final dbHelper = DatabaseHelper.instance;
+   final allRows = await dbHelper.queryAllRows();
+   print('query all rows:');
+   allRows.forEach((row) => print(row));
+   var ip = allRows[0]['ip_address'];
 
    if(response.statusCode == 201){
 //     return true;
      ApiServices services = ApiServices();
-     var response = await services.Profil(usrId, date);
+     var response = await services.Profil(ip, usrId, date);
      try {
        if (response.status == true) {
          setState(() {
@@ -217,8 +223,14 @@ class _PreviewScreenState extends State<PreviewScreen>{
 
     if(response.statusCode == 201){
 //     return true;
+      final dbHelper = DatabaseHelper.instance;
+      final allRows = await dbHelper.queryAllRows();
+      print('query all rows:');
+      allRows.forEach((row) => print(row));
+      var ip = allRows[0]['ip_address'];
+
       ApiServices services = ApiServices();
-      var response = await services.Profil(usrId, date);
+      var response = await services.Profil(ip, usrId, date);
       try {
         if (response.status == true) {
           setState(() {

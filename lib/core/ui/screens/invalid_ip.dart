@@ -7,26 +7,28 @@ import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class NoConnection extends StatelessWidget {
+class InvalidIP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      body: BodyNoConnection()
+        body: BodyInvalidIP()
     );
   }
 }
 
-class BodyNoConnection extends StatefulWidget {
+class BodyInvalidIP extends StatefulWidget {
 
   @override
-  _BodyNoConnectionState createState() => _BodyNoConnectionState();
+  _BodyInvalidIPState createState() => _BodyInvalidIPState();
 }
 
-class _BodyNoConnectionState extends State<BodyNoConnection> {
+class _BodyInvalidIPState extends State<BodyInvalidIP> {
 
   String userID;
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
+
+  final dbHelper = DatabaseHelper.instance;
 
   @override
   initState() {
@@ -45,7 +47,6 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     final username = pref.getString('username');
     userID = pref.getString('userID');
 
-    final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
     print('query all rows:');
     allRows.forEach((row) => print(row));
@@ -158,10 +159,40 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
             ),
           ),
           SizedBox(height: 20,),
-          Text("Please connect to the office WiFi and try again.")
+          RaisedButton(
+            onPressed: () {
+              Future.delayed(const Duration(microseconds: 2000),(){
+                Navigator.pushNamedAndRemoveUntil(context, "/ip_config", (Route<dynamic>routes)=>false);
+              });
+            },
+            textColor: Colors.white,
+            padding: const EdgeInsets.all(0.0),
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: <Color>[
+                    Color(0xFF0D47A1),
+                    Color(0xFF1976D2),
+                    Color(0xFF42A5F5),
+                  ],
+                ),
+              ),
+              padding: const EdgeInsets.all(10.0),
+              child:
+              const Text('Setting IP Address', style: TextStyle(fontSize: 20)),
+            ),
+          ),
         ],
       ),
     );
   }
+
+//  void show_ip() async {
+//    final allRows = await dbHelper.queryAllRows();
+//    print('query all rows:');
+//    allRows.forEach((row) => print(row));
+//    ip = allRows[0]['ip_address'];
+//    print(ip);
+//  }
 }
 

@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -141,9 +142,14 @@ class _LoginBodyState extends State<LoginBody> {
     if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
 
 //      ToastUtils.show("Check Login ...");
+      final dbHelper = DatabaseHelper.instance;
+      final allRows = await dbHelper.queryAllRows();
+      print('query all rows:');
+      allRows.forEach((row) => print(row));
+      var ip = allRows[0]['ip_address'];
 
       ApiServices services = ApiServices();
-      var response = await services.Login(usernameController.text, passwordController.text);
+      var response = await services.Login(ip, usernameController.text, passwordController.text);
       String usrId = response.data[0].userId.toString();
       String messageLogin = response.message.toString();
 

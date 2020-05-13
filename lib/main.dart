@@ -1,6 +1,10 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/ui/screens/invalid_ip.dart';
+import 'package:login_absen/core/ui/screens/ip_config.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
@@ -8,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 
+import 'core/ui/screens/invalid_ip.dart';
 import 'core/utils/toast_util.dart';
 
 void main() => runApp(MyApp());
@@ -30,6 +35,8 @@ class MyApp extends StatelessWidget {
         "/profile": (context) => ProfileScreen(),
         "/camera": (context) => CameraScreen(),
         "/no_connection": (context) => NoConnection(),
+        "/invalid_ip": (context) => InvalidIP(),
+        "/ip_config": (context) => IpConfig(),
       },
     );
   }
@@ -44,12 +51,15 @@ class __cekLoginState extends State<_cekLogin> {
 
   String userID;
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
+  final dbHelper = DatabaseHelper.instance;
 
   @override
   void initState() {
     super.initState();
-    getPref();
-//    checkConnection();
+//    getPref();
+    checkConnection();
+    _delete();
+
   }
 
   @override
@@ -63,15 +73,17 @@ class __cekLoginState extends State<_cekLogin> {
     final username = pref.getString('username');
     userID = pref.getString('userID');
 
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+    var ip = allRows[0]['ip_address'];
+
     ApiServices services = ApiServices();
-    var response = await services.Profil(userID, date);
+    var response = await services.Profil(ip, userID, date);
     if(response == null){
-//      ToastUtils.show("Error !");
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-//      });
       Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
       });
     }else{
 
@@ -137,5 +149,34 @@ class __cekLoginState extends State<_cekLogin> {
             ),
           ),
         );
+  }
+
+  void _delete() async {
+//     Assuming that the number of rows is the id for the last row.
+    final id = await dbHelper.queryRowCount();
+    final rowsDeleted = await dbHelper.deleteAll();
+    print('deleted $rowsDeleted row(s): row $id');
+    _insert();
+    show_ip();
+  }
+
+  void _insert() async {
+    // row to insert
+    Map<String, dynamic> row = {
+      DatabaseHelper.columnIpAddress : Endpoint.base_url,
+      DatabaseHelper.columnName : '',
+      DatabaseHelper.columnIsActive  : 1
+    };
+    final id = await dbHelper.insert(row);
+    print('inserted row id: $id');
+  }
+
+  void show_ip() async {
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    allRows.forEach((row) => print(row));
+    var ip = '';
+    ip = allRows[0]['ip_address'];
+    print(ip);
   }
 }
