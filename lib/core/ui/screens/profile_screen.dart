@@ -337,7 +337,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                       Container(
                         width: MediaQuery.of(context).size.width,
                         height: (MediaQuery.of(context).size.height / 2) +
-                            (MediaQuery.of(context).size.height / 16),
+                            (MediaQuery.of(context).size.height / 8),
 //                    color: Colors.red[900],
                         decoration: BoxDecoration(
                           image: DecorationImage(
