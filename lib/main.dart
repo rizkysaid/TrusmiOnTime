@@ -68,6 +68,7 @@ class __cekLoginState extends State<_cekLogin> {
   }
 
   getPref()async{
+    var ip = '';
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
@@ -76,8 +77,10 @@ class __cekLoginState extends State<_cekLogin> {
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
     print('query all rows:');
-    allRows.forEach((row) => print(row));
-    var ip = allRows[0]['ip_address'];
+    if(allRows != null){
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    }
 
     ApiServices services = ApiServices();
     var response = await services.Profil(ip, userID, date);

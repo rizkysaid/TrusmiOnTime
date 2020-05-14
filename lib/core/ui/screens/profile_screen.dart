@@ -99,7 +99,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
       if(response == null){
         ToastUtils.show("Error Connecting To Server");
         Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+          Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
         });
       }else{
 
@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       if(response == null){
         Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+          Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
         });
       }else{
         print('Ini responsnya : '+response.toString());

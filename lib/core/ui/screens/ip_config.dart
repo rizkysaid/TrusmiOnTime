@@ -65,7 +65,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 //      ToastUtils.show("Error Connecting To Server");
       Future.delayed(const Duration(microseconds: 2000), () {
         Navigator.pushNamedAndRemoveUntil(
-            context, "/no_connection", (Route<dynamic>routes) => false);
+            context, "/invalid_ip", (Route<dynamic>routes) => false);
       });
     } else {
       if (username != null) {
