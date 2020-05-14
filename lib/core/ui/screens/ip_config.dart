@@ -208,6 +208,14 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
                     semanticLabel: 'Connection success!',
                   ),
                   Text('Connection success!', style: TextStyle(color: Colors.green),),
+                  RaisedButton(
+                    child: Text('Ok', style: TextStyle(fontSize: 20),),
+                    onPressed: () {
+                      Future.delayed(const Duration(microseconds: 2000),(){
+                        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+                      });
+                    },
+                  ),
                 ],
               ),
             ),
@@ -272,6 +280,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
     final id = await dbHelper.queryRowCount();
     final rowsDeleted = await dbHelper.delete(id);
     print('deleted $rowsDeleted row(s): row $id');
+
   }
 
   void check_connection() async{
@@ -282,11 +291,30 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
     print('responsenya'+response.toString());
 
     if(response != null){
-      show_con_success = true;
+
       print('stts sccss:'+show_con_success.toString());
+      setState(() {
+        show_con_success = true;
+        show_con_failed = false;
+      });
+
+      //delete IP
+      final rowsDeleted = await dbHelper.deleteAll();
+      print('deleted $rowsDeleted row(s): row ');
+
+      //insert new IP
+      Map<String, dynamic> row = {
+        DatabaseHelper.columnIpAddress : ip,
+        DatabaseHelper.columnName : '',
+        DatabaseHelper.columnIsActive  : 1
+      };
+      final id = await dbHelper.insert(row);
+      print('inserted row id: $id');
     }else{
-      show_con_failed = true;
-      print('stts fld:'+show_con_failed.toString());
+      setState(() {
+        show_con_success = false;
+        show_con_failed = true;
+      });
     }
 
   }

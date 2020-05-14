@@ -12,7 +12,7 @@ class ApiServices{
   Future<AuthModel> Login(ip, username, password) async{
     try{
       var response = await http.post(
-          ip.login,
+          ip+'/login',
           body: {'username' : username, 'password' : password}
       );
 //      print("Response Status : ${response.statusCode}");
@@ -33,7 +33,7 @@ class ApiServices{
 
   Future<ProfileModel> Profil(ip, userID, date) async{
     try{
-      var response = await http.get(ip.profil+'/'+userID+'/'+date);
+      var response = await http.get(ip+'/profil/'+userID+'/'+date);
       print("Response Status : ${response.statusCode}");
       print("Response Body : ${response.body}");
       if (response.statusCode == 200) {
