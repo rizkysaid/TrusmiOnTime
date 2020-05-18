@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -130,23 +131,61 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   getPref() async{
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    final username = pref.getString('username');
-    if(username != null){
-      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes) => false);
+
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:' +allRows.toList().toString());
+    print('Length = '+allRows.length.toString());
+
+    if(allRows.length != 0){
+
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+
+    }else{
+      ip = Endpoint.base_url;
     }
+
+    print('Check IP in getPref LoginScreen = '+ip.toString());
+
+    ApiServices services = ApiServices();
+    var response = await services.CheckKoneksi(ip);
+    if(response == null){
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
+      });
+    }else{
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var username = pref.getString('username');
+      if(username != null){
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+        });
+      }
+    }
+
+
   }
 
   Future<void> prosesLogin() async{
     
     if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
-
-//      ToastUtils.show("Check Login ...");
+      String ip;
+      ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      print('query all rows:');
-      allRows.forEach((row) => print(row));
-      var ip = allRows[0]['ip_address'];
+      print('query all rows: '+allRows.toList().toString());
+      print('Length = '+allRows.length.toString());
+
+      if(allRows.length != 0){
+
+        allRows.forEach((row) => print(row));
+        ip = allRows[0]['ip_address'];
+
+      }else{
+        ip = Endpoint.base_url;
+      }
 
       ApiServices services = ApiServices();
       var response = await services.Login(ip, usernameController.text, passwordController.text);

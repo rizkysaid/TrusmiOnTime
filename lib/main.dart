@@ -53,12 +53,14 @@ class __cekLoginState extends State<_cekLogin> {
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
 
+  String IpAddress;
+
   @override
   void initState() {
     super.initState();
 //    getPref();
     checkConnection();
-    _delete();
+//    _delete();
 
   }
 
@@ -68,40 +70,33 @@ class __cekLoginState extends State<_cekLogin> {
   }
 
   getPref()async{
-    var ip = '';
 
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    final username = pref.getString('username');
-    userID = pref.getString('userID');
-
+    String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    if(allRows != null){
+    print('query all rows:' +allRows.toList().toString());
+    print('Length = '+allRows.length.toString());
+
+    if(allRows.length != 0){
+
       allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
+
+    }else{
+      ip = Endpoint.base_url;
     }
 
     ApiServices services = ApiServices();
-    var response = await services.Profil(ip, userID, date);
+    var response = await services.CheckKoneksi(ip);
     if(response == null){
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
       });
     }else{
-
-      if(username != null){
         Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
-      }else{
-        Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
-        });
-      }
-
     }
-
 
   }
 
@@ -159,14 +154,13 @@ class __cekLoginState extends State<_cekLogin> {
     final id = await dbHelper.queryRowCount();
     final rowsDeleted = await dbHelper.deleteAll();
     print('deleted $rowsDeleted row(s): row $id');
-    _insert();
-    show_ip();
+//    show_ip();
   }
 
-  void _insert() async {
+  void _insert(ip) async {
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseHelper.columnIpAddress : Endpoint.base_url,
+      DatabaseHelper.columnIpAddress : ip,
       DatabaseHelper.columnName : '',
       DatabaseHelper.columnIsActive  : 1
     };

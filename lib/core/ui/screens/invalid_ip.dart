@@ -47,10 +47,11 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
     final username = pref.getString('username');
     userID = pref.getString('userID');
 
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
-    var ip = allRows[0]['ip_address'];
+//    final allRows = await dbHelper.queryAllRows();
+//    print('query all rows:');
+//    allRows.forEach((row) => print(row));
+//    var ip = allRows[0]['ip_address'];
+    var ip = pref.getString('IpAddress');
 
     ApiServices services = ApiServices();
     var response = await services.Profil(ip, userID, date);

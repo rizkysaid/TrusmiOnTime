@@ -178,11 +178,14 @@ class _PreviewScreenState extends State<PreviewScreen>{
    request.fields['clock_in'] = clock_in;
 
    var response = await request.send();
-   final dbHelper = DatabaseHelper.instance;
-   final allRows = await dbHelper.queryAllRows();
-   print('query all rows:');
-   allRows.forEach((row) => print(row));
-   var ip = allRows[0]['ip_address'];
+//   final dbHelper = DatabaseHelper.instance;
+//   final allRows = await dbHelper.queryAllRows();
+//   print('query all rows:');
+//   allRows.forEach((row) => print(row));
+//   var ip = allRows[0]['ip_address'];
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var ip = pref.getString('IpAddress');
 
    if(response.statusCode == 201){
 //     return true;
@@ -223,11 +226,13 @@ class _PreviewScreenState extends State<PreviewScreen>{
 
     if(response.statusCode == 201){
 //     return true;
-      final dbHelper = DatabaseHelper.instance;
-      final allRows = await dbHelper.queryAllRows();
-      print('query all rows:');
-      allRows.forEach((row) => print(row));
-      var ip = allRows[0]['ip_address'];
+//      final dbHelper = DatabaseHelper.instance;
+//      final allRows = await dbHelper.queryAllRows();
+//      print('query all rows:');
+//      allRows.forEach((row) => print(row));
+//      var ip = allRows[0]['ip_address'];
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var ip = pref.getString('IpAddress');
 
       ApiServices services = ApiServices();
       var response = await services.Profil(ip, usrId, date);

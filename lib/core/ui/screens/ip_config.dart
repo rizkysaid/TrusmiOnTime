@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -49,37 +50,28 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
   }
 
-  getPref()async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    final username = pref.getString('username');
-    userID = pref.getString('userID');
-
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
-    var ip = allRows[0]['ip_address'];
+  getPref()async{
 
     ApiServices services = ApiServices();
-    var response = await services.Profil(ip, userID, date);
-    if (response == null) {
-//      ToastUtils.show("Error Connecting To Server");
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/invalid_ip", (Route<dynamic>routes) => false);
+    var response = await services.CheckKoneksi(Endpoint.base_url);
+    if(response == null){
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
       });
-    } else {
-      if (username != null) {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic>routes) => false);
+    }else{
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      var username = pref.getString('username');
+      if(username != null){
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
-      } else {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/login", (Route<dynamic>routes) => false);
+      }else{
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
         });
       }
     }
+
   }
 
 
@@ -255,13 +247,8 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
   }
 
   void show_ip() async {
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
-    allRows.forEach((row) => print(row));
-    var ip = '';
-    ip = allRows[0]['ip_address'];
-    print(ip);
-    ipconfig.text = ip.toString();
+
+    ipconfig.text = Endpoint.base_url;
   }
 
   void _update() async {
@@ -288,7 +275,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
     var ip = ipconfig.text;
     var response = await services.CheckKoneksi(ip);
-    print('responsenya'+response.toString());
+    print('response check_connection ip_config = '+response.toString());
 
     if(response != null){
 
@@ -296,9 +283,9 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
       setState(() {
         show_con_success = true;
         show_con_failed = false;
+
       });
 
-      //delete IP
       final rowsDeleted = await dbHelper.deleteAll();
       print('deleted $rowsDeleted row(s): row ');
 
@@ -309,14 +296,19 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
         DatabaseHelper.columnIsActive  : 1
       };
       final id = await dbHelper.insert(row);
-      print('inserted row id: $id');
+      print('inserted row id (ip_config/checkconnection): $id');
+
     }else{
       setState(() {
         show_con_success = false;
         show_con_failed = true;
       });
+
     }
 
   }
+
 }
+
+
 
