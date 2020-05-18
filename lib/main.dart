@@ -50,6 +50,7 @@ class _cekLogin extends StatefulWidget {
 class __cekLoginState extends State<_cekLogin> {
 
   String userID;
+  String username;
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
 
@@ -93,9 +94,23 @@ class __cekLoginState extends State<_cekLogin> {
         Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
       });
     }else{
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      setState(() {
+        username = pref.getString('username');
+        userID = pref.getString('userID');
+      });
+
+      if(username == false){
+        Future.delayed(const Duration(microseconds: 2000),(){
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+        });
+      }else{
         Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
+      }
+
+
     }
 
   }
