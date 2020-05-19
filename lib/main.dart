@@ -87,8 +87,13 @@ class __cekLoginState extends State<_cekLogin> {
       ip = Endpoint.base_url;
     }
 
+    print("IP = "+ip);
+
     ApiServices services = ApiServices();
+    print('servis');
     var response = await services.CheckKoneksi(ip);
+    print('checkKoneksi');
+    print('Response service = '+response.toString());
     if(response == null){
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
@@ -109,6 +114,7 @@ class __cekLoginState extends State<_cekLogin> {
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
       }
+
 
 
     }
