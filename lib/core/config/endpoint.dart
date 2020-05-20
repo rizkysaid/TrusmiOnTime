@@ -2,7 +2,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Endpoint{
   String ip;
-  static String _baseURL = "http://9192.168.23.23/absensi/api";
+  static String _baseURL = "http://192.168.23.23/absensi/api";
 //  static String _baseURL = "http://trusmicorp.com/absensi/api";
   static String login = "$_baseURL/login";
   static String checkin = "$_baseURL/check_in";
