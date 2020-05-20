@@ -163,7 +163,8 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
           RaisedButton(
             onPressed: () {
               Future.delayed(const Duration(microseconds: 2000),(){
-                Navigator.pushNamedAndRemoveUntil(context, "/ip_config", (Route<dynamic>routes)=>false);
+//                Navigator.pushNamedAndRemoveUntil(context, "/login_config", (Route<dynamic>routes)=>false);
+                Navigator.pushNamed(context, '/login_config');
               });
             },
             textColor: Colors.white,

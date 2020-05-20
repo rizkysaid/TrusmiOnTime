@@ -1,6 +1,7 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/invalid_ip.dart';
@@ -13,6 +14,7 @@ import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 
 import 'core/ui/screens/invalid_ip.dart';
+import 'core/ui/screens/login_config.dart';
 import 'core/utils/toast_util.dart';
 
 void main() => runApp(MyApp());
@@ -37,6 +39,7 @@ class MyApp extends StatelessWidget {
         "/no_connection": (context) => NoConnection(),
         "/invalid_ip": (context) => InvalidIP(),
         "/ip_config": (context) => IpConfig(),
+        "/login_config": (context) => LoginConfig(),
       },
     );
   }
@@ -53,6 +56,7 @@ class __cekLoginState extends State<_cekLogin> {
   String username;
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
+  final dbConfig = DatabaseConfigHelper.instance;
 
   String IpAddress;
 
@@ -61,7 +65,7 @@ class __cekLoginState extends State<_cekLogin> {
     super.initState();
 //    getPref();
     checkConnection();
-//    _delete();
+    _deleteConfig();
 
   }
 
@@ -170,23 +174,28 @@ class __cekLoginState extends State<_cekLogin> {
         );
   }
 
-  void _delete() async {
+  void _deleteConfig() async {
 //     Assuming that the number of rows is the id for the last row.
-    final id = await dbHelper.queryRowCount();
-    final rowsDeleted = await dbHelper.deleteAll();
+    final id = await dbConfig.queryRowCount();
+    final rowsDeleted = await dbConfig.deleteAll();
     print('deleted $rowsDeleted row(s): row $id');
-//    show_ip();
+    _insertConfig();
   }
 
-  void _insert(ip) async {
+  void _insertConfig() async {
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseHelper.columnIpAddress : ip,
-      DatabaseHelper.columnName : '',
-      DatabaseHelper.columnIsActive  : 1
+      DatabaseConfigHelper.columnUsername : 'admintrusmi',
+      DatabaseConfigHelper.columnPassword  : 'trusmiadmin'
     };
-    final id = await dbHelper.insert(row);
+    final id = await dbConfig.insert(row);
     print('inserted row id: $id');
+    _showConfig();
+  }
+
+  void _showConfig()async{
+    final allRows = await dbConfig.queryAllRows();
+    allRows.forEach((row) => print("Config = "+row.toString()));
   }
 
   void show_ip() async {
