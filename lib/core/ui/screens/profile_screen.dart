@@ -89,13 +89,21 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
       // I am connected to a wifi network.
-//      final dbHelper = DatabaseHelper.instance;
-//      final allRows = await dbHelper.queryAllRows();
-//      print('query all rows:');
-//      allRows.forEach((row) => print(row));
-//      var ip = allRows[0]['ip_address'];
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      var ip = pref.getString('IpAddress');
+      String ip;
+      final dbHelper = DatabaseHelper.instance;
+      final allRows = await dbHelper.queryAllRows();
+      print('query all rows: '+allRows.toList().toString());
+      print('Length = '+allRows.length.toString());
+
+      if(allRows.length != 0){
+
+        allRows.forEach((row) => print(row));
+        ip = allRows[0]['ip_address'];
+
+      }else{
+        ip = Endpoint.base_url;
+      }
+
 
       ApiServices services = ApiServices();
       var response = await services.Profil(ip, userID, date);

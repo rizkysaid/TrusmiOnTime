@@ -102,6 +102,10 @@ class __cekLoginState extends State<_cekLogin> {
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
       });
+      final id = await dbHelper.queryRowCount();
+      final rowsDeleted = await dbHelper.deleteAll();
+      print('deleted $rowsDeleted row(s): row $id');
+
     }else{
       SharedPreferences pref = await SharedPreferences.getInstance();
       setState(() {

@@ -45,8 +45,8 @@ class ApiServices{
       }
 
     }catch(e){
-      print("Error get profile: "+e.toString());
-      print('IP in ApiService - Profil - Error = '+ip.toString());
+      print("Error get profile: " + e.toString());
+      print('IP in ApiService - Profil - Error = ' + ip.toString());
       return null;
 
     }
