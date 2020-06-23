@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:date_format/date_format.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -37,12 +38,19 @@ class _ProfileScreenState extends State<ProfileScreen>{
   static Color _colorButton = Colors.red[700];
   static Timer timer;
 
+  String date_in;
+  String date_out;
+  String id_shift;
+  String shift_in;
+
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   static String _toolTip = "Check In";
   String photo_profile;
 
   String _timeString;
   String _hariTanggal;
+
+  String dateId = formatDate(DateTime.now(), [dd, '-', mm, '-', yyyy]);
 
   @override
   void initState() {
@@ -70,7 +78,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
         }
       });
 
-
+      print("Hari ini = "+dateId.toString());
   }
 
   @override
@@ -107,14 +115,23 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       ApiServices services = ApiServices();
       var response = await services.Profil(ip, userID, date);
-      if(response == null){
-        ToastUtils.show("Error Connecting To Server");
+      print("IP in profile_screen = "+ip);
+      print("UserID in profile_screen = "+userID.toString());
+      print("date in profile_screen = "+date.toString());
+
+      if(userID == null){
         Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
+          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
         });
       }else{
-
+        if(response == null){
+          ToastUtils.show("Error Connecting To Server");
+          Future.delayed(const Duration(microseconds: 2000),(){
+            Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
+          });
+        }
       }
+
     }
   }
 
@@ -171,6 +188,18 @@ class _ProfileScreenState extends State<ProfileScreen>{
         message = response.message.toString();
         total_work = response.data.totalWork.toString();
         photo_profile = response.data.fotoProfil.toString();
+        date_in = response.data.dateIn.toString();
+        date_out = response.data.dateOut.toString();
+
+        id_shift = response.data.idShift.toString();
+        shift_in = response.data.shiftIn.toString();
+
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        setState(() {
+          pref.setString('id_shift', id_shift);
+          pref.setString('shift_in', shift_in);
+        });
+
 
         if (dataClockIn == "--:--"){
           statusPhoto = false;
@@ -192,14 +221,25 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _statusTotalWork = false;
           _visibleButton = true;
           _status = "checkout";
+        }else if (date_out != dateId){
+          clockin = dataClockIn;
+          clockout = "--:--";
+          date_out = "";
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = dataImageUrl;
+          _colorButton = Colors.red[700];
+          _statusTotalWork = false;
+          _visibleButton = true;
+          _status = "checkin";
         }else{
           statusPhoto = true;
           statusIcon = false;
           clockin = dataClockIn;
           clockout = dataClockOut;
           imageUrl = dataImageUrl;
-          _visibleButton = false;
-          _statusTotalWork = true;
+          _visibleButton = true;
+          _statusTotalWork = false;
           _status = null;
         }
 
@@ -468,7 +508,12 @@ class _ProfileScreenState extends State<ProfileScreen>{
                                   Text("Start Time", style: TextStyle(fontSize: 18)),
                                   Text(clockin.toString(),
                                       style: TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold)),
+                                          fontSize: 18, fontWeight: FontWeight.bold)
+                                  ),
+                                  Text(date_in.toString(),
+                                      style: TextStyle(
+                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
                                 ]),
                                 Container(
                                     height: 30,
@@ -480,7 +525,12 @@ class _ProfileScreenState extends State<ProfileScreen>{
                                   Text("End Time", style: TextStyle(fontSize: 18)),
                                   Text(clockout.toString(),
                                       style: TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold)),
+                                          fontSize: 18, fontWeight: FontWeight.bold)
+                                  ),
+                                  Text(date_out.toString(),
+                                    style: TextStyle(
+                                        fontSize: 16, fontWeight: FontWeight.bold),
+                                  ),
                                 ]),
                               ],
                             ),
@@ -517,7 +567,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
             child: FloatingActionButton(
               onPressed: () => {
               Navigator.pushNamed(context, "/camera",
-                    arguments: ScreenArguments(userID, _status)
+                    arguments: ScreenArguments(userID, _status, id_shift, shift_in)
                 )
               },
               tooltip: _toolTip,

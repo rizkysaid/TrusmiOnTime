@@ -151,18 +151,18 @@ class _LoginBodyState extends State<LoginBody> {
 
     ApiServices services = ApiServices();
     var response = await services.CheckKoneksi(ip);
-    if(response == null){
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
-      });
-    }else{
+//    if(response == null){
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
+//      });
+//    }else{
       SharedPreferences pref = await SharedPreferences.getInstance();
       var username = pref.getString('username');
       if(username != null){
         Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
-      }
+//      }
     }
 
 
