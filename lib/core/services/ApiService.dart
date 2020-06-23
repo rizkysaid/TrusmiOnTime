@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:login_absen/core/models/AuthModel.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
+import 'package:login_absen/core/models/CheckStatusModel.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:http/http.dart' as http;
@@ -68,6 +69,27 @@ class ApiServices{
 
     }catch(e){
       print("Error Cek Koneksi: "+e.toString());
+      return null;
+
+    }
+  }
+
+  Future<CheckStatusModel> CheckStatus(ip, userID) async{
+    try{
+      var response = await http.get(ip+'/check_in/'+userID);
+      print("Response CekStatus Status : ${response.statusCode}");
+      print("Response CekStatus Body : ${response.body}");
+//      if (response.statusCode == 200) {
+      CheckStatusModel responseRequest = CheckStatusModel.fromJson(jsonDecode(response.body));
+      return responseRequest;
+//      } else {
+//        ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
+//        return responseRequest;
+//      }
+
+    }catch(e){
+      print("Error Check Status: " + e.toString());
+      print('IP in ApiService - CheckStatus - Error = ' + ip.toString());
       return null;
 
     }

@@ -217,7 +217,7 @@ class _CameraScreenState extends State<CameraScreen> {
               status: args.status,
               clockIn: '${DateTime.now()}',
               idShift: args.idShift,
-              shiftIn: args.shiftIn
+              shift: args.shift
             )),
       );
     } catch (e) {

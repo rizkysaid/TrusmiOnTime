@@ -22,9 +22,9 @@ class PreviewScreen extends StatefulWidget{
   final String status;
   final bool isCheckin = false;
   final String idShift;
-  final String shiftIn;
+  final String shift;
 
-  PreviewScreen({this.imgPath, this.userID, this.clockIn, this.imageUrl, this.status, this.idShift, this.shiftIn});
+  PreviewScreen({this.imgPath, this.userID, this.clockIn, this.imageUrl, this.status, this.idShift, this.shift});
 
   @override
   _PreviewScreenState createState() => _PreviewScreenState();
@@ -83,10 +83,10 @@ class _PreviewScreenState extends State<PreviewScreen>{
                             String clock_in = widget.clockIn.substring(0,19);
                             String usrId = basename(widget.userID);
                             String idShift = basename(widget.idShift);
-                            String shiftIn = basename(widget.shiftIn);
+                            String shift = basename(widget.shift);
 
                             if(widget.status == "checkin"){
-                              if(prosesCheckin(usrId, clock_in, File(widget.imgPath), idShift, shiftIn) != null){
+                              if(prosesCheckin(usrId, clock_in, File(widget.imgPath), idShift, shift) != null){
                                 savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
                                 Alert(
                                     context: context,
@@ -112,7 +112,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                               }
                             }else{
 
-                              if(prosesCheckout(usrId, clock_in, File(widget.imgPath)) != null){
+                              if(prosesCheckout(usrId, clock_in, File(widget.imgPath), idShift, shift) != null){
                                 savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
                                 Alert(
                                     context: context,
@@ -167,7 +167,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
     return ByteData.view(bytes.buffer);
   }
 
-  Future prosesCheckin(String usrId, String clock_in, File imageFile, String idShift, String shiftIn) async{
+  Future prosesCheckin(String usrId, String clock_in, File imageFile, String idShift, String shift) async{
 
    var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
    var length = await imageFile.length();
@@ -181,7 +181,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
    request.fields['employee_id'] = usrId;
    request.fields['clock_in'] = clock_in;
    request.fields['id_shift'] = idShift;
-   request.fields['shift_in'] = shiftIn;
+   request.fields['shift'] = shift;
 
    var response = await request.send();
 //   final dbHelper = DatabaseHelper.instance;
@@ -214,7 +214,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
   }
 
 
-  Future prosesCheckout(String usrId, String clock_in, File imageFile) async{
+  Future prosesCheckout(String usrId, String clock_in, File imageFile, String idShift, String shift) async{
 
     var stream = new http.ByteStream(DelegatingStream.typed(imageFile.openRead()));
     var length = await imageFile.length();
@@ -227,6 +227,8 @@ class _PreviewScreenState extends State<PreviewScreen>{
     request.files.add(multiPartFile);
     request.fields['employee_id'] = usrId;
     request.fields['clock_out'] = clock_in;
+    request.fields['id_shift'] = idShift;
+    request.fields['shift'] = shift;
 
     var response = await request.send();
 

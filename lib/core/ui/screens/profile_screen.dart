@@ -8,11 +8,13 @@ import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -42,6 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
   String date_out;
   String id_shift;
   String shift_in;
+  String shift_out;
+  String shift;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
   static String _toolTip = "Check In";
@@ -78,7 +82,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
         }
       });
 
-      print("Hari ini = "+dateId.toString());
   }
 
   @override
@@ -118,6 +121,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
       print("IP in profile_screen = "+ip);
       print("UserID in profile_screen = "+userID.toString());
       print("date in profile_screen = "+date.toString());
+      print("Hari ini = "+dateId.toString());
 
       if(userID == null){
         Future.delayed(const Duration(microseconds: 2000),(){
@@ -193,11 +197,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
         id_shift = response.data.idShift.toString();
         shift_in = response.data.shiftIn.toString();
+        shift_out = response.data.shiftOut.toString();
 
         SharedPreferences pref = await SharedPreferences.getInstance();
         setState(() {
           pref.setString('id_shift', id_shift);
           pref.setString('shift_in', shift_in);
+          pref.setString('shift_out', shift_out);
         });
 
 
@@ -211,6 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _statusTotalWork = false;
           _visibleButton = true;
           _status = "checkin";
+          shift = shift_in;
         }else if (dataClockOut == "--:--"){
           clockin = dataClockIn;
           clockout = dataClockOut;
@@ -221,6 +228,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _statusTotalWork = false;
           _visibleButton = true;
           _status = "checkout";
+          shift = shift_out;
         }else if (date_out != dateId){
           clockin = dataClockIn;
           clockout = "--:--";
@@ -232,15 +240,29 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _statusTotalWork = false;
           _visibleButton = true;
           _status = "checkin";
-        }else{
+          shift = shift_in;
+        }else if(id_shift == '3'){
           statusPhoto = true;
           statusIcon = false;
           clockin = dataClockIn;
           clockout = dataClockOut;
           imageUrl = dataImageUrl;
           _visibleButton = true;
-          _statusTotalWork = false;
-          _status = null;
+          _statusTotalWork = true;
+          _status = "checkin";
+          shift = shift_in;
+          _colorButton = Colors.red[700];
+        }else{
+          statusPhoto = true;
+          statusIcon = false;
+          clockin = dataClockIn;
+          clockout = dataClockOut;
+          imageUrl = dataImageUrl;
+          _visibleButton = false;
+          _statusTotalWork = true;
+          shift = shift_in;
+          _colorButton = Colors.red[700];
+          _status = "checkin";
         }
 
         try {
@@ -389,6 +411,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
               ),
               Card(
                 child: ListTile(
+                    leading: Icon(Icons.screen_share),
+                    title: Text('Go to website'),
+                    onTap: () => goToWebsite()
+                ),
+              ),
+              Card(
+                child: ListTile(
                   leading: Icon(Icons.exit_to_app),
                   title: Text('Log Out'),
                   onTap: () => logout()
@@ -490,7 +519,21 @@ class _ProfileScreenState extends State<ProfileScreen>{
                               message.toString(),
                               style: TextStyle(
                                   color: Colors.white
-                              ),                )
+                              ),
+                            ),
+                            SizedBox(height: 20),
+                            Visibility(
+                              visible: _statusTotalWork,
+                              child: Column(children: <Widget>[
+                                Text("Total Work", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                Text(total_work.toString(),
+                                    style: TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white
+                                    )
+                                ),
+                              ]),
+                            ),
+                            SizedBox(height: 5),
                           ],
                         ),
 //            ),
@@ -534,16 +577,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
                                 ]),
                               ],
                             ),
-                            SizedBox(height: 25),
-                            Visibility(
-                              visible: _statusTotalWork,
-                              child: Column(children: <Widget>[
-                                Text("Total Work", style: TextStyle(fontSize: 18)),
-                                Text(total_work.toString(),
-                                    style: TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold)),
-                              ]),
-                            ),
                           ],
                         ),
                       )
@@ -566,9 +599,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
             width: 80,
             child: FloatingActionButton(
               onPressed: () => {
-              Navigator.pushNamed(context, "/camera",
-                    arguments: ScreenArguments(userID, _status, id_shift, shift_in)
-                )
+                check_status(userID)
               },
               tooltip: _toolTip,
               backgroundColor: _colorButton,
@@ -606,6 +637,85 @@ class _ProfileScreenState extends State<ProfileScreen>{
 //      pref.remove('_status');
     });
   }
+
+  goToWebsite() async{
+    const url = "http://192.168.23.23/hr/admin";
+    if(await canLaunch(url)){
+      await launch(url);
+    }else{
+      ToastUtils.show("Can not launch website");
+    }
+  }
+
+  check_status(userId) async{
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows:');
+    print('Length = '+allRows.length.toString());
+
+    if(allRows.length != 0){
+
+//        allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+
+    }else{
+      ip = Endpoint.base_url;
+    }
+
+    ApiServices services = ApiServices();
+    var response = await services.CheckStatus(ip, userID);
+
+    print(response.data.aktif);
+
+    if(response.data.aktif == '1'){
+        Navigator.pushNamed(context, "/camera",
+          arguments: ScreenArguments(userID, _status, id_shift, shift)
+        );
+//        print("shift="+shift+" - idshift="+id_shift+" - status="+_status)
+    }else{
+      Alert(
+          context: context,
+          style: alertStyle,
+          type: AlertType.error,
+          title: "Anda tidak bisa melakukan absen!",
+          desc: "User anda telah dinonaktifkan.",
+          buttons: [
+            DialogButton(
+              child: Text(
+                "Logout",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+              onPressed: ()=> {
+//                Future.delayed(const Duration(microseconds: 2000),(){
+//                  Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//                })
+                logout()
+              },
+              width: 120,
+            )
+          ]
+      ).show();
+    }
+
+  }
+  var alertStyle = AlertStyle(
+      animationType: AnimationType.fromTop,
+      isCloseButton: false,
+      isOverlayTapDismiss: false,
+      descStyle: TextStyle(fontWeight: FontWeight.bold),
+      animationDuration: Duration(milliseconds: 400),
+      alertBorder: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(0.0),
+        side: BorderSide(
+            color: Colors.grey
+        ),
+      ),
+      titleStyle: TextStyle(
+          color: Colors.red
+      )
+  );
+
 }
 
 
