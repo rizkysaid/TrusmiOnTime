@@ -15,6 +15,7 @@ import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:package_info/package_info.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -55,6 +56,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
   String _hariTanggal;
 
   String dateId = formatDate(DateTime.now(), [dd, '-', mm, '-', yyyy]);
+
+
 
   @override
   void initState() {
@@ -320,7 +323,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
         _status = "checkin";
       }
 
-      print("_status : "+_status);
+
+//      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+//
+//      String appName = packageInfo.appName;
+//      String packageName = packageInfo.packageName;
+//      String version = packageInfo.version;
+//      String buildNumber = packageInfo.buildNumber;
 
   }
 

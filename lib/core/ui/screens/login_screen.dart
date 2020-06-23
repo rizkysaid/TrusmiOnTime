@@ -7,6 +7,7 @@ import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:package_info/package_info.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -19,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     checkConnection();
-
   }
 
 
@@ -165,7 +165,6 @@ class _LoginBodyState extends State<LoginBody> {
 //      }
     }
 
-
   }
 
   Future<void> prosesLogin() async{
@@ -209,7 +208,21 @@ class _LoginBodyState extends State<LoginBody> {
 //    Future.delayed(const Duration(microseconds: 2000),(){
 //      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
 //    });
+
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
   }
+
+  PackageInfo _packageInfo = PackageInfo(
+    appName: 'Unknown',
+    packageName: 'Unknown',
+    version: '1.2.0',
+    buildNumber: 'Unknown',
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -236,7 +249,9 @@ class _LoginBodyState extends State<LoginBody> {
                     height: MediaQuery.of(context).size.width / 4,
                     width: MediaQuery.of(context).size.width / 2,
                     image: AssetImage("assets/logo_png_ontime.png")
-                )
+                ),
+                Text("Version "+_packageInfo.version,
+                    style: TextStyle(color: Colors.white)),
               ],
             ),
           ),
@@ -332,8 +347,6 @@ Widget _username(BuildContext context){
     }
     return null;
   }
-
-  
 
 }
 
