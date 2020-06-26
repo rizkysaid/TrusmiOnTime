@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:login_absen/core/models/AuthModel.dart';
-import 'package:login_absen/core/config/endpoint.dart';
+//import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';

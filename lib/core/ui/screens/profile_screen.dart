@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -14,8 +15,8 @@ import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
-import 'package:url_launcher/url_launcher.dart';
-import 'package:package_info/package_info.dart';
+//import 'package:url_launcher/url_launcher.dart';
+//import 'package:package_info/package_info.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -26,13 +27,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   String username;
   String userID;
-  static String nama;
-  static String jabatan;
+  static String nama = '';
+  static String jabatan = '';
   static String clockin;
   static String clockout;
   static String imageUrl;
-  static String message;
-  static String total_work;
+  static String message = '';
+  static String total_work = '';
   static String _status;
   static bool statusPhoto = false;
   static bool statusIcon = true;
@@ -41,11 +42,11 @@ class _ProfileScreenState extends State<ProfileScreen>{
   static Color _colorButton = Colors.red[700];
   static Timer timer;
 
-  String date_in;
-  String date_out;
-  String id_shift;
-  String shift_in;
-  String shift_out;
+  String date_in = '';
+  String date_out = '';
+  String id_shift = '';
+  String shift_in = '';
+  String shift_out = '';
   String shift;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
@@ -55,9 +56,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
   String _timeString;
   String _hariTanggal;
 
-  String dateId = formatDate(DateTime.now(), [dd, '-', mm, '-', yyyy]);
-
-
+  String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
 
   @override
   void initState() {
@@ -205,10 +204,12 @@ class _ProfileScreenState extends State<ProfileScreen>{
         SharedPreferences pref = await SharedPreferences.getInstance();
         setState(() {
           pref.setString('id_shift', id_shift);
-          pref.setString('shift_in', shift_in);
-          pref.setString('shift_out', shift_out);
+//          pref.setString('shift_in', shift_in);
+//          pref.setString('shift_out', shift_out);
         });
 
+        nama = dataNama;
+        jabatan = dataJabatan;
 
         if (dataClockIn == "--:--"){
           statusPhoto = false;
@@ -221,6 +222,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _visibleButton = true;
           _status = "checkin";
           shift = shift_in;
+          pref.remove('shift');
+          pref.setString('shift', shift_in);
         }else if (dataClockOut == "--:--"){
           clockin = dataClockIn;
           clockout = dataClockOut;
@@ -232,6 +235,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _visibleButton = true;
           _status = "checkout";
           shift = shift_out;
+          pref.remove('shift');
+          pref.setString('shift', shift_out);
         }else if (date_out != dateId){
           clockin = dataClockIn;
           clockout = "--:--";
@@ -244,6 +249,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _visibleButton = true;
           _status = "checkin";
           shift = shift_in;
+          pref.remove('shift');
+          pref.setString('shift', shift_in);
         }else if(id_shift == '3'){
           statusPhoto = true;
           statusIcon = false;
@@ -254,6 +261,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _statusTotalWork = true;
           _status = "checkin";
           shift = shift_in;
+          pref.remove('shift');
+          pref.setString('shift', shift_in);
           _colorButton = Colors.red[700];
         }else{
           statusPhoto = true;
@@ -264,6 +273,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
           _visibleButton = false;
           _statusTotalWork = true;
           shift = shift_in;
+          pref.remove('shift');
+          pref.setString('shift', shift_in);
           _colorButton = Colors.red[700];
           _status = "checkin";
         }
@@ -336,6 +347,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
   @override
   Widget build(BuildContext context) {
 
+    String version = About.version;
+
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: false,
@@ -399,41 +412,81 @@ class _ProfileScreenState extends State<ProfileScreen>{
         ),
         ),
         drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
+          elevation: 1.5,
+          child: Column(
             children: <Widget>[
               DrawerHeader(
-                child: new CircleAvatar(
-                  radius: 20.0,
-                    child: ClipOval(
-                      child: Image.network(photo_profile.toString(),
-                        width: 125,
-                        height: 125,
-                        fit: BoxFit.cover
-                      ),
-                    ),
-                  backgroundColor: Colors.transparent,
-                ),
+                padding: EdgeInsets.zero,
                 decoration: BoxDecoration(
-                  color: Colors.red[700]
+                    color: Colors.red[700]
+                ),
+                child: Row(
+                  children: <Widget>[
+                    SizedBox(width: 15),
+                    new CircleAvatar(
+                      radius: 30.0,
+                      child: ClipOval(
+                        child: Image.network(photo_profile.toString(),
+                            width: 125,
+                            height: 125,
+                            fit: BoxFit.cover
+                        ),
+                      ),
+                      backgroundColor: Colors.transparent,
+                    ),
+                    SizedBox(width: 10),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text(
+                          nama.toString(),
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        ),
+                        Text(
+                          jabatan.toString(),
+                          textAlign: TextAlign.left,
+                          style: TextStyle(fontSize: 14, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: <Widget>[
+                    ListTile(
+                      leading: Icon(Icons.exit_to_app),
+                      title: Text('Log Out'),
+                        onTap: () => logout()
+                    )
+                  ],
                 ),
               ),
-              Card(
-                child: ListTile(
-                    leading: Icon(Icons.screen_share),
-                    title: Text('Go to website'),
-                    onTap: () => goToWebsite()
+              Container(
+                child: Align(
+                  alignment: FractionalOffset.bottomCenter,
+                  child: Container(
+                    child: Column(
+                      children: <Widget>[
+                        Divider(),
+                        ListTile(
+                          title: new Center(
+                              child: Text(version)
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-              Card(
-                child: ListTile(
-                  leading: Icon(Icons.exit_to_app),
-                  title: Text('Log Out'),
-                  onTap: () => logout()
-                ),
-              ),
+              )
             ],
           ),
+
         ),
         body: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints viewportConstraints){
@@ -448,7 +501,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                       Container(
                         width: MediaQuery.of(context).size.width,
                         height: (MediaQuery.of(context).size.height / 2) +
-                            (MediaQuery.of(context).size.height / 8),
+                            (MediaQuery.of(context).size.height / 6),
 //                    color: Colors.red[900],
                         decoration: BoxDecoration(
                           image: DecorationImage(
@@ -534,15 +587,14 @@ class _ProfileScreenState extends State<ProfileScreen>{
                             Visibility(
                               visible: _statusTotalWork,
                               child: Column(children: <Widget>[
-                                Text("Total Work", style: TextStyle(fontSize: 18, color: Colors.white)),
+                                Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
                                 Text(total_work.toString(),
                                     style: TextStyle(
-                                      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white
+                                        fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
                                     )
                                 ),
                               ]),
                             ),
-                            SizedBox(height: 5),
                           ],
                         ),
 //            ),
@@ -550,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
                       //bagian field
                       Padding(
-                        padding: EdgeInsets.only(left: 20, right: 20, top: 30),
+                        padding: EdgeInsets.only(left: 20, right: 20, top: 15),
                         child: Column(
                           children: <Widget>[
                             Row(
@@ -568,11 +620,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
                                   ),
                                 ]),
                                 Container(
-                                    height: 30,
-                                    child: VerticalDivider(
-                                      color: Colors.redAccent,
-                                      thickness: 3,
-                                    )),
+                                    height: 10,
+                                    width: 10,
+//                                    child: VerticalDivider(
+//                                      color: Colors.redAccent,
+//                                      thickness: 3,
+//                                    ),
+                                ),
                                 Column(children: <Widget>[
                                   Text("End Time", style: TextStyle(fontSize: 18)),
                                   Text(clockout.toString(),
@@ -647,14 +701,14 @@ class _ProfileScreenState extends State<ProfileScreen>{
     });
   }
 
-  goToWebsite() async{
-    const url = "http://192.168.23.23/hr/admin";
-    if(await canLaunch(url)){
-      await launch(url);
-    }else{
-      ToastUtils.show("Can not launch website");
-    }
-  }
+//  goToWebsite() async{
+//    const url = "http://192.168.23.23/hr/admin";
+//    if(await canLaunch(url)){
+//      await launch(url);
+//    }else{
+//      ToastUtils.show("Can not launch website");
+//    }
+//  }
 
   check_status(userId) async{
     String ip;

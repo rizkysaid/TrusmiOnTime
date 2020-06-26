@@ -7,7 +7,7 @@ import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:package_info/package_info.dart';
+//import 'package:package_info/package_info.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -209,20 +209,20 @@ class _LoginBodyState extends State<LoginBody> {
 //      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
 //    });
 
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+//    PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
-    String appName = packageInfo.appName;
-    String packageName = packageInfo.packageName;
-    String version = packageInfo.version;
-    String buildNumber = packageInfo.buildNumber;
+//    String appName = packageInfo.appName;
+//    String packageName = packageInfo.packageName;
+//    String version = packageInfo.version;
+//    String buildNumber = packageInfo.buildNumber;
   }
 
-  PackageInfo _packageInfo = PackageInfo(
-    appName: 'Unknown',
-    packageName: 'Unknown',
-    version: '1.2.0',
-    buildNumber: 'Unknown',
-  );
+//  PackageInfo _packageInfo = PackageInfo(
+//    appName: 'Unknown',
+//    packageName: 'Unknown',
+//    version: '1.2.0',
+//    buildNumber: 'Unknown',
+//  );
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +250,7 @@ class _LoginBodyState extends State<LoginBody> {
                     width: MediaQuery.of(context).size.width / 2,
                     image: AssetImage("assets/logo_png_ontime.png")
                 ),
-                Text("Version "+_packageInfo.version,
+                Text("Version 1.2.0",
                     style: TextStyle(color: Colors.white)),
               ],
             ),
