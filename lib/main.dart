@@ -15,9 +15,15 @@ import 'dart:async';
 
 import 'core/ui/screens/invalid_ip.dart';
 import 'core/ui/screens/login_config.dart';
-import 'core/utils/toast_util.dart';
+//import 'core/utils/toast_util.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-void main() => runApp(MyApp());
+
+void main() => runApp(
+    Phoenix(
+        child: MyApp()
+    )
+);
 
 class MyApp extends StatelessWidget {
   @override

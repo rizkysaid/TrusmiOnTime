@@ -7,6 +7,7 @@ import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:login_absen/core/config/about.dart';
 //import 'package:package_info/package_info.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -226,6 +227,7 @@ class _LoginBodyState extends State<LoginBody> {
 
   @override
   Widget build(BuildContext context) {
+    String version = About.version;
     return Column(
       children: <Widget>[
         // bagian header
@@ -250,7 +252,7 @@ class _LoginBodyState extends State<LoginBody> {
                     width: MediaQuery.of(context).size.width / 2,
                     image: AssetImage("assets/logo_png_ontime.png")
                 ),
-                Text("Version 1.2.0",
+                Text(version,
                     style: TextStyle(color: Colors.white)),
               ],
             ),

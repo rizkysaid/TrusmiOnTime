@@ -150,6 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
     checkConnection();
+    getProfil(userID, date);
   }
 
   void _onLoading() async{
