@@ -194,18 +194,18 @@ class _PreviewScreenState extends State<PreviewScreen>{
     var ip = pref.getString('IpAddress');
 
    if(response.statusCode == 201){
-//     return true;
-     ApiServices services = ApiServices();
-     var response = await services.Profil(ip, usrId, date);
-     try {
-       if (response.status == true) {
-         setState(() {
-           return true;
-         });
-       }
-     } catch (err) {
-       print("Cannot read");
-     }
+     return true;
+//     ApiServices services = ApiServices();
+//     var response = await services.Profil(ip, usrId, date);
+//     try {
+//       if (response.status == true) {
+//         setState(() {
+//           return true;
+//         });
+//       }
+//     } catch (err) {
+//       print("Cannot read");
+//     }
 
    }else{
      print(response.statusCode);
