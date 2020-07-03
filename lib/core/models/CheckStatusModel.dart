@@ -31,15 +31,23 @@ class CheckStatusModel {
 class Data {
   Data({
     this.aktif,
+    this.achive,
+    this.message,
   });
 
   String aktif;
+  bool achive;
+  String message;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
     aktif: json["aktif"],
+    achive: json["achive"],
+    message: json["message"],
   );
 
   Map<String, dynamic> toJson() => {
     "aktif": aktif,
+    "achive": achive,
+    "message": message,
   };
 }

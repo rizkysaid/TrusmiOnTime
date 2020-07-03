@@ -733,7 +733,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
     print('Status aktif = '+response.data.aktif);
 
     if(response.data.aktif == '1'){
-        if(response.data.achieve == true) {
+        if(response.data.achive == true) {
           Navigator.pushNamed(context, "/camera",
               arguments: ScreenArguments(userID, _status, id_shift, shift)
           );
@@ -747,14 +747,14 @@ class _ProfileScreenState extends State<ProfileScreen>{
               buttons: [
                 DialogButton(
                   child: Text(
-                    "Logout",
+                    "Kembali",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   onPressed: ()=> {
-//                Future.delayed(const Duration(microseconds: 2000),(){
-//                  Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//                })
-                    logout()
+                    Future.delayed(const Duration(microseconds: 2000),(){
+                      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                    })
+//                    logout()
                   },
                   width: 120,
                 )
