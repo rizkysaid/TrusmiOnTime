@@ -730,12 +730,37 @@ class _ProfileScreenState extends State<ProfileScreen>{
     ApiServices services = ApiServices();
     var response = await services.CheckStatus(ip, userID);
 
-    print(response.data.aktif);
+    print('Status aktif = '+response.data.aktif);
 
     if(response.data.aktif == '1'){
-        Navigator.pushNamed(context, "/camera",
-          arguments: ScreenArguments(userID, _status, id_shift, shift)
-        );
+        if(response.data.achieve == true) {
+          Navigator.pushNamed(context, "/camera",
+              arguments: ScreenArguments(userID, _status, id_shift, shift)
+          );
+        }else{
+          Alert(
+              context: context,
+              style: alertStyle,
+              type: AlertType.error,
+              title: "Anda tidak bisa melakukan absen!",
+              desc: response.data.message,
+              buttons: [
+                DialogButton(
+                  child: Text(
+                    "Logout",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                  onPressed: ()=> {
+//                Future.delayed(const Duration(microseconds: 2000),(){
+//                  Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//                })
+                    logout()
+                  },
+                  width: 120,
+                )
+              ]
+          ).show();
+        }
 //        print("shift="+shift+" - idshift="+id_shift+" - status="+_status)
     }else{
       Alert(
