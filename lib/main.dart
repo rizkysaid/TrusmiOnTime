@@ -4,6 +4,7 @@ import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/ui/screens/HistoryAbsen.dart';
 import 'package:login_absen/core/ui/screens/invalid_ip.dart';
 import 'package:login_absen/core/ui/screens/ip_config.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
@@ -46,6 +47,7 @@ class MyApp extends StatelessWidget {
         "/invalid_ip": (context) => InvalidIP(),
         "/ip_config": (context) => IpConfig(),
         "/login_config": (context) => LoginConfig(),
+        "/history_absen": (context) => HistoryAbsen(),
       },
     );
   }

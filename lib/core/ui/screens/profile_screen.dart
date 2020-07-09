@@ -461,8 +461,18 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   padding: EdgeInsets.zero,
                   children: <Widget>[
                     ListTile(
-                      leading: Icon(Icons.exit_to_app),
-                      title: Text('Log Out'),
+                        leading: Icon(Icons.alarm_on),
+                        title: Text('Absen'),
+                        onTap: () => absen()
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.add_to_home_screen),
+                      title: Text('History Absen'),
+                        onTap: () => history()
+                    ),
+                    ListTile(
+                        leading: Icon(Icons.exit_to_app),
+                        title: Text('Log Out'),
                         onTap: () => logout()
                     )
                   ],
@@ -690,6 +700,20 @@ class _ProfileScreenState extends State<ProfileScreen>{
     Future.delayed(const Duration(microseconds: 2000), () {
       Navigator.pushNamedAndRemoveUntil(
           context, "/login", (Route<dynamic> routes) => false);
+    });
+  }
+
+  absen(){
+    Future.delayed(const Duration(microseconds: 2000), () {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/profile", (Route<dynamic> routes) => false);
+    });
+  }
+
+  history(){
+    Future.delayed(const Duration(microseconds: 2000), () {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/history_absen", (Route<dynamic> routes) => false);
     });
   }
 

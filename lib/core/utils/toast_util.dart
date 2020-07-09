@@ -14,9 +14,6 @@ class ToastUtils {
       fontSize: 16.0
     );
 
-
-
   }
-
 
 }

@@ -53,15 +53,15 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
 //    var ip = allRows[0]['ip_address'];
     var ip = pref.getString('IpAddress');
 
-    ApiServices services = ApiServices();
-    var response = await services.Profil(ip, userID, date);
-    if (response == null) {
-//      ToastUtils.show("Error Connecting To Server");
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/invalid_ip", (Route<dynamic>routes) => false);
-      });
-    } else {
+//    ApiServices services = ApiServices();
+//    var response = await services.Profil(ip, userID, date);
+//    if (response == null) {
+////      ToastUtils.show("Error Connecting To Server");
+//      Future.delayed(const Duration(microseconds: 2000), () {
+//        Navigator.pushNamedAndRemoveUntil(
+//            context, "/invalid_ip", (Route<dynamic>routes) => false);
+//      });
+//    } else {
       if (username != null) {
         Future.delayed(const Duration(microseconds: 2000), () {
           Navigator.pushNamedAndRemoveUntil(
@@ -73,7 +73,7 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
               context, "/login", (Route<dynamic>routes) => false);
         });
       }
-    }
+//    }
   }
 
 
