@@ -1,6 +1,3 @@
-// To parse this JSON data, do
-//
-//     final checkKoneksiModel = checkKoneksiModelFromJson(jsonString);
 
 import 'dart:convert';
 

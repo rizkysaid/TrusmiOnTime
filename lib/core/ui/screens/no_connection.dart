@@ -1,7 +1,6 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -31,7 +30,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   @override
   initState() {
     super.initState();
-//    checkConnection();
+
   }
 
   @override
@@ -49,7 +48,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     ApiServices services = ApiServices();
     var response = await services.Profil(ip, userID, date);
     if (response == null) {
-//      ToastUtils.show("Error Connecting To Server");
+
       Future.delayed(const Duration(microseconds: 2000), () {
         Navigator.pushNamedAndRemoveUntil(
             context, "/invalid_ip", (Route<dynamic>routes) => false);
@@ -73,15 +72,10 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
+
       ToastUtils.show("No office Wifi connection");
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        ToastUtils.show("Connected to server");
-//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//      });
 
       getPref();
     }
@@ -91,17 +85,17 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 
 
   void _onRefresh() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
   void _onLoading() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
 
     _refreshController.loadComplete();
   }
@@ -142,7 +136,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
       onLoading: _onLoading,
       child: Column(
         children: <Widget>[
-          // bagian header
+
           SizedBox(height: 50,),
           Container(
             child: Image(

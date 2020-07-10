@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:login_absen/core/models/AuthModel.dart';
-//import 'package:login_absen/core/config/endpoint.dart';
+
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
@@ -16,8 +16,7 @@ class ApiServices{
           ip+'/login',
           body: {'username' : username, 'password' : password}
       );
-//      print("Response Status : ${response.statusCode}");
-//      print("Response Body : ${response.body}");
+
       if (response.statusCode == 200) {
         AuthModel responseRequest = AuthModel.fromJson(jsonDecode(response.body));
         return responseRequest;
@@ -41,7 +40,7 @@ class ApiServices{
         ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
         return responseRequest;
       } else {
-//        ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
+
         return null;
       }
 
@@ -83,7 +82,7 @@ class ApiServices{
         CheckStatusModel responseRequest = CheckStatusModel.fromJson(jsonDecode(response.body));
         return responseRequest;
       } else {
-//        ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
+
         return null;
       }
 

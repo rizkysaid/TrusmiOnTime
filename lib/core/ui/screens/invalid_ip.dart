@@ -2,7 +2,6 @@ import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/database/database_helper.dart';
-import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -69,17 +68,11 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
+
       ToastUtils.show("No office Wifi connection");
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
 
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        ToastUtils.show("Connected to server");
-//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//      });
-
-//      getPref();
       setState(() {
         _saving = false;
       });
@@ -184,12 +177,6 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
     );
   }
 
-//  void show_ip() async {
-//    final allRows = await dbHelper.queryAllRows();
-//    print('query all rows:');
-//    allRows.forEach((row) => print(row));
-//    ip = allRows[0]['ip_address'];
-//    print(ip);
-//  }
+
 }
 

@@ -57,7 +57,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   void dispose() {
-    // Dispose of the controller when the widget is disposed.
+
     controller.dispose();
     super.dispose();
   }
@@ -89,7 +89,7 @@ class _CameraScreenState extends State<CameraScreen> {
     ApiServices services = ApiServices();
     var response = await services.Profil(ip, userID, date);
     if (response == null) {
-//      ToastUtils.show("Error Connecting To Server");
+
       Future.delayed(const Duration(microseconds: 2000), () {
         Navigator.pushNamedAndRemoveUntil(
             this.context, "/invalid_ip", (Route<dynamic>routes) => false);
@@ -140,7 +140,7 @@ class _CameraScreenState extends State<CameraScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Expanded(
-//                flex: 1,
+
                   child: _cameraPreviewWidget(),
                 ),
                 Align(
@@ -148,7 +148,7 @@ class _CameraScreenState extends State<CameraScreen> {
                   child: Container(
                     height: 120,
                     width: double.infinity,
-//                    padding: EdgeInsets.all(15),
+
                     color: Colors.black,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.start,

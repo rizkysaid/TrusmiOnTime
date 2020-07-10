@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -40,7 +38,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
   @override
   initState() {
     super.initState();
-//    checkConnection();
+
     getPref();
 
   }
@@ -81,15 +79,10 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
+
       ToastUtils.show("No office Wifi connection");
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        ToastUtils.show("Connected to server");
-//        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//      });
 
       getPref();
     }
@@ -99,17 +92,16 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
 
   void _onRefresh() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
   void _onLoading() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
 
     _refreshController.loadComplete();
   }
@@ -154,16 +146,11 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
         ),
         body: Center(
           child: Column(
-//            mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.all(8.0),
                 child: TextFormField(
                   controller: ipconfig,
-//                  validator: validateUser,
-//                  onSaved: (String value){
-//                    username = value;
-//                  },
                   key: Key('ip_address'),
                   decoration: InputDecoration(
                       hintText: 'IP Address', labelText: 'IP Address',
@@ -176,22 +163,10 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
                   ),
                 ),
               ),
-//               RaisedButton(
-//                child: Text('insert', style: TextStyle(fontSize: 20),),
-//                onPressed: () {_insert();},
-//              ),
               RaisedButton(
                 child: Text('Connect', style: TextStyle(fontSize: 20),),
                 onPressed: () {check_connection();},
               ),
-//              RaisedButton(
-//                child: Text('update', style: TextStyle(fontSize: 20),),
-//                onPressed: () {_update();},
-//              ),
-//              RaisedButton(
-//                child: Text('delete', style: TextStyle(fontSize: 20),),
-//                onPressed: () {_delete();},
-//              ),
             Visibility(
               visible: show_con_success,
               child: Column(
@@ -228,7 +203,6 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
                   ],
                 ),
               ),
-
             ],
           ),
         ),
@@ -236,41 +210,9 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
     );
   }
 
-  // Button onPressed methods
-
-  void _insert() async {
-    // row to insert
-//    Map<String, dynamic> row = {
-//      DatabaseHelper.columnIpAddress : 'http://192.168.1.117/absensi/api',
-//      DatabaseHelper.columnName : 'Trusmi Holding Office',
-//      DatabaseHelper.columnIsActive  : 1
-//    };
-//    final id = await dbHelper.insert(row);
-//    print('inserted row id: $id');
-  }
-
   void show_ip() async {
 
     ipconfig.text = Endpoint.base_url;
-  }
-
-  void _update() async {
-    // row to update
-//    Map<String, dynamic> row = {
-//      DatabaseHelper.columnId   : 1,
-//      DatabaseHelper.columnName : 'Mary',
-//      DatabaseHelper.columnAge  : 32
-//    };
-//    final rowsAffected = await dbHelper.update(row);
-//    print('updated $rowsAffected row(s)');
-  }
-
-  void _delete() async {
-//     Assuming that the number of rows is the id for the last row.
-    final id = await dbHelper.queryRowCount();
-    final rowsDeleted = await dbHelper.delete(id);
-    print('deleted $rowsDeleted row(s): row $id');
-
   }
 
   void check_connection() async{

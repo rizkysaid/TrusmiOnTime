@@ -9,7 +9,6 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:login_absen/core/config/about.dart';
-//import 'package:package_info/package_info.dart';
 
 bool _saving = false;
 
@@ -36,13 +35,13 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
+
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
       });
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
+
 
     }
   }
@@ -51,17 +50,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
 
   void _onRefresh() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
   void _onLoading() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
 
     _refreshController.loadComplete();
   }
@@ -161,18 +160,14 @@ class _LoginBodyState extends State<LoginBody> {
 
     ApiServices services = ApiServices();
     var response = await services.CheckKoneksi(ip);
-//    if(response == null){
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
-//      });
-//    }else{
+
       SharedPreferences pref = await SharedPreferences.getInstance();
       var username = pref.getString('username');
       if(username != null){
         Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });
-//      }
+
     }
 
   }
@@ -223,35 +218,18 @@ class _LoginBodyState extends State<LoginBody> {
       ToastUtils.show("Please Input All Fields");
     }
 
-//    Future.delayed(const Duration(microseconds: 2000),(){
-//      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//    });
-
-//    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-//    String appName = packageInfo.appName;
-//    String packageName = packageInfo.packageName;
-//    String version = packageInfo.version;
-//    String buildNumber = packageInfo.buildNumber;
   }
-
-//  PackageInfo _packageInfo = PackageInfo(
-//    appName: 'Unknown',
-//    packageName: 'Unknown',
-//    version: '1.2.0',
-//    buildNumber: 'Unknown',
-//  );
 
   @override
   Widget build(BuildContext context) {
     String version = About.version;
     return Column(
       children: <Widget>[
-        // bagian header
+
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 6,
-//          color: Colors.red,
+
           decoration: BoxDecoration(
             image: DecorationImage(
               image: AssetImage('assets/background_login.png'),

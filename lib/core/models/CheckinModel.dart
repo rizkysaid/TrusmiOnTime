@@ -1,6 +1,3 @@
-// To parse this JSON data, do
-//
-//     final checkinModel = checkinModelFromJson(jsonString);
 
 import 'dart:convert';
 

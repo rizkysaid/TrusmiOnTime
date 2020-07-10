@@ -1,12 +1,8 @@
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
-import 'package:login_absen/core/database/database_helper.dart';
-import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 
 class LoginConfig extends StatefulWidget {
@@ -33,13 +29,13 @@ class _LoginConfigState extends State<LoginConfig> {
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
+
       Future.delayed(const Duration(microseconds: 2000),(){
         Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
       });
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
+
 
     }
   }
@@ -48,17 +44,17 @@ class _LoginConfigState extends State<LoginConfig> {
 
 
   void _onRefresh() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use refreshFailed()
+
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
   void _onLoading() async{
-    // monitor network fetch
+
     await Future.delayed(Duration(milliseconds: 1000));
-    // if failed,use loadFailed(),if no data return,use LoadNodata()
+
 
     _refreshController.loadComplete();
   }
@@ -119,55 +115,8 @@ class _LoginBodyState extends State<LoginBody> {
   @override
   void initState(){
     super.initState();
-//    getPref();
+
   }
-
-
-//  savePref(String username, String userID) async{
-//    SharedPreferences pref = await SharedPreferences.getInstance();
-//    setState(() {
-//      pref.setString('username', username);
-//      pref.setString('userID', userID);
-//    });
-//  }
-
-//  getPref() async{
-//
-//    String ip;
-//    final dbHelper = DatabaseHelper.instance;
-//    final allRows = await dbHelper.queryAllRows();
-//    print('query all rows:' +allRows.toList().toString());
-//    print('Length = '+allRows.length.toString());
-//
-//    if(allRows.length != 0){
-//
-//      allRows.forEach((row) => print(row));
-//      ip = allRows[0]['ip_address'];
-//
-//    }else{
-//      ip = Endpoint.base_url;
-//    }
-//
-//    print('Check IP in getPref LoginConfig = '+ip.toString());
-//
-//    ApiServices services = ApiServices();
-//    var response = await services.CheckKoneksi(ip);
-//    if(response == null){
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
-//      });
-//    }else{
-//      SharedPreferences pref = await SharedPreferences.getInstance();
-//      var username = pref.getString('username');
-//      if(username != null){
-//        Future.delayed(const Duration(microseconds: 2000),(){
-//          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//        });
-//      }
-//    }
-//
-//
-//  }
 
   Future<void> prosesLogin() async{
 
@@ -197,20 +146,15 @@ class _LoginBodyState extends State<LoginBody> {
       ToastUtils.show("Please Input All Fields");
     }
 
-//    Future.delayed(const Duration(microseconds: 2000),(){
-//      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        // bagian header
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 6,
-//          color: Colors.red,
           decoration: BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('assets/background_login.png'),
@@ -222,12 +166,6 @@ class _LoginBodyState extends State<LoginBody> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-//                Image(
-//                    alignment: Alignment.center,
-//                    height: MediaQuery.of(context).size.width / 4,
-//                    width: MediaQuery.of(context).size.width / 2,
-//                    image: AssetImage("assets/logo_png_ontime.png")
-//                )
                 Text('Login Configuration',
                   style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
                 )
@@ -236,7 +174,6 @@ class _LoginBodyState extends State<LoginBody> {
           ),
         ),
 
-        //bagian field
         Padding(
           padding: EdgeInsets.only(left: 20, right: 20, top: 30),
           child: Column(
