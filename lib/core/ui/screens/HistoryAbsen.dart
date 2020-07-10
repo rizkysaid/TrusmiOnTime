@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,9 +19,13 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
   String url = "";
   double progress = 0;
 
+  String username = '';
+  String password = '';
+
   @override
   void initState() {
     super.initState();
+    getPref();
   }
 
   @override
@@ -28,25 +33,32 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
     super.dispose();
   }
 
+  void getPref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      username = pref.getString('username');
+      password = pref.getString('password');
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
                 child: Container(
-                  margin: const EdgeInsets.all(10.0),
-                  decoration:
-                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    initialUrl: "http://192.168.23.23/hr/bypass/login/said/12345678",
+                    initialUrl: "http://192.168.23.23/hr/bypass/login/"+username+"/"+password,
                     initialHeaders: {},
-                    initialOptions: InAppWebViewGroupOptions(
-                        crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true,
-                        )
-                    ),
+//                    initialOptions: InAppWebViewGroupOptions(
+//                        crossPlatform: InAppWebViewOptions(
+//                          debuggingEnabled: true,
+//                        )
+//                    ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
@@ -68,35 +80,6 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                   ),
                 ),
               ),
-//              ButtonBar(
-//                alignment: MainAxisAlignment.center,
-//                children: <Widget>[
-//                  RaisedButton(
-//                    child: Icon(Icons.arrow_back),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.goBack();
-//                      }
-//                    },
-//                  ),
-//                  RaisedButton(
-//                    child: Icon(Icons.arrow_forward),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.goForward();
-//                      }
-//                    },
-//                  ),
-//                  RaisedButton(
-//                    child: Icon(Icons.refresh),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.reload();
-//                      }
-//                    },
-//                  ),
-//                ],
-//              ),
             ]
             )
         ),

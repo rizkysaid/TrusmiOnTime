@@ -123,11 +123,12 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
 
-  savePref(String username, String userID) async{
+  savePref(String username, String userID, String pass) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString('username', username);
       pref.setString('userID', userID);
+      pref.setString('password', pass);
     });
   }
 
@@ -194,7 +195,7 @@ class _LoginBodyState extends State<LoginBody> {
 
 
       if(response.status == true){
-        savePref(usernameController.text.toString(), usrId);
+        savePref(usernameController.text.toString(), usrId, passwordController.text);
         Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
         });

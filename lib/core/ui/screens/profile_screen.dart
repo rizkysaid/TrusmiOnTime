@@ -721,6 +721,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.remove('username');
+      pref.remove('password');
       pref.remove('clock_in');
 //      pref.remove('_status');
     });
