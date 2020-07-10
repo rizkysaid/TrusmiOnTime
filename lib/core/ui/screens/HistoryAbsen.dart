@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+bool _saving = false;
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +29,9 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
   void initState() {
     super.initState();
     getPref();
+    setState(() {
+      _saving = true;
+    });
   }
 
   @override
@@ -47,41 +53,47 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        body: Container(
-            child: Column(children: <Widget>[
-              Expanded(
-                child: Container(
-                  child: InAppWebView(
-                    initialUrl: "http://192.168.23.23/hr/bypass/login/"+username+"/"+password,
-                    initialHeaders: {},
+        body: ModalProgressHUD(
+          inAsyncCall: _saving,
+          child: Container(
+              child: Column(children: <Widget>[
+                Expanded(
+                  child: Container(
+                    child: InAppWebView(
+                      initialUrl: "http://192.168.23.23/hr/bypass/login/"+username+"/"+password,
+                      initialHeaders: {},
 //                    initialOptions: InAppWebViewGroupOptions(
 //                        crossPlatform: InAppWebViewOptions(
 //                          debuggingEnabled: true,
 //                        )
 //                    ),
-                    onWebViewCreated: (InAppWebViewController controller) {
-                      webView = controller;
-                    },
-                    onLoadStart: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        this.url = url;
-                      });
-                    },
-                    onLoadStop: (InAppWebViewController controller, String url) async {
-                      setState(() {
-                        this.url = url;
-                      });
-                    },
-                    onProgressChanged: (InAppWebViewController controller, int progress) {
-                      setState(() {
-                        this.progress = progress / 100;
-                      });
-                    },
+                      onWebViewCreated: (InAppWebViewController controller) {
+                        webView = controller;
+                        _saving = true;
+                      },
+                      onLoadStart: (InAppWebViewController controller, String url) {
+                        setState(() {
+                          this.url = url;
+                          _saving = true;
+                        });
+                      },
+                      onLoadStop: (InAppWebViewController controller, String url) async {
+                        setState(() {
+                          this.url = url;
+                          _saving = false;
+                        });
+                      },
+                      onProgressChanged: (InAppWebViewController controller, int progress) {
+                        setState(() {
+                          this.progress = progress / 100;
+                        });
+                      },
+                    ),
                   ),
                 ),
-              ),
-            ]
-            )
+              ]
+              )
+          ),
         ),
         bottomNavigationBar:
         BottomAppBar(
@@ -100,7 +112,7 @@ class _HistoryAbsenState extends State<HistoryAbsen> {
                 })
               },
               backgroundColor: Colors.red,
-              child: Icon(Icons.alarm_on, color: Colors.white, size: 40),
+              child: Icon(Icons.chevron_left, color: Colors.white, size: 40),
             )
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

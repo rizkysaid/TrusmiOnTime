@@ -842,8 +842,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
       }
     }
 
-
-
   }
   var alertStyle = AlertStyle(
       animationType: AnimationType.fromTop,
