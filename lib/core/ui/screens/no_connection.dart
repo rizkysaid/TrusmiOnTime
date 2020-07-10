@@ -44,12 +44,6 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
     userID = pref.getString('userID');
-
-//    final dbHelper = DatabaseHelper.instance;
-//    final allRows = await dbHelper.queryAllRows();
-//    print('query all rows:');
-//    allRows.forEach((row) => print(row));
-//    var ip = allRows[0]['ip_address'];
     var ip = pref.getString('IpAddress');
 
     ApiServices services = ApiServices();

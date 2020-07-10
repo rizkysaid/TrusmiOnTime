@@ -9,6 +9,7 @@ import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
@@ -17,6 +18,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
 //import 'package:url_launcher/url_launcher.dart';
 //import 'package:package_info/package_info.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -58,6 +60,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
 
+  bool _saving = false;
+
   @override
   void initState() {
 
@@ -83,6 +87,10 @@ class _ProfileScreenState extends State<ProfileScreen>{
           });
         }
       });
+
+    setState(() {
+      _saving = true;
+    });
 
   }
 
@@ -151,6 +159,9 @@ class _ProfileScreenState extends State<ProfileScreen>{
     _refreshController.refreshCompleted();
     checkConnection();
     getProfil(userID, date);
+    setState(() {
+      _saving = true;
+    });
   }
 
   void _onLoading() async{
@@ -166,7 +177,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
       String ip;
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      print('query all rows:');
+      print('query all rows get profil profile screen:');
       print('Length = '+allRows.length.toString());
 
       if(allRows.length != 0){
@@ -176,6 +187,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       }else{
         ip = Endpoint.base_url;
+
       }
 
       ApiServices services = ApiServices();
@@ -285,6 +297,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
             setState(() {
               nama = dataNama;
               jabatan = dataJabatan;
+              _saving = false;
             });
           }else{
             Future.delayed(const Duration(microseconds: 2000),(){
@@ -381,6 +394,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
+      child: ModalProgressHUD(
       child: Scaffold(
         appBar: AppBar(
           brightness: Brightness.dark,
@@ -500,166 +514,167 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
         ),
         body: LayoutBuilder(
-            builder: (BuildContext context, BoxConstraints viewportConstraints){
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: viewportConstraints.maxHeight
-                  ),
-                  child: Column(
-                    children: <Widget>[
-                      // bagian header
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        height: (MediaQuery.of(context).size.height / 2) +
-                            (MediaQuery.of(context).size.height / 6),
+              builder: (BuildContext context, BoxConstraints viewportConstraints){
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: viewportConstraints.maxHeight
+                    ),
+                    child: Column(
+                      children: <Widget>[
+                        // bagian header
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: (MediaQuery.of(context).size.height / 2) +
+                              (MediaQuery.of(context).size.height / 6),
 //                    color: Colors.red[900],
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('assets/background.png'),
-                            fit: BoxFit.cover
-                          )
-                        ),
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage('assets/background.png'),
+                              fit: BoxFit.cover
+                            )
+                          ),
 
 //            child: SafeArea(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            SizedBox(height: 20),
-                            Container(
-                              width: 300.0,
-                              height: 300.0,
-                              decoration: new BoxDecoration(
-                                color: Colors.lightBlue[50].withOpacity(0.2),
-                                shape: BoxShape.circle,
-                              ),
-                              child: Column(
-                                children: <Widget>[
-                                  SizedBox(height: 20),
-                                  Visibility(
-                                    visible: statusPhoto,
-                                    child: Container(
-                                      width: 160.0,
-                                      height: 160.0,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[300],
-                                        shape: BoxShape.circle,
-                                        image: new DecorationImage(
-                                          fit: BoxFit.cover,
-                                          image: new NetworkImage(imageUrl.toString()),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              SizedBox(height: 20),
+                              Container(
+                                width: 300.0,
+                                height: 300.0,
+                                decoration: new BoxDecoration(
+                                  color: Colors.lightBlue[50].withOpacity(0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Column(
+                                  children: <Widget>[
+                                    SizedBox(height: 20),
+                                    Visibility(
+                                      visible: statusPhoto,
+                                      child: Container(
+                                        width: 160.0,
+                                        height: 160.0,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          shape: BoxShape.circle,
+                                          image: new DecorationImage(
+                                            fit: BoxFit.cover,
+                                            image: new NetworkImage(imageUrl.toString()),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Visibility(
-                                    visible: statusIcon,
-                                    child: Container(
-                                      width: 160.0,
-                                      height: 160.0,
-                                      decoration: new BoxDecoration(
-                                        color: Colors.grey[300],
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Icon(
-                                        Icons.person_outline,
-                                        color: Colors.white,
-                                        size: 120.0,
+                                    Visibility(
+                                      visible: statusIcon,
+                                      child: Container(
+                                        width: 160.0,
+                                        height: 160.0,
+                                        decoration: new BoxDecoration(
+                                          color: Colors.grey[300],
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Icon(
+                                          Icons.person_outline,
+                                          color: Colors.white,
+                                          size: 120.0,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Text(nama.toString(),
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(jabatan.toString(),
-                                      style: TextStyle(color: Colors.white)),
-                                  SizedBox(height: 20),
-                                  Text(_timeString.toString(),
-                                      style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 25,
-                                          fontWeight: FontWeight.bold)),
-                                  Text(_hariTanggal.toString(),
-                                      style: TextStyle(color: Colors.white, fontSize: 12))
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Text(
-                              message.toString(),
-                              style: TextStyle(
-                                  color: Colors.white
-                              ),
-                            ),
-                            SizedBox(height: 20),
-                            Visibility(
-                              visible: _statusTotalWork,
-                              child: Column(children: <Widget>[
-                                Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
-                                Text(total_work.toString(),
-                                    style: TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
-                                    )
+                                    SizedBox(height: 10),
+                                    Text(nama.toString(),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(jabatan.toString(),
+                                        style: TextStyle(color: Colors.white)),
+                                    SizedBox(height: 20),
+                                    Text(_timeString.toString(),
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 25,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(_hariTanggal.toString(),
+                                        style: TextStyle(color: Colors.white, fontSize: 12))
+                                  ],
                                 ),
-                              ]),
-                            ),
-                          ],
-                        ),
-//            ),
-                      ),
-
-                      //bagian field
-                      Padding(
-                        padding: EdgeInsets.only(left: 20, right: 20, top: 15),
-                        child: Column(
-                          children: <Widget>[
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: <Widget>[
-                                Column(children: <Widget>[
-                                  Text("Start Time", style: TextStyle(fontSize: 18)),
-                                  Text(clockin.toString(),
+                              ),
+                              SizedBox(height: 20),
+                              Text(
+                                message.toString(),
+                                style: TextStyle(
+                                    color: Colors.white
+                                ),
+                              ),
+                              SizedBox(height: 20),
+                              Visibility(
+                                visible: _statusTotalWork,
+                                child: Column(children: <Widget>[
+                                  Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
+                                  Text(total_work.toString(),
                                       style: TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold)
-                                  ),
-                                  Text(date_in.toString(),
-                                      style: TextStyle(
-                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                          fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
+                                      )
                                   ),
                                 ]),
-                                Container(
-                                    height: 10,
-                                    width: 10,
+                              ),
+                            ],
+                          ),
+//            ),
+                        ),
+
+                        //bagian field
+                        Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20, top: 15),
+                          child: Column(
+                            children: <Widget>[
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Column(children: <Widget>[
+                                    Text("Start Time", style: TextStyle(fontSize: 18)),
+                                    Text(clockin.toString(),
+                                        style: TextStyle(
+                                            fontSize: 18, fontWeight: FontWeight.bold)
+                                    ),
+                                    Text(date_in.toString(),
+                                        style: TextStyle(
+                                            fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ]),
+                                  Container(
+                                      height: 10,
+                                      width: 10,
 //                                    child: VerticalDivider(
 //                                      color: Colors.redAccent,
 //                                      thickness: 3,
 //                                    ),
-                                ),
-                                Column(children: <Widget>[
-                                  Text("End Time", style: TextStyle(fontSize: 18)),
-                                  Text(clockout.toString(),
+                                  ),
+                                  Column(children: <Widget>[
+                                    Text("End Time", style: TextStyle(fontSize: 18)),
+                                    Text(clockout.toString(),
+                                        style: TextStyle(
+                                            fontSize: 18, fontWeight: FontWeight.bold)
+                                    ),
+                                    Text(date_out.toString(),
                                       style: TextStyle(
-                                          fontSize: 18, fontWeight: FontWeight.bold)
-                                  ),
-                                  Text(date_out.toString(),
-                                    style: TextStyle(
-                                        fontSize: 16, fontWeight: FontWeight.bold),
-                                  ),
-                                ]),
-                              ],
-                            ),
-                          ],
-                        ),
-                      )
-                    ],
+                                          fontSize: 16, fontWeight: FontWeight.bold),
+                                    ),
+                                  ]),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
-                ),
-              );
-            }
-          ),
+                );
+              }
+            ),
+
         bottomNavigationBar:
         BottomAppBar(
           shape: const CircularNotchedRectangle(),
@@ -683,6 +698,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
         ),
 
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      ),
+          inAsyncCall: _saving
       ),
     );
   }
@@ -737,17 +754,19 @@ class _ProfileScreenState extends State<ProfileScreen>{
 //  }
 
   check_status(userId) async{
+
+    setState(() {
+      _saving = true;
+    });
+
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
+    print('query all rows check status profil screen:'+dbHelper.toString());
     print('Length = '+allRows.length.toString());
 
     if(allRows.length != 0){
-
-//        allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
-
     }else{
       ip = Endpoint.base_url;
     }
@@ -755,9 +774,19 @@ class _ProfileScreenState extends State<ProfileScreen>{
     ApiServices services = ApiServices();
     var response = await services.CheckStatus(ip, userID);
 
-    print('Status aktif = '+response.data.aktif);
+    if(response == null){
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/invalid_ip", (Route<dynamic> routes) => false);
+      });
+    }else{
+      print('Status aktif = '+response.data.aktif);
 
-    if(response.data.aktif == '1'){
+      setState(() {
+        _saving = false;
+      });
+
+      if(response.data.aktif == '1'){
         if(response.data.achive == true) {
           Navigator.pushNamed(context, "/camera",
               arguments: ScreenArguments(userID, _status, id_shift, shift)
@@ -787,30 +816,33 @@ class _ProfileScreenState extends State<ProfileScreen>{
           ).show();
         }
 //        print("shift="+shift+" - idshift="+id_shift+" - status="+_status)
-    }else{
-      Alert(
-          context: context,
-          style: alertStyle,
-          type: AlertType.error,
-          title: "Anda tidak bisa melakukan absen!",
-          desc: "User anda telah dinonaktifkan.",
-          buttons: [
-            DialogButton(
-              child: Text(
-                "Logout",
-                style: TextStyle(color: Colors.white, fontSize: 20),
-              ),
-              onPressed: ()=> {
+      }else{
+        Alert(
+            context: context,
+            style: alertStyle,
+            type: AlertType.error,
+            title: "Anda tidak bisa melakukan absen!",
+            desc: "User anda telah dinonaktifkan.",
+            buttons: [
+              DialogButton(
+                child: Text(
+                  "Logout",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),
+                onPressed: ()=> {
 //                Future.delayed(const Duration(microseconds: 2000),(){
 //                  Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
 //                })
-                logout()
-              },
-              width: 120,
-            )
-          ]
-      ).show();
+                  logout()
+                },
+                width: 120,
+              )
+            ]
+        ).show();
+      }
     }
+
+
 
   }
   var alertStyle = AlertStyle(

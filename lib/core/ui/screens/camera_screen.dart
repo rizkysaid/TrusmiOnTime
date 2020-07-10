@@ -1,11 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
+import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/database/database_helper.dart';
+import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/preview_screen.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 
+bool _saving = false;
 class CameraScreen extends StatefulWidget {
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -17,6 +23,10 @@ class _CameraScreenState extends State<CameraScreen> {
   List cameras;
   int selectedCameraIndex;
   String imgPath;
+
+  String userID;
+  String username;
+  static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   @override
   void initState(){
@@ -36,6 +46,13 @@ class _CameraScreenState extends State<CameraScreen> {
     }).catchError((err){
       print('Error :${err.code}Error message : ${err.message}');
     });
+
+    getPref();
+
+    setState(() {
+      _saving = true;
+    });
+
   }
 
   @override
@@ -43,6 +60,45 @@ class _CameraScreenState extends State<CameraScreen> {
     // Dispose of the controller when the widget is disposed.
     controller.dispose();
     super.dispose();
+  }
+
+  getPref()async {
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if(allRows.length != 0){
+
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      setState(() {
+        username = pref.getString('username');
+        userID = pref.getString('userID');
+      });
+
+    }else{
+      ip = Endpoint.base_url;
+    }
+
+
+    print('userId nyee '+userID);
+    print('IP nyee '+ip);
+    print('date nyee '+date);
+
+    ApiServices services = ApiServices();
+    var response = await services.Profil(ip, userID, date);
+    if (response == null) {
+//      ToastUtils.show("Error Connecting To Server");
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            this.context, "/invalid_ip", (Route<dynamic>routes) => false);
+      });
+    } else {
+      setState(() {
+        _saving = false;
+      });
+    }
   }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
@@ -75,38 +131,42 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget build(BuildContext context) {
 
     return Scaffold(
-      body: Container(
-        color: Colors.black,
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
+      body: ModalProgressHUD(
+        inAsyncCall: _saving,
+        child: Container(
+          color: Colors.black,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                Expanded(
 //                flex: 1,
-                child: _cameraPreviewWidget(),
-              ),
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  padding: EdgeInsets.all(15),
-                  color: Colors.black,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      _cameraToggleRowWidget(),
-                      _cameraControlWidget(context),
-                      Spacer()
-                    ],
-                  ),
+                  child: _cameraPreviewWidget(),
                 ),
-              )
-            ],
+                Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    height: 120,
+                    width: double.infinity,
+//                    padding: EdgeInsets.all(15),
+                    color: Colors.black,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        _cameraToggleRowWidget(),
+                        _cameraControlWidget(context),
+                        Spacer()
+                      ],
+                    ),
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),
     );
+
   }
 
   /// Display Camera preview.
@@ -231,6 +291,8 @@ class _CameraScreenState extends State<CameraScreen> {
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
     _initCameraController(selectedCamera);
   }
+
+
 
 
 }

@@ -37,13 +37,13 @@ class ApiServices{
       var response = await http.get(ip+'/profil/'+userID+'/'+date);
       print("Response Status : ${response.statusCode}");
       print("Response Body : ${response.body}");
-//      if (response.statusCode == 200) {
+      if (response.statusCode == 200) {
         ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
         return responseRequest;
-//      } else {
+      } else {
 //        ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
-//        return responseRequest;
-//      }
+        return null;
+      }
 
     }catch(e){
       print("Error get profile: " + e.toString());
@@ -79,13 +79,13 @@ class ApiServices{
       var response = await http.get(ip+'/check_in/'+userID);
       print("Response CekStatus Status : ${response.statusCode}");
       print("Response CekStatus Body : ${response.body}");
-//      if (response.statusCode == 200) {
-      CheckStatusModel responseRequest = CheckStatusModel.fromJson(jsonDecode(response.body));
-      return responseRequest;
-//      } else {
+      if (response.statusCode == 200) {
+        CheckStatusModel responseRequest = CheckStatusModel.fromJson(jsonDecode(response.body));
+        return responseRequest;
+      } else {
 //        ProfileModel responseRequest = ProfileModel.fromJson(jsonDecode(response.body));
-//        return responseRequest;
-//      }
+        return null;
+      }
 
     }catch(e){
       print("Error Check Status: " + e.toString());

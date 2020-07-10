@@ -5,10 +5,13 @@ import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:login_absen/core/config/about.dart';
 //import 'package:package_info/package_info.dart';
+
+bool _saving = false;
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -98,7 +101,12 @@ class _LoginScreenState extends State<LoginScreen> {
       onRefresh: _onRefresh,
       onLoading: _onLoading,
       child: Scaffold(
-          body: SingleChildScrollView(child: LoginBody()),
+        body: ModalProgressHUD(
+            child: SingleChildScrollView(
+                child: LoginBody()
+            ),
+            inAsyncCall: _saving
+        ),
       ),
     );
   }
@@ -172,6 +180,11 @@ class _LoginBodyState extends State<LoginBody> {
   Future<void> prosesLogin() async{
     
     if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
+
+      setState(() {
+        _saving = true;
+      });
+
       String ip;
       ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
@@ -198,6 +211,9 @@ class _LoginBodyState extends State<LoginBody> {
         savePref(usernameController.text.toString(), usrId, passwordController.text);
         Future.delayed(const Duration(microseconds: 2000),(){
           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+        });
+        setState(() {
+          _saving = false;
         });
       }else{
         ToastUtils.show(messageLogin);
@@ -234,7 +250,7 @@ class _LoginBodyState extends State<LoginBody> {
         // bagian header
         Container(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 4,
+          height: MediaQuery.of(context).size.height / 6,
 //          color: Colors.red,
           decoration: BoxDecoration(
             image: DecorationImage(
@@ -249,7 +265,7 @@ class _LoginBodyState extends State<LoginBody> {
               children: <Widget>[
                 Image(
                   alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.width / 4,
+                    height: MediaQuery.of(context).size.width / 6,
                     width: MediaQuery.of(context).size.width / 2,
                     image: AssetImage("assets/logo_png_ontime.png")
                 ),

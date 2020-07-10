@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+bool _saving = false;
 class InvalidIP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -33,7 +35,10 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
   @override
   initState() {
     super.initState();
-//    checkConnection();
+    checkConnection();
+    setState(() {
+      _saving = true;
+    });
   }
 
   @override
@@ -47,21 +52,6 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
     final username = pref.getString('username');
     userID = pref.getString('userID');
 
-//    final allRows = await dbHelper.queryAllRows();
-//    print('query all rows:');
-//    allRows.forEach((row) => print(row));
-//    var ip = allRows[0]['ip_address'];
-    var ip = pref.getString('IpAddress');
-
-//    ApiServices services = ApiServices();
-//    var response = await services.Profil(ip, userID, date);
-//    if (response == null) {
-////      ToastUtils.show("Error Connecting To Server");
-//      Future.delayed(const Duration(microseconds: 2000), () {
-//        Navigator.pushNamedAndRemoveUntil(
-//            context, "/invalid_ip", (Route<dynamic>routes) => false);
-//      });
-//    } else {
       if (username != null) {
         Future.delayed(const Duration(microseconds: 2000), () {
           Navigator.pushNamedAndRemoveUntil(
@@ -73,7 +63,6 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
               context, "/login", (Route<dynamic>routes) => false);
         });
       }
-//    }
   }
 
 
@@ -84,13 +73,16 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
       ToastUtils.show("No office Wifi connection");
 
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      // I am connected to a wifi network.
+
 //      Future.delayed(const Duration(microseconds: 2000),(){
 //        ToastUtils.show("Connected to server");
 //        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
 //      });
 
-      getPref();
+//      getPref();
+      setState(() {
+        _saving = false;
+      });
     }
   }
 
@@ -102,7 +94,7 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
     _refreshController.refreshCompleted();
-    checkConnection();
+    getPref();
   }
 
   void _onLoading() async{
@@ -147,44 +139,47 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
-      child: Column(
-        children: <Widget>[
-          // bagian header
-          SizedBox(height: 50,),
-          Container(
-            child: Image(
-                alignment: Alignment.center,
-                height: MediaQuery.of(context).size.height/2,
-                width: MediaQuery.of(context).size.width,
-                image: AssetImage("assets/no_connection.png")
-            ),
-          ),
-          SizedBox(height: 20,),
-          RaisedButton(
-            onPressed: () {
-              Future.delayed(const Duration(microseconds: 2000),(){
-//                Navigator.pushNamedAndRemoveUntil(context, "/login_config", (Route<dynamic>routes)=>false);
-                Navigator.pushNamed(context, '/login_config');
-              });
-            },
-            textColor: Colors.white,
-            padding: const EdgeInsets.all(0.0),
-            child: Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  colors: <Color>[
-                    Color(0xFF0D47A1),
-                    Color(0xFF1976D2),
-                    Color(0xFF42A5F5),
-                  ],
-                ),
+      child: ModalProgressHUD(
+        inAsyncCall: _saving,
+        child: Column(
+          children: <Widget>[
+            // bagian header
+            SizedBox(height: 50,),
+            Container(
+              child: Image(
+                  alignment: Alignment.center,
+                  height: MediaQuery.of(context).size.height/2,
+                  width: MediaQuery.of(context).size.width,
+                  image: AssetImage("assets/no_connection.png")
               ),
-              padding: const EdgeInsets.all(10.0),
-              child:
-              const Text('Setting IP Address', style: TextStyle(fontSize: 20)),
             ),
-          ),
-        ],
+            SizedBox(height: 20,),
+            RaisedButton(
+              onPressed: () {
+                Future.delayed(const Duration(microseconds: 2000),(){
+//                Navigator.pushNamedAndRemoveUntil(context, "/login_config", (Route<dynamic>routes)=>false);
+                  Navigator.pushNamed(context, '/login_config');
+                });
+              },
+              textColor: Colors.white,
+              padding: const EdgeInsets.all(0.0),
+              child: Container(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: <Color>[
+                      Color(0xFF0D47A1),
+                      Color(0xFF1976D2),
+                      Color(0xFF42A5F5),
+                    ],
+                  ),
+                ),
+                padding: const EdgeInsets.all(10.0),
+                child:
+                const Text('Setting IP Address', style: TextStyle(fontSize: 20)),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

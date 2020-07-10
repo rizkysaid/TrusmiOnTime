@@ -87,34 +87,13 @@ class __cekLoginState extends State<_cekLogin> {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows:' +allRows.toList().toString());
+    print('query all rows getPref Profil:' +allRows.toList().toString());
     print('Length = '+allRows.length.toString());
 
     if(allRows.length != 0){
 
       allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
-
-    }else{
-      ip = Endpoint.base_url;
-    }
-
-    print("IP = "+ip);
-
-    ApiServices services = ApiServices();
-    print('servis');
-    var response = await services.CheckKoneksi(ip);
-    print('checkKoneksi');
-    print('Response service = '+response.toString());
-    if(response == null){
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
-      });
-      final id = await dbHelper.queryRowCount();
-      final rowsDeleted = await dbHelper.deleteAll();
-      print('deleted $rowsDeleted row(s): row $id');
-
-    }else{
       SharedPreferences pref = await SharedPreferences.getInstance();
       setState(() {
         username = pref.getString('username');
@@ -131,9 +110,48 @@ class __cekLoginState extends State<_cekLogin> {
         });
       }
 
-
-
+    }else{
+      ip = Endpoint.base_url;
+      Future.delayed(const Duration(microseconds: 2000),(){
+        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+      });
     }
+
+    print("IP = "+ip);
+//
+//    ApiServices services = ApiServices();
+//    print('servis');
+//    var response = await services.CheckKoneksi(ip);
+//    print('checkKoneksi');
+//    print('Response service = '+response.toString());
+//    if(response == null){
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
+//      });
+//      final id = await dbHelper.queryRowCount();
+//      final rowsDeleted = await dbHelper.deleteAll();
+//      print('deleted $rowsDeleted row(s): row $id');
+//
+//    }else{
+//      SharedPreferences pref = await SharedPreferences.getInstance();
+//      setState(() {
+//        username = pref.getString('username');
+//        userID = pref.getString('userID');
+//      });
+//
+//      if(username == false){
+//        Future.delayed(const Duration(microseconds: 2000),(){
+//          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+//        });
+//      }else{
+//        Future.delayed(const Duration(microseconds: 2000),(){
+//          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+//        });
+//      }
+//
+//
+//
+//    }
 
   }
 
@@ -212,7 +230,7 @@ class __cekLoginState extends State<_cekLogin> {
 
   void show_ip() async {
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows:');
+    print('query all rows show IP:');
     allRows.forEach((row) => print(row));
     var ip = '';
     ip = allRows[0]['ip_address'];

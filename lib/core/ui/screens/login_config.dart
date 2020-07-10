@@ -189,7 +189,7 @@ class _LoginBodyState extends State<LoginBody> {
           Navigator.pushNamed(context, '/ip_config');
         });
       }else{
-        ToastUtils.show("Username or password is invalid!");
+        ToastUtils.show("Username / password konfigurasi salah!");
       }
 
 
@@ -209,7 +209,7 @@ class _LoginBodyState extends State<LoginBody> {
         // bagian header
         Container(
           width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height / 4,
+          height: MediaQuery.of(context).size.height / 6,
 //          color: Colors.red,
           decoration: BoxDecoration(
               image: DecorationImage(
@@ -222,11 +222,14 @@ class _LoginBodyState extends State<LoginBody> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Image(
-                    alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.width / 4,
-                    width: MediaQuery.of(context).size.width / 2,
-                    image: AssetImage("assets/logo_png_ontime.png")
+//                Image(
+//                    alignment: Alignment.center,
+//                    height: MediaQuery.of(context).size.width / 4,
+//                    width: MediaQuery.of(context).size.width / 2,
+//                    image: AssetImage("assets/logo_png_ontime.png")
+//                )
+                Text('Login Configuration',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
                 )
               ],
             ),

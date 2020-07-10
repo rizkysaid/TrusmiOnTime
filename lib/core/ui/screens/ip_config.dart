@@ -41,7 +41,8 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
   initState() {
     super.initState();
 //    checkConnection();
-    show_ip();
+    getPref();
+
   }
 
   @override
@@ -51,6 +52,8 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
   }
 
   getPref()async{
+
+    show_ip();
 
     ApiServices services = ApiServices();
     var response = await services.CheckKoneksi(Endpoint.base_url);
