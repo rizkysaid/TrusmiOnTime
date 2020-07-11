@@ -478,6 +478,11 @@ class _ProfileScreenState extends State<ProfileScreen>{
                           onTap: () => goToHR(context)
                       ),
                       ListTile(
+                          leading: Icon(Icons.account_balance),
+                          title: Text('WFH'),
+                          onTap: () => WFH(context)
+                      ),
+                      ListTile(
                           leading: Icon(Icons.exit_to_app),
                           title: Text('Log Out'),
                           onTap: () => logout()
@@ -718,8 +723,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
   }
 
   goToHR(context) async{
-
     Navigator.pushNamed(context, "/hrsystem",
+        arguments: PassParams(username, password)
+    );
+  }
+
+  WFH(context) async{
+    Navigator.pushNamed(context, "/wfh",
         arguments: PassParams(username, password)
     );
   }
