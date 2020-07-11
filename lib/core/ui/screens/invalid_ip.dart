@@ -34,7 +34,7 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
   @override
   initState() {
     super.initState();
-    checkConnection();
+//    checkConnection();
     setState(() {
       _saving = true;
     });
@@ -67,16 +67,16 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-
-      ToastUtils.show("No office Wifi connection");
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      ToastUtils.show("No office Wifi connection");
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
 
       setState(() {
         _saving = false;
       });
-    }
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);

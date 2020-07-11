@@ -22,7 +22,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
-    checkConnection();
+//    checkConnection();
   }
 
 
@@ -34,16 +34,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-      });
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-
-
-    }
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+//      });
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
+//
+//
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);

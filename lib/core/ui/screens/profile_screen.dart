@@ -102,13 +102,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-      });
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+//      });
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
 
       String ip;
       final dbHelper = DatabaseHelper.instance;
@@ -146,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
         }
       }
 
-    }
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);

@@ -160,15 +160,15 @@ class __cekLoginState extends State<_cekLogin> {
   Future<void>checkConnection() async{
 
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-      // I am connected to a mobile network.
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-      });
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//      // I am connected to a mobile network.
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+//      });
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
       getPref();
-    }
+//    }
   }
 
   @override

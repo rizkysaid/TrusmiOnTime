@@ -36,7 +36,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   @override
   void dispose() {
     super.dispose();
-
+//    getPref();
   }
 
   getPref()async {
@@ -71,14 +71,14 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-
-      ToastUtils.show("No office Wifi connection");
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      ToastUtils.show("No office Wifi connection");
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
+//
       getPref();
-    }
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);

@@ -78,14 +78,14 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      ToastUtils.show("No office Wifi connection");
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
 
-      ToastUtils.show("No office Wifi connection");
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-
-      getPref();
-    }
+//      getPref();
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);

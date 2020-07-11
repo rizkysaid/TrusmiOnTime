@@ -15,7 +15,7 @@ class _LoginConfigState extends State<LoginConfig> {
   @override
   void initState() {
     super.initState();
-    checkConnection();
+//    checkConnection();
 
   }
 
@@ -28,16 +28,16 @@ class _LoginConfigState extends State<LoginConfig> {
 
   Future<void>checkConnection() async{
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile) {
-
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-      });
-
-    } else if (connectivityResult == ConnectivityResult.wifi) {
-
-
-    }
+//    if (connectivityResult == ConnectivityResult.mobile) {
+//
+//      Future.delayed(const Duration(microseconds: 2000),(){
+//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+//      });
+//
+//    } else if (connectivityResult == ConnectivityResult.wifi) {
+//
+//
+//    }
   }
 
   RefreshController _refreshController = RefreshController(initialRefresh: false);
