@@ -12,6 +12,7 @@ import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'PassParams.dart';
 import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -26,6 +27,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen>{
 
   String username;
+  String password;
   String userID;
   static String nama = '';
   static String jabatan = '';
@@ -316,6 +318,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
       setState(() {
         username = pref.getString('username');
+        password = pref.getString('password');
         userID = pref.getString('userID');
         clockin = pref.get('clock_in');
         imageUrl = pref.getString('imageUrl');
@@ -471,8 +474,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                       ),
                       ListTile(
                         leading: Icon(Icons.add_to_home_screen),
-                        title: Text('History Absen'),
-                          onTap: () => history()
+                        title: Text('HR System'),
+                          onTap: () => goToHR(context)
                       ),
                       ListTile(
                           leading: Icon(Icons.exit_to_app),
@@ -714,11 +717,11 @@ class _ProfileScreenState extends State<ProfileScreen>{
     });
   }
 
-  history(){
-    Future.delayed(const Duration(microseconds: 2000), () {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/history_absen", (Route<dynamic> routes) => false);
-    });
+  goToHR(context) async{
+
+    Navigator.pushNamed(context, "/hrsystem",
+        arguments: PassParams(username, password)
+    );
   }
 
   savePref() async {

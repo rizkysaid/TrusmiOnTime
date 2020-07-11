@@ -11,7 +11,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'ScreenArguments.dart';
 
-bool _saving = false;
+//bool _saving = false;
 class CameraScreen extends StatefulWidget {
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -24,9 +24,9 @@ class _CameraScreenState extends State<CameraScreen> {
   int selectedCameraIndex;
   String imgPath;
 
-  String userID;
-  String username;
-  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+//  String userID;
+//  String username;
+//  static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   @override
   void initState(){
@@ -47,11 +47,11 @@ class _CameraScreenState extends State<CameraScreen> {
       print('Error :${err.code}Error message : ${err.message}');
     });
 
-    getPref();
+//    getPref();
 
-    setState(() {
-      _saving = true;
-    });
+//    setState(() {
+//      _saving = true;
+//    });
 
   }
 
@@ -62,44 +62,44 @@ class _CameraScreenState extends State<CameraScreen> {
     super.dispose();
   }
 
-  getPref()async {
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-
-    if(allRows.length != 0){
-
-      allRows.forEach((row) => print(row));
-      ip = allRows[0]['ip_address'];
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      setState(() {
-        username = pref.getString('username');
-        userID = pref.getString('userID');
-      });
-
-    }else{
-      ip = Endpoint.base_url;
-    }
-
-
-    print('userId nyee '+userID);
-    print('IP nyee '+ip);
-    print('date nyee '+date);
-
-    ApiServices services = ApiServices();
-    var response = await services.Profil(ip, userID, date);
-    if (response == null) {
-
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            this.context, "/invalid_ip", (Route<dynamic>routes) => false);
-      });
-    } else {
-      setState(() {
-        _saving = false;
-      });
-    }
-  }
+//  getPref()async {
+//    String ip;
+//    final dbHelper = DatabaseHelper.instance;
+//    final allRows = await dbHelper.queryAllRows();
+//
+//    if(allRows.length != 0){
+//
+//      allRows.forEach((row) => print(row));
+//      ip = allRows[0]['ip_address'];
+//      SharedPreferences pref = await SharedPreferences.getInstance();
+//      setState(() {
+//        username = pref.getString('username');
+//        userID = pref.getString('userID');
+//      });
+//
+//    }else{
+//      ip = Endpoint.base_url;
+//    }
+//
+//
+//    print('userId nyee '+userID);
+//    print('IP nyee '+ip);
+//    print('date nyee '+date);
+//
+//    ApiServices services = ApiServices();
+//    var response = await services.Profil(ip, userID, date);
+//    if (response == null) {
+//
+//      Future.delayed(const Duration(microseconds: 2000), () {
+//        Navigator.pushNamedAndRemoveUntil(
+//            this.context, "/invalid_ip", (Route<dynamic>routes) => false);
+//      });
+//    } else {
+//      setState(() {
+//        _saving = false;
+//      });
+//    }
+//  }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
     if (controller != null) {
@@ -130,39 +130,34 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      body: ModalProgressHUD(
-        inAsyncCall: _saving,
-        child: Container(
-          color: Colors.black,
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Expanded(
+    return Container(
+      color: Colors.black,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
 
-                  child: _cameraPreviewWidget(),
-                ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    height: 120,
-                    width: double.infinity,
-
-                    color: Colors.black,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        _cameraToggleRowWidget(),
-                        _cameraControlWidget(context),
-                        Spacer()
-                      ],
-                    ),
-                  ),
-                )
-              ],
+              child: _cameraPreviewWidget(),
             ),
-          ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 120,
+                width: double.infinity,
+
+                color: Colors.black,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    _cameraToggleRowWidget(),
+                    _cameraControlWidget(context),
+                    Spacer()
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
       ),
     );
@@ -171,6 +166,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
+
     if (controller == null || !controller.value.isInitialized) {
       return const Text(
         'Loading',
@@ -182,9 +178,19 @@ class _CameraScreenState extends State<CameraScreen> {
       );
     }
 
+    final size = MediaQuery.of(this.context).size;
+    final deviceRatio = size.width / size.height;
+    final xScale = controller.value.aspectRatio / deviceRatio;
+    // Modify the yScale if you are in Landscape
+    final yScale = 1.0;
+
     return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: CameraPreview(controller),
+      aspectRatio: deviceRatio,
+      child: Transform(
+        alignment: Alignment.center,
+        transform: Matrix4.diagonal3Values(xScale, yScale, 1),
+        child: CameraPreview(controller),
+      ),
     );
   }
 

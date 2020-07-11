@@ -42,18 +42,18 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
   getPref()async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
-    userID = pref.getString('userID');
-    var ip = pref.getString('IpAddress');
+//    userID = pref.getString('userID');
+//    var ip = pref.getString('IpAddress');
 
-    ApiServices services = ApiServices();
-    var response = await services.Profil(ip, userID, date);
-    if (response == null) {
-
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/invalid_ip", (Route<dynamic>routes) => false);
-      });
-    } else {
+//    ApiServices services = ApiServices();
+//    var response = await services.Profil(ip, userID, date);
+//    if (response == null) {
+//
+//      Future.delayed(const Duration(microseconds: 2000), () {
+//        Navigator.pushNamedAndRemoveUntil(
+//            context, "/invalid_ip", (Route<dynamic>routes) => false);
+//      });
+//    } else {
       if (username != null) {
         Future.delayed(const Duration(microseconds: 2000), () {
           Navigator.pushNamedAndRemoveUntil(
@@ -65,7 +65,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
               context, "/login", (Route<dynamic>routes) => false);
         });
       }
-    }
+//    }
   }
 
 
