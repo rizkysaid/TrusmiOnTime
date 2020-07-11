@@ -85,7 +85,6 @@ class _WfhState extends State<Wfh> {
                   ),
                 ),
                 Container(
-                    padding: EdgeInsets.all(10.0),
                     child: progress < 1.0
                         ? LinearProgressIndicator(value: progress)
                         : Container()),
