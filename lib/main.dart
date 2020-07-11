@@ -159,7 +159,7 @@ class __cekLoginState extends State<_cekLogin> {
 
   Future<void>checkConnection() async{
 
-    var connectivityResult = await (Connectivity().checkConnectivity());
+//    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //      // I am connected to a mobile network.
 //      Future.delayed(const Duration(microseconds: 2000),(){

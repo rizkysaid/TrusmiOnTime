@@ -101,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
   }
 
   Future<void>checkConnection() async{
-    var connectivityResult = await (Connectivity().checkConnectivity());
+//    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
 //      Future.delayed(const Duration(microseconds: 2000),(){

@@ -77,7 +77,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
 
   Future<void>checkConnection() async{
-    var connectivityResult = await (Connectivity().checkConnectivity());
+//    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
 //      ToastUtils.show("No office Wifi connection");
