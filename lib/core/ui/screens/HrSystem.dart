@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -43,7 +44,8 @@ class _HrSystemState extends State<HrSystem> {
     final PassParams args = ModalRoute.of(context).settings.arguments;
     String username = args.username;
     String password = args.password;
-    String urlAbsen = "http://192.168.23.23/hr/bypass/login/"+username.toString()+"/"+password.toString();
+    String urlAbsen = Endpoint.base_ip+"/hr/bypass/login/"+username.toString()+"/"+password.toString();
+    print("ip="+urlAbsen);
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

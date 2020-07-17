@@ -196,6 +196,8 @@ class _LoginBodyState extends State<LoginBody> {
         ip = Endpoint.base_url;
       }
 
+      print('ip='+ip);
+
       ApiServices services = ApiServices();
       var response = await services.Login(ip, usernameController.text, passwordController.text);
       String usrId = response.data[0].userId.toString();
@@ -243,7 +245,7 @@ class _LoginBodyState extends State<LoginBody> {
               children: <Widget>[
                 Image(
                   alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.width / 6,
+                    height: MediaQuery.of(context).size.width / 8,
                     width: MediaQuery.of(context).size.width / 2,
                     image: AssetImage("assets/logo_png_ontime.png")
                 ),

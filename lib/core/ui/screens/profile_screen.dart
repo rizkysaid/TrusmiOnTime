@@ -434,7 +434,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                       new CircleAvatar(
                         radius: 30.0,
                         child: ClipOval(
-                          child: Image.network(photo_profile.toString(),
+                          child: Image.network(Endpoint.url_profile+"/"+photo_profile.toString(),
                               width: 125,
                               height: 125,
                               fit: BoxFit.cover
@@ -559,7 +559,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
                                             shape: BoxShape.circle,
                                             image: new DecorationImage(
                                               fit: BoxFit.cover,
-                                              image: new NetworkImage(imageUrl.toString()),
+                                              image: new NetworkImage(Endpoint.url_foto+"/"+imageUrl.toString()),
                                             ),
                                           ),
                                         ),
