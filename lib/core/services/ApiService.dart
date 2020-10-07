@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:login_absen/core/models/AuthModel.dart';
+import 'package:login_absen/core/models/CheckHolidaysModel.dart';
 
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
@@ -81,6 +82,27 @@ class ApiServices{
       if (response.statusCode == 200) {
         CheckStatusModel responseRequest = CheckStatusModel.fromJson(jsonDecode(response.body));
         return responseRequest;
+      } else {
+
+        return null;
+      }
+
+    }catch(e){
+      print("Error Check Status: " + e.toString());
+      print('IP in ApiService - CheckStatus - Error = ' + ip.toString());
+      return null;
+
+    }
+  }
+
+  Future<CheckHolidaysModel> CheckHolidays(ip, userID) async{
+    try{
+      var response = await http.get(ip+'/check_holidays/'+userID);
+      print("Response CekStatus Status : ${response.statusCode}");
+      print("Response CekStatus Body : ${response.body}");
+      if (response.statusCode == 200) {
+        CheckHolidaysModel responseBirthday = CheckHolidaysModel.fromJson(jsonDecode(response.body));
+        return responseBirthday;
       } else {
 
         return null;

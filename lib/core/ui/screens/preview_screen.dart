@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
+import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
@@ -12,8 +13,10 @@ import 'package:http/http.dart' as http;
 import 'package:async/async.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:giffy_dialog/giffy_dialog.dart';
 
 bool _saving = false;
+bool _hari_besar = false;
 
 class PreviewScreen extends StatefulWidget{
   final String imgPath;
@@ -32,6 +35,67 @@ class PreviewScreen extends StatefulWidget{
 
 }
 class _PreviewScreenState extends State<PreviewScreen>{
+
+  static bool status_hari_besar;
+  static String msg;
+  static String gif;
+
+
+  @override
+  void initState(){
+
+    checkHolidays();
+
+  }
+
+  Future<void>checkHolidays() async{
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+    print('query all rows: '+allRows.toList().toString());
+    print('Length = '+allRows.length.toString());
+
+    if(allRows.length != 0){
+
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+
+    }else{
+      ip = Endpoint.base_url;
+    }
+
+    String usrId = basename(widget.userID);
+
+    ApiServices services = ApiServices();
+    var response = await services.CheckHolidays(ip, usrId);
+
+    if(response == null){
+      return null;
+
+    }else{
+
+      status_hari_besar = response.status;
+
+      if(status_hari_besar == true){
+        setState(() {
+          _hari_besar = true;
+          msg = response.message.toString();
+          gif = response.gif.toString();
+        });
+      }else{
+        setState(() {
+          _hari_besar = false;
+        });
+      }
+
+    }
+
+    // print('status_hari_besar = '+status_hari_besar.toString());
+    // print('_hari_besar = '+_hari_besar.toString());
+    // print('msg = '+msg.toString());
+    // print('gif = '+gif.toString());
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -106,13 +170,44 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                             "OK",
                                             style: TextStyle(color: Colors.white, fontSize: 20),
                                           ),
-                                          onPressed: ()=> {
-                                            Future.delayed(const Duration(microseconds: 5000),(){
-                                              setState(() {
-                                                _saving = false;
-                                              });
-                                              Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                                            })
+                                          onPressed: () => {
+
+                                            if(_hari_besar == true){
+
+                                                showDialog(
+                                                  context: context,builder: (_) => NetworkGiffyDialog(
+                                                  image: Image.network(Endpoint.url_gif+"/"+gif) ,
+                                                    title: Text(msg.toString(),
+                                                    textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                    fontSize: 18.0, fontWeight: FontWeight.w600),
+                                                    ),
+                                                    entryAnimation: EntryAnimation.BOTTOM_RIGHT,
+                                                    // description: Text(
+                                                    //   msg.toString(),
+                                                    //   textAlign: TextAlign.center,
+                                                    //   style: TextStyle(),
+                                                    // ),
+                                                    onlyOkButton: true,
+                                                    onOkButtonPressed: () {
+                                                      Future.delayed(const Duration(microseconds: 5000),(){
+                                                        setState(() {
+                                                          _saving = false;
+                                                        });
+                                                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                                                      });
+                                                    },
+                                                  )
+                                                )
+
+                                            }else{
+                                              Future.delayed(const Duration(microseconds: 5000),(){
+                                                setState(() {
+                                                  _saving = false;
+                                                });
+                                                Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                                              })
+                                            }
                                           },
                                           width: 120,
                                         )
