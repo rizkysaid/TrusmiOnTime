@@ -37,6 +37,7 @@ class PreviewScreen extends StatefulWidget{
 class _PreviewScreenState extends State<PreviewScreen>{
 
   static bool status_hari_besar;
+  static String title;
   static String msg;
   static String gif;
 
@@ -52,8 +53,6 @@ class _PreviewScreenState extends State<PreviewScreen>{
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows: '+allRows.toList().toString());
-    print('Length = '+allRows.length.toString());
 
     if(allRows.length != 0){
 
@@ -79,6 +78,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
       if(status_hari_besar == true){
         setState(() {
           _hari_besar = true;
+          title = response.title.toString();
           msg = response.message.toString();
           gif = response.gif.toString();
         });
@@ -175,29 +175,37 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                             if(_hari_besar == true){
 
                                                 showDialog(
-                                                  context: context,builder: (_) => NetworkGiffyDialog(
-                                                  image: Image.network(Endpoint.url_gif+"/"+gif) ,
-                                                    title: Text(msg.toString(),
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                    fontSize: 18.0, fontWeight: FontWeight.w600),
-                                                    ),
-                                                    entryAnimation: EntryAnimation.BOTTOM_RIGHT,
-                                                    // description: Text(
-                                                    //   msg.toString(),
-                                                    //   textAlign: TextAlign.center,
-                                                    //   style: TextStyle(),
-                                                    // ),
-                                                    onlyOkButton: true,
-                                                    onOkButtonPressed: () {
-                                                      Future.delayed(const Duration(microseconds: 5000),(){
-                                                        setState(() {
-                                                          _saving = false;
+                                                  context: context,builder: (_) =>
+                                                    NetworkGiffyDialog(
+                                                      image: Image.network(Endpoint.url_gif+"/"+gif) ,
+                                                      title: Text(title.toString(),
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontSize: 20.0,
+                                                            fontWeight: FontWeight.w700),
+                                                        ),
+                                                      description: Text(msg.toString(),
+                                                        textAlign: TextAlign.center,
+                                                        style: TextStyle(
+                                                          fontSize: 18.0,
+                                                            fontWeight: FontWeight.w400),
+                                                          ),
+                                                      entryAnimation: EntryAnimation.BOTTOM_RIGHT,
+                                                      // description: Text(
+                                                      //   msg.toString(),
+                                                      //   textAlign: TextAlign.center,
+                                                      //   style: TextStyle(),
+                                                      // ),
+                                                      onlyOkButton: true,
+                                                      onOkButtonPressed: () {
+                                                        Future.delayed(const Duration(microseconds: 5000),(){
+                                                          setState(() {
+                                                            _saving = false;
+                                                          });
+                                                          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                                                         });
-                                                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                                                      });
-                                                    },
-                                                  )
+                                                      },
+                                                    ),
                                                 )
 
                                             }else{

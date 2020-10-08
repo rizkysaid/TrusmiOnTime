@@ -12,18 +12,21 @@ class CheckHolidaysModel {
   CheckHolidaysModel({
     this.status,
     this.data,
+    this.title,
     this.message,
     this.gif,
   });
 
   bool status;
   List<Datum> data;
+  String title;
   String message;
   String gif;
 
   factory CheckHolidaysModel.fromJson(Map<String, dynamic> json) => CheckHolidaysModel(
     status: json["status"],
     data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+    title: json["title"],
     message: json["message"],
     gif: json["gif"],
   );
@@ -31,6 +34,7 @@ class CheckHolidaysModel {
   Map<String, dynamic> toJson() => {
     "status": status,
     "data": List<dynamic>.from(data.map((x) => x.toJson())),
+    "title": title,
     "message": message,
     "gif": gif,
   };
