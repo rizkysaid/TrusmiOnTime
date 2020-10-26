@@ -239,7 +239,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                             style: TextStyle(color: Colors.white, fontSize: 20),
                                           ),
                                           onPressed: ()=> {
-                                            Future.delayed(const Duration(microseconds: 2000),(){
+                                            Future.delayed(const Duration(microseconds: 5000),(){
                                               setState(() {
                                                 _saving = false;
                                               });
