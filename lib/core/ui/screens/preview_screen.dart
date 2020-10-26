@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +41,8 @@ class _PreviewScreenState extends State<PreviewScreen>{
   static String title;
   static String msg;
   static String gif;
+
+  static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
 
   @override
@@ -202,6 +205,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                                           setState(() {
                                                             _saving = false;
                                                           });
+                                                          ProfileScreen().createState().getProfil(usrId, date);
                                                           Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                                                         });
                                                       },
@@ -213,6 +217,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                                 setState(() {
                                                   _saving = false;
                                                 });
+                                                ProfileScreen().createState().getProfil(usrId, date);
                                                 Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                                               })
                                             }
@@ -243,6 +248,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                               setState(() {
                                                 _saving = false;
                                               });
+                                              ProfileScreen().createState().getProfil(usrId, date);
                                               Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                                             })
                                           },
@@ -332,21 +338,29 @@ class _PreviewScreenState extends State<PreviewScreen>{
 
     var response = await request.send();
 
-    if(response.statusCode == 201){
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      var ip = pref.getString('IpAddress');
+    // if(response.statusCode == 201){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   var ip = pref.getString('IpAddress');
+    //
+    //   ApiServices services = ApiServices();
+    //   var response = await services.Profil(ip, usrId, date);
+    //   try {
+    //     if (response.status == true) {
+    //       setState(() {
+    //         return true;
+    //       });
+    //     }
+    //   } catch (err) {
+    //     print("Cannot read");
+    //   }
+    //
+    // }else{
+    //   print(response.statusCode);
+    //   return null;
+    // }
 
-      ApiServices services = ApiServices();
-      var response = await services.Profil(ip, usrId, date);
-      try {
-        if (response.status == true) {
-          setState(() {
-            return true;
-          });
-        }
-      } catch (err) {
-        print("Cannot read");
-      }
+    if(response.statusCode == 201){
+      return true;
 
     }else{
       print(response.statusCode);

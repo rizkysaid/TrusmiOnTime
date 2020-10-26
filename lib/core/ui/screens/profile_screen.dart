@@ -198,7 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
           Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
         });
       }else{
-        print('Ini responsnya : '+response.toString());
+        // print('Ini responsnya : '+response.toString());
         String dataNama = response.data.nama.toString();
         String dataJabatan = response.data.jabatan.toString();
         String dataClockIn = response.data.clockIn.toString();
@@ -223,7 +223,20 @@ class _ProfileScreenState extends State<ProfileScreen>{
         nama = dataNama;
         jabatan = dataJabatan;
 
-        if (dataClockIn == "--:--"){
+        if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+          clockin = dataClockIn;
+          clockout = dataClockOut;
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = dataImageUrl;
+          _colorButton = Colors.red[700];
+          _statusTotalWork = true;
+          _visibleButton = false;
+          _status = "checkin";
+          shift = shift_in;
+          pref.remove('shift');
+          pref.setString('shift', shift_in);
+        }else if (dataClockIn == "--:--"){
           statusPhoto = false;
           statusIcon = true;
           imageUrl = "";
@@ -276,19 +289,21 @@ class _ProfileScreenState extends State<ProfileScreen>{
           pref.remove('shift');
           pref.setString('shift', shift_in);
           _colorButton = Colors.red[700];
-        }else{
-          statusPhoto = true;
-          statusIcon = false;
+        }else {
+
           clockin = dataClockIn;
           clockout = dataClockOut;
+          statusPhoto = true;
+          statusIcon = false;
           imageUrl = dataImageUrl;
-          _visibleButton = false;
+          _colorButton = Colors.red[700];
           _statusTotalWork = true;
+          _visibleButton = false;
+          _status = "checkin";
           shift = shift_in;
           pref.remove('shift');
           pref.setString('shift', shift_in);
-          _colorButton = Colors.red[700];
-          _status = "checkin";
+
         }
 
         try {
