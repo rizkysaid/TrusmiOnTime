@@ -18,6 +18,7 @@ import 'package:giffy_dialog/giffy_dialog.dart';
 
 bool _saving = false;
 bool _hari_besar = false;
+// bool _get_profil = false;
 
 class PreviewScreen extends StatefulWidget{
   final String imgPath;
@@ -41,6 +42,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
   static String title;
   static String msg;
   static String gif;
+  // static bool status_get_profil;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
@@ -98,6 +100,47 @@ class _PreviewScreenState extends State<PreviewScreen>{
     // print('msg = '+msg.toString());
     // print('gif = '+gif.toString());
   }
+
+  // Future<void>getProfil(userID) async{
+  //   String ip;
+  //   final dbHelper = DatabaseHelper.instance;
+  //   final allRows = await dbHelper.queryAllRows();
+  //   print('query all rows get profil profile screen:');
+  //   print('Length = '+allRows.length.toString());
+  //
+  //   if(allRows.length != 0){
+  //
+  //
+  //     ip = allRows[0]['ip_address'];
+  //
+  //   }else{
+  //     ip = Endpoint.base_url;
+  //
+  //   }
+  //
+  //   // ApiServices services = ApiServices();
+  //   // var response = await services.Profil(ip, userID, date);
+  //
+  //   // if(response == null){
+  //   //   return null;
+  //   //
+  //   // }else{
+  //   //
+  //   //   status_get_profil = response.status;
+  //   //
+  //   //   if(status_get_profil == true){
+  //   //     setState(() {
+  //   //       _get_profil = true;
+  //   //     });
+  //   //   }else{
+  //   //     setState(() {
+  //   //       _get_profil = false;
+  //   //     });
+  //   //   }
+  //   //
+  //   // }
+  //
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -244,13 +287,25 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                             style: TextStyle(color: Colors.white, fontSize: 20),
                                           ),
                                           onPressed: ()=> {
-                                            Future.delayed(const Duration(microseconds: 5000),(){
-                                              setState(() {
-                                                _saving = false;
-                                              });
-                                              ProfileScreen().createState().getProfil(usrId, date);
-                                              Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                                            })
+
+                                            // if(_get_profil == true){
+                                              Future.delayed(const Duration(microseconds: 5000),(){
+                                                setState(() {
+                                                  _saving = false;
+                                                });
+                                                ProfileScreen().createState().getProfil(usrId, date);
+                                                Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                                              })
+                                            // }else{
+                                            //   Alert(
+                                            //     context: context,
+                                            //     style: alertStyle,
+                                            //     type: AlertType.error,
+                                            //     title: "Network Error!",
+                                            //     desc: "Network not connected! Reload and try again!",
+                                            //
+                                            //   )
+                                            // }
                                           },
                                           width: 120,
                                         )
@@ -297,7 +352,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
    var request = new http.MultipartRequest("POST", uri);
 
    var multiPartFile = new http.MultipartFile("foto", stream, length, filename: basename(imageFile.path));
-   String date = new DateTime.now().toIso8601String().substring(0, 10);
+   // String date = new DateTime.now().toIso8601String().substring(0, 10);
 
    request.files.add(multiPartFile);
    request.fields['employee_id'] = usrId;
@@ -328,7 +383,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
     var request = new http.MultipartRequest("POST", uri);
 
     var multiPartFile = new http.MultipartFile("foto", stream, length, filename: basename(imageFile.path));
-    String date = new DateTime.now().toIso8601String().substring(0, 10);
+    // String date = new DateTime.now().toIso8601String().substring(0, 10);
 
     request.files.add(multiPartFile);
     request.fields['employee_id'] = usrId;

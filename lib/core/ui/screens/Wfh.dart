@@ -43,9 +43,9 @@ class _WfhState extends State<Wfh> {
     final PassParams args = ModalRoute.of(context).settings.arguments;
     String username = args.username;
     String password = args.password;
-   // String urlAbsen = "https://trusmicorp.com/wfh/login/auth/"+username.toString()+"/"+password.toString();
+   String urlAbsen = "https://trusmicorp.com/wfh/login/auth/"+username.toString()+"/"+password.toString();
 //  static String _baseIP = "http://192.168.23.195"; //wfh - local
-    String urlAbsen = "http://192.168.23.195/wfh/login/auth/"+username.toString()+"/"+password.toString();
+//     String urlAbsen = "http://192.168.23.195/wfh/login/auth/"+username.toString()+"/"+password.toString();
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

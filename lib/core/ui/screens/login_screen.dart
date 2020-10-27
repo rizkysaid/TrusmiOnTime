@@ -136,6 +136,7 @@ class _LoginBodyState extends State<LoginBody> {
       pref.setString('username', username);
       pref.setString('userID', userID);
       pref.setString('password', pass);
+      pref.setString('id_shift', '1');
     });
   }
 

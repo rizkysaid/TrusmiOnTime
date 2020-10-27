@@ -69,27 +69,23 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
     checkConnection();
 
-      getPref();
+    getPref();
 
-      _timeString = _formatDateTime(DateTime.now());
-      _hariTanggal = _formatHariTanggal(DateTime.now());
-      timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-        final DateTime now = DateTime.now();
-        final DateTime HTnow = DateTime.now();
-        final String formattedDateTime = _formatDateTime(now);
-        final String formattedHariTanggal = _formatHariTanggal(HTnow);
+    _timeString = _formatDateTime(DateTime.now());
+    _hariTanggal = _formatHariTanggal(DateTime.now());
+    timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
+      final DateTime now = DateTime.now();
+      final DateTime HTnow = DateTime.now();
+      final String formattedDateTime = _formatDateTime(now);
+      final String formattedHariTanggal = _formatHariTanggal(HTnow);
 
-        _hariTanggal = formattedHariTanggal;
-        _timeString = formattedDateTime;
-        if(this.mounted) {
-          setState(() {
-            _timeString = formattedDateTime;
-          });
-        }
-      });
-
-    setState(() {
-      _saving = true;
+      _hariTanggal = formattedHariTanggal;
+      _timeString = formattedDateTime;
+      if(this.mounted) {
+        setState(() {
+          _timeString = formattedDateTime;
+        });
+      }
     });
 
   }
@@ -154,7 +150,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   void _onRefresh() async{
 
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(Duration(milliseconds: 3000));
 
     _refreshController.refreshCompleted();
     checkConnection();
@@ -166,13 +162,17 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   void _onLoading() async{
 
-    await Future.delayed(Duration(milliseconds: 1000));
+    await Future.delayed(Duration(milliseconds: 3000));
 
 
     _refreshController.loadComplete();
   }
 
   Future<void> getProfil(userID, date) async {
+
+    setState(() {
+      _saving = true;
+    });
 
       String ip;
       final dbHelper = DatabaseHelper.instance;
@@ -198,6 +198,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
           Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
         });
       }else{
+
         // print('Ini responsnya : '+response.toString());
         String dataNama = response.data.nama.toString();
         String dataJabatan = response.data.jabatan.toString();
@@ -215,96 +216,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
         shift_out = response.data.shiftOut.toString();
 
         SharedPreferences pref = await SharedPreferences.getInstance();
-        setState(() {
-          pref.setString('id_shift', id_shift);
+        // setState(() {
+        //   pref.setString('id_shift', id_shift);
+        //
+        // });
 
-        });
-
-        nama = dataNama;
-        jabatan = dataJabatan;
-
-        if(dataClockIn != "--:--" && dataClockOut != "--:--"){
-          clockin = dataClockIn;
-          clockout = dataClockOut;
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = dataImageUrl;
-          _colorButton = Colors.red[700];
-          _statusTotalWork = true;
-          _visibleButton = false;
-          _status = "checkin";
-          shift = shift_in;
-          pref.remove('shift');
-          pref.setString('shift', shift_in);
-        }else if (dataClockIn == "--:--"){
-          statusPhoto = false;
-          statusIcon = true;
-          imageUrl = "";
-          _colorButton = Colors.red[700];
-          clockout = dataClockOut;
-          clockin = dataClockIn;
-          _statusTotalWork = false;
-          _visibleButton = true;
-          _status = "checkin";
-          shift = shift_in;
-          pref.remove('shift');
-          pref.setString('shift', shift_in);
-        }else if (dataClockOut == "--:--"){
-          clockin = dataClockIn;
-          clockout = dataClockOut;
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = dataImageUrl;
-          _colorButton = Colors.deepOrange;
-          _statusTotalWork = false;
-          _visibleButton = true;
-          _status = "checkout";
-          shift = shift_out;
-          pref.remove('shift');
-          pref.setString('shift', shift_out);
-        }else if (date_out != dateId){
-          clockin = dataClockIn;
-          clockout = "--:--";
-          date_out = "";
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = dataImageUrl;
-          _colorButton = Colors.red[700];
-          _statusTotalWork = false;
-          _visibleButton = true;
-          _status = "checkin";
-          shift = shift_in;
-          pref.remove('shift');
-          pref.setString('shift', shift_in);
-        }else if(id_shift == '3'){
-          statusPhoto = true;
-          statusIcon = false;
-          clockin = dataClockIn;
-          clockout = dataClockOut;
-          imageUrl = dataImageUrl;
-          _visibleButton = true;
-          _statusTotalWork = true;
-          _status = "checkin";
-          shift = shift_in;
-          pref.remove('shift');
-          pref.setString('shift', shift_in);
-          _colorButton = Colors.red[700];
-        }else {
-
-          clockin = dataClockIn;
-          clockout = dataClockOut;
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = dataImageUrl;
-          _colorButton = Colors.red[700];
-          _statusTotalWork = true;
-          _visibleButton = false;
-          _status = "checkin";
-          shift = shift_in;
-          pref.remove('shift');
-          pref.setString('shift', shift_in);
-
-        }
+        // nama = dataNama;
+        // jabatan = dataJabatan;
 
         try {
           if (response.status == true) {
@@ -312,6 +230,124 @@ class _ProfileScreenState extends State<ProfileScreen>{
               nama = dataNama;
               jabatan = dataJabatan;
               _saving = false;
+              pref.setString('id_shift', id_shift);
+
+              if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+                clockin = dataClockIn;
+                clockout = dataClockOut;
+                statusPhoto = true;
+                statusIcon = false;
+                imageUrl = dataImageUrl;
+                _colorButton = Colors.red[700];
+                _statusTotalWork = true;
+                _visibleButton = false;
+                _status = "checkin";
+                shift = shift_in;
+                pref.remove('shift');
+                pref.setString('shift', shift_in);
+
+                print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }else if (dataClockIn == "--:--"){
+
+                if(_status == 'checkin' && dataClockIn == "--:--"){
+                  Future.delayed(const Duration(microseconds: 3000),(){
+                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                  });
+                  _status = "checkout";
+                }else{
+                  statusPhoto = false;
+                  statusIcon = true;
+                  imageUrl = "";
+                  _colorButton = Colors.red[700];
+                  clockout = dataClockOut;
+                  clockin = dataClockIn;
+                  _statusTotalWork = false;
+                  _visibleButton = true;
+                  _status = "checkin";
+                  shift = shift_in;
+                  pref.remove('shift');
+                  pref.setString('shift', shift_in);
+                }
+
+                print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }else if (dataClockOut == "--:--"){
+
+                if(_status == 'checkout' && dataClockOut == "--:--"){
+                  Future.delayed(const Duration(microseconds: 3000),(){
+                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                  });
+                  _status = "checkin";
+                }else{
+                  clockin = dataClockIn;
+                  clockout = dataClockOut;
+                  statusPhoto = true;
+                  statusIcon = false;
+                  imageUrl = dataImageUrl;
+                  _colorButton = Colors.deepOrange;
+                  _statusTotalWork = false;
+                  _visibleButton = true;
+                  _status = "checkout";
+                  shift = shift_out;
+                  pref.remove('shift');
+                  pref.setString('shift', shift_out);
+                }
+
+                print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }else if (date_out != dateId){
+                clockin = dataClockIn;
+                clockout = "--:--";
+                date_out = "";
+                statusPhoto = true;
+                statusIcon = false;
+                imageUrl = dataImageUrl;
+                _colorButton = Colors.red[700];
+                _statusTotalWork = false;
+                _visibleButton = true;
+                _status = "checkin";
+                shift = shift_in;
+                pref.remove('shift');
+                pref.setString('shift', shift_in);
+
+                print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }else if(id_shift == '3'){
+                statusPhoto = true;
+                statusIcon = false;
+                clockin = dataClockIn;
+                clockout = dataClockOut;
+                imageUrl = dataImageUrl;
+                _visibleButton = true;
+                _statusTotalWork = true;
+                _status = "checkin";
+                shift = shift_in;
+                pref.remove('shift');
+                pref.setString('shift', shift_in);
+                _colorButton = Colors.red[700];
+
+                print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }else {
+
+                clockin = dataClockIn;
+                clockout = dataClockOut;
+                statusPhoto = true;
+                statusIcon = false;
+                imageUrl = dataImageUrl;
+                _colorButton = Colors.red[700];
+                _statusTotalWork = true;
+                _visibleButton = false;
+                _status = "checkin";
+                shift = shift_in;
+                pref.remove('shift');
+                pref.setString('shift', shift_in);
+
+                print('con. 6 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+
+              }
+
             });
           }else{
             Future.delayed(const Duration(microseconds: 2000),(){
