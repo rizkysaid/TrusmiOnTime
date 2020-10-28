@@ -37,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
   static String message = '';
   static String total_work = '';
   static String _status;
+  static bool _isCheckin = false;
+  static bool _isCheckout = false;
   static bool statusPhoto = false;
   static bool statusIcon = true;
   static bool _visibleButton = true;
@@ -70,6 +72,10 @@ class _ProfileScreenState extends State<ProfileScreen>{
     checkConnection();
 
     getPref();
+
+    setState(() {
+      _saving = true;
+    });
 
     _timeString = _formatDateTime(DateTime.now());
     _hariTanggal = _formatHariTanggal(DateTime.now());
@@ -170,10 +176,6 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   Future<void> getProfil(userID, date) async {
 
-    // setState(() {
-    //   _saving = true;
-    // });
-
       String ip;
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
@@ -227,10 +229,9 @@ class _ProfileScreenState extends State<ProfileScreen>{
         try {
           if (response.status == true) {
             setState(() {
-              _saving = true;
+              // _saving = true;
               nama = dataNama;
               jabatan = dataJabatan;
-              _saving = false;
               pref.setString('id_shift', id_shift);
 
               if(dataClockIn != "--:--" && dataClockOut != "--:--"){
@@ -247,16 +248,22 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 pref.remove('shift');
                 pref.setString('shift', shift_in);
 
+                _saving = false;
+
                 print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
               }else if (dataClockIn == "--:--"){
 
-                // if(_status == 'checkin' && dataClockIn == "--:--"){
-                //   Future.delayed(const Duration(microseconds: 3000),(){
-                //     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                //   });
-                //   _status = "checkout";
-                // }else{
+                setState(() {
+                  _isCheckin = false;
+                  _isCheckout = false;
+                });
+
+                if(_isCheckin == true && dataClockIn == "--:--"){
+                  Future.delayed(const Duration(microseconds: 3000),(){
+                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                  });
+                }else{
                   statusPhoto = false;
                   statusIcon = true;
                   imageUrl = "";
@@ -269,17 +276,24 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   shift = shift_in;
                   pref.remove('shift');
                   pref.setString('shift', shift_in);
-                // }
+
+                  _saving = false;
+                }
 
                 print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
               }else if (dataClockOut == "--:--"){
 
-                if(_status == 'checkout' && dataClockIn != "--:--" && dataClockOut == "--:--"){
+                if(_isCheckin == true){
+                  setState(() {
+                    _isCheckout = false;
+                  });
+                }
+
+                if(_isCheckout == true && dataClockOut == "--:--"){
                   Future.delayed(const Duration(microseconds: 3000),(){
                     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                   });
-                  _status = "checkin";
                 }else{
                   clockin = dataClockIn;
                   clockout = dataClockOut;
@@ -293,6 +307,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   shift = shift_out;
                   pref.remove('shift');
                   pref.setString('shift', shift_out);
+
+                  _saving = false;
                 }
 
                 print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
@@ -312,6 +328,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 pref.remove('shift');
                 pref.setString('shift', shift_in);
 
+                _saving = false;
+
                 print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
               }else if(id_shift == '3'){
@@ -327,6 +345,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 pref.remove('shift');
                 pref.setString('shift', shift_in);
                 _colorButton = Colors.red[700];
+
+                _saving = false;
 
                 print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
@@ -345,6 +365,8 @@ class _ProfileScreenState extends State<ProfileScreen>{
                 pref.remove('shift');
                 pref.setString('shift', shift_in);
 
+                _saving = false;
+
                 print('con. 6 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
               }
@@ -356,7 +378,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
             });
           }
         } catch (err) {
-          print("Cannot read");
+          print('NOPE');
         }
       }
 
@@ -375,10 +397,19 @@ class _ProfileScreenState extends State<ProfileScreen>{
         clockin = pref.get('clock_in');
         imageUrl = pref.getString('imageUrl');
         _status = pref.getString('status');
+        _isCheckin = pref.getBool('isCheckin');
+        _isCheckout = pref.getBool('isCheckout');
       });
 
+      print("_isCheckin = "+_isCheckin.toString());
+      print("_isCheckout = "+_isCheckout.toString());
+
       if (username != null) {
-        getProfil(userID, date);
+        Timer timer = new Timer(new Duration(seconds: 1), () {
+          // debugPrint("Print after 1 seconds");
+          getProfil(userID, date);
+        });
+
       } else {
         Navigator.pushNamedAndRemoveUntil(
             context, "/login", (Route<dynamic> routes) => false);

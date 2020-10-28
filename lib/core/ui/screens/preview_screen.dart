@@ -18,7 +18,6 @@ import 'package:giffy_dialog/giffy_dialog.dart';
 
 bool _saving = false;
 bool _hari_besar = false;
-// bool _get_profil = false;
 
 class PreviewScreen extends StatefulWidget{
   final String imgPath;
@@ -27,6 +26,7 @@ class PreviewScreen extends StatefulWidget{
   final String imageUrl;
   final String status;
   final bool isCheckin = false;
+  final bool isCheckout = false;
   final String idShift;
   final String shift;
 
@@ -203,7 +203,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
 
                               if(widget.status == "checkin"){
                                 if(prosesCheckin(usrId, clock_in, File(widget.imgPath), idShift, shift) != null){
-                                  savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
+                                  savePref(clock_in.substring(11,16), true, false, widget.imgPath, widget.status);
                                   Alert(
                                       context: context,
                                       style: alertStyle,
@@ -273,7 +273,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                               }else{
 
                                 if(prosesCheckout(usrId, clock_in, File(widget.imgPath), idShift, shift) != null){
-                                  savePref(clock_in.substring(11,16), true, widget.imgPath, widget.status);
+                                  savePref(clock_in.substring(11,16), true, true, widget.imgPath, widget.status);
                                   Alert(
                                       context: context,
                                       style: alertStyle,
@@ -329,11 +329,12 @@ class _PreviewScreenState extends State<PreviewScreen>{
     );
   }
 
-  savePref(String clock_in, bool isCheckin, String imageUrl, String status) async{
+  savePref(String clock_in, bool isCheckin, bool isCheckout, String imageUrl, String status) async{
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
 
       pref.setBool('isCheckin', isCheckin);
+      pref.setBool('isCheckout', isCheckout);
       pref.setString('imageUrl', imageUrl);
       pref.setString('status', status);
     });
