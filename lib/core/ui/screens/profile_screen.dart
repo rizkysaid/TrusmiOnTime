@@ -170,9 +170,9 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
   Future<void> getProfil(userID, date) async {
 
-    setState(() {
-      _saving = true;
-    });
+    // setState(() {
+    //   _saving = true;
+    // });
 
       String ip;
       final dbHelper = DatabaseHelper.instance;
@@ -227,6 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen>{
         try {
           if (response.status == true) {
             setState(() {
+              _saving = true;
               nama = dataNama;
               jabatan = dataJabatan;
               _saving = false;
@@ -250,12 +251,12 @@ class _ProfileScreenState extends State<ProfileScreen>{
 
               }else if (dataClockIn == "--:--"){
 
-                if(_status == 'checkin' && dataClockIn == "--:--"){
-                  Future.delayed(const Duration(microseconds: 3000),(){
-                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                  });
-                  _status = "checkout";
-                }else{
+                // if(_status == 'checkin' && dataClockIn == "--:--"){
+                //   Future.delayed(const Duration(microseconds: 3000),(){
+                //     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                //   });
+                //   _status = "checkout";
+                // }else{
                   statusPhoto = false;
                   statusIcon = true;
                   imageUrl = "";
@@ -268,13 +269,13 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   shift = shift_in;
                   pref.remove('shift');
                   pref.setString('shift', shift_in);
-                }
+                // }
 
                 print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
               }else if (dataClockOut == "--:--"){
 
-                if(_status == 'checkout' && dataClockOut == "--:--"){
+                if(_status == 'checkout' && dataClockIn != "--:--" && dataClockOut == "--:--"){
                   Future.delayed(const Duration(microseconds: 3000),(){
                     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
                   });
