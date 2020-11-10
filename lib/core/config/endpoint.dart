@@ -4,7 +4,7 @@ class Endpoint{
   String ip;
 
  static String _baseIP = "http://103.39.50.142"; //public
- //  static String _baseIP = "http://192.168.23.23"; //local
+  // static String _baseIP = "http://192.168.23.23"; //local
 
   static String _baseURL = "$_baseIP/absensi2/api/";
   static String login = "$_baseURL/login";

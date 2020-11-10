@@ -244,7 +244,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                                       // ),
                                                       onlyOkButton: true,
                                                       onOkButtonPressed: () {
-                                                        Future.delayed(const Duration(microseconds: 5000),(){
+                                                        Future.delayed(const Duration(seconds: 2),(){
                                                           setState(() {
                                                             _saving = false;
                                                           });
@@ -256,7 +256,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                                 )
 
                                             }else{
-                                              Future.delayed(const Duration(microseconds: 5000),(){
+                                              Future.delayed(const Duration(seconds: 2),(){
                                                 setState(() {
                                                   _saving = false;
                                                 });
@@ -289,7 +289,7 @@ class _PreviewScreenState extends State<PreviewScreen>{
                                           onPressed: ()=> {
 
                                             // if(_get_profil == true){
-                                              Future.delayed(const Duration(microseconds: 5000),(){
+                                              Future.delayed(Duration(seconds: 2),(){
                                                 setState(() {
                                                   _saving = false;
                                                 });

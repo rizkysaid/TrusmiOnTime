@@ -234,69 +234,137 @@ class _ProfileScreenState extends State<ProfileScreen>{
               jabatan = dataJabatan;
               pref.setString('id_shift', id_shift);
 
-              if(dataClockIn != "--:--" && dataClockOut != "--:--"){
-                clockin = dataClockIn;
-                clockout = dataClockOut;
-                statusPhoto = true;
-                statusIcon = false;
-                imageUrl = dataImageUrl;
-                _colorButton = Colors.red[700];
-                _statusTotalWork = true;
-                _visibleButton = false;
-                _status = "checkin";
-                shift = shift_in;
-                pref.remove('shift');
-                pref.setString('shift', shift_in);
 
-                _saving = false;
+              if(id_shift != '3'){
 
-                print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                if(dataClockIn != dateId){
+                  if (dataClockIn == "--:--"){
 
-              }else if (dataClockIn == "--:--"){
+                    setState(() {
+                      _isCheckin = false;
+                      _isCheckout = false;
+                    });
 
-                setState(() {
-                  _isCheckin = false;
-                  _isCheckout = false;
-                });
+                    if(_isCheckin == true && dataClockIn == "--:--"){
+                      Future.delayed(const Duration(microseconds: 3000),(){
+                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                      });
+                    }else{
+                      statusPhoto = false;
+                      statusIcon = true;
+                      imageUrl = "";
+                      _colorButton = Colors.red[700];
+                      clockout = dataClockOut;
+                      clockin = dataClockIn;
+                      _statusTotalWork = false;
+                      _visibleButton = true;
+                      _status = "checkin";
+                      shift = shift_in;
+                      pref.remove('shift');
+                      pref.setString('shift', shift_in);
 
-                if(_isCheckin == true && dataClockIn == "--:--"){
-                  Future.delayed(const Duration(microseconds: 3000),(){
-                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                  });
-                }else{
-                  statusPhoto = false;
-                  statusIcon = true;
-                  imageUrl = "";
-                  _colorButton = Colors.red[700];
-                  clockout = dataClockOut;
-                  clockin = dataClockIn;
-                  _statusTotalWork = false;
-                  _visibleButton = true;
-                  _status = "checkin";
-                  shift = shift_in;
-                  pref.remove('shift');
-                  pref.setString('shift', shift_in);
+                      _saving = false;
+                    }
 
-                  _saving = false;
+                    print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                    //kondisi belum checkin
+
+                  }else if (dataClockOut == "--:--"){
+
+                    if(_isCheckin == true){
+                      setState(() {
+                        _isCheckout = false;
+                      });
+                    }
+
+                    if(_isCheckout == true && dataClockOut == "--:--"){
+                      Future.delayed(const Duration(microseconds: 3000),(){
+                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                      });
+                    }else{
+                      clockin = dataClockIn;
+                      clockout = dataClockOut;
+                      statusPhoto = true;
+                      statusIcon = false;
+                      imageUrl = dataImageUrl;
+                      _colorButton = Colors.deepOrange;
+                      _statusTotalWork = false;
+                      _visibleButton = true;
+                      _status = "checkout";
+                      shift = shift_out;
+                      pref.remove('shift');
+                      pref.setString('shift', shift_out);
+
+                      _saving = false;
+                    }
+
+                    print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                    //kondisi sudah checkin & belum checkout
+
+                  }else{
+                    if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+                      clockin = dataClockIn;
+                      clockout = dataClockOut;
+                      statusPhoto = true;
+                      statusIcon = false;
+                      imageUrl = dataImageUrl;
+                      _colorButton = Colors.red[700];
+                      _statusTotalWork = true;
+                      _visibleButton = false;
+                      _status = "checkin";
+                      shift = shift_in;
+                      pref.remove('shift');
+                      pref.setString('shift', shift_in);
+
+                      _saving = false;
+
+                      print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                      //kondisi sudah checkin & sudah checkout
+
+                    }
+                  }
                 }
 
-                print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
 
-              }else if (dataClockOut == "--:--"){
 
-                if(_isCheckin == true){
+              }else{ //KONDISI SIFT 3
+
+                if (dataClockIn == "--:--"){
+
                   setState(() {
+                    _isCheckin = false;
                     _isCheckout = false;
                   });
-                }
 
-                if(_isCheckout == true && dataClockOut == "--:--"){
-                  Future.delayed(const Duration(microseconds: 3000),(){
-                    Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                  });
-                }else{
+                  if(_isCheckin == true && dataClockIn == "--:--"){
+                    Future.delayed(const Duration(microseconds: 3000),(){
+                      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                    });
+                  }else{
+                    statusPhoto = false;
+                    statusIcon = true;
+                    imageUrl = "";
+                    _colorButton = Colors.red[700];
+                    clockout = dataClockOut;
+                    clockin = dataClockIn;
+                    _statusTotalWork = false;
+                    _visibleButton = true;
+                    _status = "checkin";
+                    shift = shift_in;
+                    pref.remove('shift');
+                    pref.setString('shift', shift_in);
+
+                    _saving = false;
+                  }
+
+                  print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                  //kondisi belum checkin
+
+                }else
+                  if (date_out != dateId){
                   clockin = dataClockIn;
-                  clockout = dataClockOut;
+                  clockout = "--:--";
+                  date_out = "";
                   statusPhoto = true;
                   statusIcon = false;
                   imageUrl = dataImageUrl;
@@ -304,72 +372,180 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   _statusTotalWork = false;
                   _visibleButton = true;
                   _status = "checkout";
-                  shift = shift_out;
+                  shift = shift_in;
                   pref.remove('shift');
-                  pref.setString('shift', shift_out);
+                  pref.setString('shift', shift_in);
 
                   _saving = false;
+
+                  print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                  //kondisi tanggal checkout sama tidak sama dengan tgl hari ini
+
+                }else{
+                  statusPhoto = true;
+                  statusIcon = false;
+                  clockin = dataClockIn;
+                  clockout = dataClockOut;
+                  imageUrl = dataImageUrl;
+                  _visibleButton = true;
+                  _statusTotalWork = true;
+                  _status = "checkin";
+                  shift = shift_in;
+                  pref.remove('shift');
+                  pref.setString('shift', shift_in);
+                  _colorButton = Colors.red[700];
+
+                  _saving = false;
+
+                  print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                  //kondisi sift malam
                 }
-
-                print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
-
-              }else if (date_out != dateId){
-                clockin = dataClockIn;
-                clockout = "--:--";
-                date_out = "";
-                statusPhoto = true;
-                statusIcon = false;
-                imageUrl = dataImageUrl;
-                _colorButton = Colors.red[700];
-                _statusTotalWork = false;
-                _visibleButton = true;
-                _status = "checkin";
-                shift = shift_in;
-                pref.remove('shift');
-                pref.setString('shift', shift_in);
-
-                _saving = false;
-
-                print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
-
-              }else if(id_shift == '3'){
-                statusPhoto = true;
-                statusIcon = false;
-                clockin = dataClockIn;
-                clockout = dataClockOut;
-                imageUrl = dataImageUrl;
-                _visibleButton = true;
-                _statusTotalWork = true;
-                _status = "checkin";
-                shift = shift_in;
-                pref.remove('shift');
-                pref.setString('shift', shift_in);
-                _colorButton = Colors.red[700];
-
-                _saving = false;
-
-                print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
-
-              }else {
-
-                clockin = dataClockIn;
-                clockout = dataClockOut;
-                statusPhoto = true;
-                statusIcon = false;
-                imageUrl = dataImageUrl;
-                _colorButton = Colors.red[700];
-                _statusTotalWork = true;
-                _visibleButton = false;
-                _status = "checkin";
-                shift = shift_in;
-                pref.remove('shift');
-                pref.setString('shift', shift_in);
-
-                _saving = false;
-
-                print('con. 6 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
-
               }
+
+
+
+
+              // if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+              //   clockin = dataClockIn;
+              //   clockout = dataClockOut;
+              //   statusPhoto = true;
+              //   statusIcon = false;
+              //   imageUrl = dataImageUrl;
+              //   _colorButton = Colors.red[700];
+              //   _statusTotalWork = true;
+              //   _visibleButton = false;
+              //   _status = "checkin";
+              //   shift = shift_in;
+              //   pref.remove('shift');
+              //   pref.setString('shift', shift_in);
+              //
+              //   _saving = false;
+              //
+              //   print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //   //kondisi sudah checkin & sudah checkout
+              //
+              // }else if (dataClockIn == "--:--"){
+              //
+              //   setState(() {
+              //     _isCheckin = false;
+              //     _isCheckout = false;
+              //   });
+              //
+              //   if(_isCheckin == true && dataClockIn == "--:--"){
+              //     Future.delayed(const Duration(microseconds: 3000),(){
+              //       Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //     });
+              //   }else{
+              //     statusPhoto = false;
+              //     statusIcon = true;
+              //     imageUrl = "";
+              //     _colorButton = Colors.red[700];
+              //     clockout = dataClockOut;
+              //     clockin = dataClockIn;
+              //     _statusTotalWork = false;
+              //     _visibleButton = true;
+              //     _status = "checkin";
+              //     shift = shift_in;
+              //     pref.remove('shift');
+              //     pref.setString('shift', shift_in);
+              //
+              //     _saving = false;
+              //   }
+              //
+              //   print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //   //kondisi belum checkin
+              //
+              // }else if (dataClockOut == "--:--"){
+              //
+              //   if(_isCheckin == true){
+              //     setState(() {
+              //       _isCheckout = false;
+              //     });
+              //   }
+              //
+              //   if(_isCheckout == true && dataClockOut == "--:--"){
+              //     Future.delayed(const Duration(microseconds: 3000),(){
+              //       Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //     });
+              //   }else{
+              //     clockin = dataClockIn;
+              //     clockout = dataClockOut;
+              //     statusPhoto = true;
+              //     statusIcon = false;
+              //     imageUrl = dataImageUrl;
+              //     _colorButton = Colors.deepOrange;
+              //     _statusTotalWork = false;
+              //     _visibleButton = true;
+              //     _status = "checkout";
+              //     shift = shift_out;
+              //     pref.remove('shift');
+              //     pref.setString('shift', shift_out);
+              //
+              //     _saving = false;
+              //   }
+              //
+              //   print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //   //kondisi sudah checkin & belum checkout
+              //
+              // }else if (date_out != dateId){
+              //   clockin = dataClockIn;
+              //   clockout = "--:--";
+              //   date_out = "";
+              //   statusPhoto = true;
+              //   statusIcon = false;
+              //   imageUrl = dataImageUrl;
+              //   _colorButton = Colors.red[700];
+              //   _statusTotalWork = false;
+              //   _visibleButton = true;
+              //   _status = "checkin";
+              //   shift = shift_in;
+              //   pref.remove('shift');
+              //   pref.setString('shift', shift_in);
+              //
+              //   _saving = false;
+              //
+              //   print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //   //kondisi tanggal checkout sama tidak sama dengan tgl hari ini
+              //
+              // }else if(id_shift == '3'){
+              //   statusPhoto = true;
+              //   statusIcon = false;
+              //   clockin = dataClockIn;
+              //   clockout = dataClockOut;
+              //   imageUrl = dataImageUrl;
+              //   _visibleButton = true;
+              //   _statusTotalWork = true;
+              //   _status = "checkin";
+              //   shift = shift_in;
+              //   pref.remove('shift');
+              //   pref.setString('shift', shift_in);
+              //   _colorButton = Colors.red[700];
+              //
+              //   _saving = false;
+              //
+              //   print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //   //kondisi sift malam
+              //
+              // }else {
+              //
+              //   clockin = dataClockIn;
+              //   clockout = dataClockOut;
+              //   statusPhoto = true;
+              //   statusIcon = false;
+              //   imageUrl = dataImageUrl;
+              //   _colorButton = Colors.red[700];
+              //   _statusTotalWork = true;
+              //   _visibleButton = false;
+              //   _status = "checkin";
+              //   shift = shift_in;
+              //   pref.remove('shift');
+              //   pref.setString('shift', shift_in);
+              //
+              //   _saving = false;
+              //
+              //   print('con. 6 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //
+              // }
 
             });
           }else{
@@ -834,86 +1010,92 @@ class _ProfileScreenState extends State<ProfileScreen>{
       _saving = true;
     });
 
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows check status profil screen:'+dbHelper.toString());
-    print('Length = '+allRows.length.toString());
+    // if(_isCheckout == true){
+    //   Future.delayed(const Duration(microseconds: 3000),(){
+    //     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+    //   });
+    // }else{
+      String ip;
+      final dbHelper = DatabaseHelper.instance;
+      final allRows = await dbHelper.queryAllRows();
+      print('query all rows check status profil screen:'+dbHelper.toString());
+      print('Length = '+allRows.length.toString());
 
-    if(allRows.length != 0){
-      ip = allRows[0]['ip_address'];
-    }else{
-      ip = Endpoint.base_url;
-    }
+      if(allRows.length != 0){
+        ip = allRows[0]['ip_address'];
+      }else{
+        ip = Endpoint.base_url;
+      }
 
-    ApiServices services = ApiServices();
-    var response = await services.CheckStatus(ip, userID);
+      ApiServices services = ApiServices();
+      var response = await services.CheckStatus(ip, userID);
 
-    if(response == null){
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/invalid_ip", (Route<dynamic> routes) => false);
-      });
-    }else{
-      print('Status aktif = '+response.data.aktif);
+      if(response == null){
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/invalid_ip", (Route<dynamic> routes) => false);
+        });
+      }else{
+        print('Status aktif = '+response.data.aktif);
 
-      setState(() {
-        _saving = false;
-      });
+        setState(() {
+          _saving = false;
+        });
 
-      if(response.data.aktif == '1'){
-        if(response.data.achive == true) {
-          Navigator.pushNamed(context, "/camera",
-              arguments: ScreenArguments(userID, _status, id_shift, shift)
-          );
+        if(response.data.aktif == '1'){
+          if(response.data.achive == true) {
+            Navigator.pushNamed(context, "/camera",
+                arguments: ScreenArguments(userID, _status, id_shift, shift)
+            );
+          }else{
+            Alert(
+                context: context,
+                style: alertStyle,
+                type: AlertType.error,
+                title: "Anda tidak bisa melakukan absen!",
+                desc: response.data.message,
+                buttons: [
+                  DialogButton(
+                    child: Text(
+                      "Kembali",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                    onPressed: ()=> {
+                      Future.delayed(const Duration(microseconds: 2000),(){
+                        Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                      })
+
+                    },
+                    width: 120,
+                  )
+                ]
+            ).show();
+          }
+
         }else{
           Alert(
               context: context,
               style: alertStyle,
               type: AlertType.error,
               title: "Anda tidak bisa melakukan absen!",
-              desc: response.data.message,
+              desc: "User anda telah dinonaktifkan.",
               buttons: [
                 DialogButton(
                   child: Text(
-                    "Kembali",
+                    "Logout",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   onPressed: ()=> {
-                    Future.delayed(const Duration(microseconds: 2000),(){
-                      Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-                    })
 
+                    logout()
                   },
                   width: 120,
                 )
               ]
           ).show();
         }
-
-      }else{
-        Alert(
-            context: context,
-            style: alertStyle,
-            type: AlertType.error,
-            title: "Anda tidak bisa melakukan absen!",
-            desc: "User anda telah dinonaktifkan.",
-            buttons: [
-              DialogButton(
-                child: Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: ()=> {
-
-                  logout()
-                },
-                width: 120,
-              )
-            ]
-        ).show();
       }
-    }
+    // }
 
   }
   var alertStyle = AlertStyle(
