@@ -360,11 +360,21 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
                   //kondisi belum checkin
 
-                }else
-                  if (date_out != dateId){
+                }else if (dataClockOut == "--:--"){
+
+                  if(_isCheckin == true){
+                  setState(() {
+                  _isCheckout = false;
+                  });
+                  }
+
+                  if(_isCheckout == true && dataClockOut == "--:--"){
+                  Future.delayed(const Duration(microseconds: 3000),(){
+                  Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+                  });
+                  }else{
                   clockin = dataClockIn;
-                  clockout = "--:--";
-                  date_out = "";
+                  clockout = dataClockOut;
                   statusPhoto = true;
                   statusIcon = false;
                   imageUrl = dataImageUrl;
@@ -372,6 +382,28 @@ class _ProfileScreenState extends State<ProfileScreen>{
                   _statusTotalWork = false;
                   _visibleButton = true;
                   _status = "checkout";
+                  shift = shift_out;
+                  pref.remove('shift');
+                  pref.setString('shift', shift_out);
+
+                  _saving = false;
+                  }
+
+                  print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+                  //kondisi sudah checkin & belum checkout
+
+              }else if (date_out != dateId){
+                  clockin = dataClockIn;
+                  clockout = dataClockOut;
+                  date_out = "";
+                  date_in = "";
+                  statusPhoto = true;
+                  statusIcon = false;
+                  imageUrl = dataImageUrl;
+                  _colorButton = Colors.red[700];
+                  _statusTotalWork = false;
+                  _visibleButton = true;
+                  _status = "checkin";
                   shift = shift_in;
                   pref.remove('shift');
                   pref.setString('shift', shift_in);
@@ -532,7 +564,332 @@ class _ProfileScreenState extends State<ProfileScreen>{
               //   clockout = dataClockOut;
               //   statusPhoto = true;
               //   statusIcon = false;
-              //   imageUrl = dataImageUrl;
+              //   imageUrl = dataImageUrl;if (response.status == true) {
+              //             setState(() {
+              //               // _saving = true;
+              //               nama = dataNama;
+              //               jabatan = dataJabatan;
+              //               pref.setString('id_shift', id_shift);
+              //
+              //
+              //               if(id_shift != '3'){
+              //
+              //                 if(dataClockIn != dateId){
+              //                   if (dataClockIn == "--:--"){
+              //
+              //                     setState(() {
+              //                       _isCheckin = false;
+              //                       _isCheckout = false;
+              //                     });
+              //
+              //                     if(_isCheckin == true && dataClockIn == "--:--"){
+              //                       Future.delayed(const Duration(microseconds: 3000),(){
+              //                         Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //                       });
+              //                     }else{
+              //                       statusPhoto = false;
+              //                       statusIcon = true;
+              //                       imageUrl = "";
+              //                       _colorButton = Colors.red[700];
+              //                       clockout = dataClockOut;
+              //                       clockin = dataClockIn;
+              //                       _statusTotalWork = false;
+              //                       _visibleButton = true;
+              //                       _status = "checkin";
+              //                       shift = shift_in;
+              //                       pref.remove('shift');
+              //                       pref.setString('shift', shift_in);
+              //
+              //                       _saving = false;
+              //                     }
+              //
+              //                     print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                     //kondisi belum checkin
+              //
+              //                   }else if (dataClockOut == "--:--"){
+              //
+              //                     if(_isCheckin == true){
+              //                       setState(() {
+              //                         _isCheckout = false;
+              //                       });
+              //                     }
+              //
+              //                     if(_isCheckout == true && dataClockOut == "--:--"){
+              //                       Future.delayed(const Duration(microseconds: 3000),(){
+              //                         Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //                       });
+              //                     }else{
+              //                       clockin = dataClockIn;
+              //                       clockout = dataClockOut;
+              //                       statusPhoto = true;
+              //                       statusIcon = false;
+              //                       imageUrl = dataImageUrl;
+              //                       _colorButton = Colors.deepOrange;
+              //                       _statusTotalWork = false;
+              //                       _visibleButton = true;
+              //                       _status = "checkout";
+              //                       shift = shift_out;
+              //                       pref.remove('shift');
+              //                       pref.setString('shift', shift_out);
+              //
+              //                       _saving = false;
+              //                     }
+              //
+              //                     print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                     //kondisi sudah checkin & belum checkout
+              //
+              //                   }else{
+              //                     if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+              //                       clockin = dataClockIn;
+              //                       clockout = dataClockOut;
+              //                       statusPhoto = true;
+              //                       statusIcon = false;
+              //                       imageUrl = dataImageUrl;
+              //                       _colorButton = Colors.red[700];
+              //                       _statusTotalWork = true;
+              //                       _visibleButton = false;
+              //                       _status = "checkin";
+              //                       shift = shift_in;
+              //                       pref.remove('shift');
+              //                       pref.setString('shift', shift_in);
+              //
+              //                       _saving = false;
+              //
+              //                       print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                       //kondisi sudah checkin & sudah checkout
+              //
+              //                     }
+              //                   }
+              //                 }
+              //
+              //
+              //
+              //               }else{ //KONDISI SIFT 3
+              //
+              //                 if (dataClockIn == "--:--"){
+              //
+              //                   setState(() {
+              //                     _isCheckin = false;
+              //                     _isCheckout = false;
+              //                   });
+              //
+              //                   if(_isCheckin == true && dataClockIn == "--:--"){
+              //                     Future.delayed(const Duration(microseconds: 3000),(){
+              //                       Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //                     });
+              //                   }else{
+              //                     statusPhoto = false;
+              //                     statusIcon = true;
+              //                     imageUrl = "";
+              //                     _colorButton = Colors.red[700];
+              //                     clockout = dataClockOut;
+              //                     clockin = dataClockIn;
+              //                     _statusTotalWork = false;
+              //                     _visibleButton = true;
+              //                     _status = "checkin";
+              //                     shift = shift_in;
+              //                     pref.remove('shift');
+              //                     pref.setString('shift', shift_in);
+              //
+              //                     _saving = false;
+              //                   }
+              //
+              //                   print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                   //kondisi belum checkin
+              //
+              //                 }else
+              //                   if (date_out != dateId){
+              //                   clockin = dataClockIn;
+              //                   clockout = "--:--";
+              //                   date_out = "";
+              //                   statusPhoto = true;
+              //                   statusIcon = false;
+              //                   imageUrl = dataImageUrl;
+              //                   _colorButton = Colors.deepOrange;
+              //                   _statusTotalWork = false;
+              //                   _visibleButton = true;
+              //                   _status = "checkout";
+              //                   shift = shift_in;
+              //                   pref.remove('shift');
+              //                   pref.setString('shift', shift_in);
+              //
+              //                   _saving = false;
+              //
+              //                   print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                   //kondisi tanggal checkout sama tidak sama dengan tgl hari ini
+              //
+              //                 }else{
+              //                   statusPhoto = true;
+              //                   statusIcon = false;
+              //                   clockin = dataClockIn;
+              //                   clockout = dataClockOut;
+              //                   imageUrl = dataImageUrl;
+              //                   _visibleButton = true;
+              //                   _statusTotalWork = true;
+              //                   _status = "checkin";
+              //                   shift = shift_in;
+              //                   pref.remove('shift');
+              //                   pref.setString('shift', shift_in);
+              //                   _colorButton = Colors.red[700];
+              //
+              //                   _saving = false;
+              //
+              //                   print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //                   //kondisi sift malam
+              //                 }
+              //               }
+              //
+              //
+              //
+              //
+              //               // if(dataClockIn != "--:--" && dataClockOut != "--:--"){
+              //               //   clockin = dataClockIn;
+              //               //   clockout = dataClockOut;
+              //               //   statusPhoto = true;
+              //               //   statusIcon = false;
+              //               //   imageUrl = dataImageUrl;
+              //               //   _colorButton = Colors.red[700];
+              //               //   _statusTotalWork = true;
+              //               //   _visibleButton = false;
+              //               //   _status = "checkin";
+              //               //   shift = shift_in;
+              //               //   pref.remove('shift');
+              //               //   pref.setString('shift', shift_in);
+              //               //
+              //               //   _saving = false;
+              //               //
+              //               //   print('con. 1 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //   //kondisi sudah checkin & sudah checkout
+              //               //
+              //               // }else if (dataClockIn == "--:--"){
+              //               //
+              //               //   setState(() {
+              //               //     _isCheckin = false;
+              //               //     _isCheckout = false;
+              //               //   });
+              //               //
+              //               //   if(_isCheckin == true && dataClockIn == "--:--"){
+              //               //     Future.delayed(const Duration(microseconds: 3000),(){
+              //               //       Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //               //     });
+              //               //   }else{
+              //               //     statusPhoto = false;
+              //               //     statusIcon = true;
+              //               //     imageUrl = "";
+              //               //     _colorButton = Colors.red[700];
+              //               //     clockout = dataClockOut;
+              //               //     clockin = dataClockIn;
+              //               //     _statusTotalWork = false;
+              //               //     _visibleButton = true;
+              //               //     _status = "checkin";
+              //               //     shift = shift_in;
+              //               //     pref.remove('shift');
+              //               //     pref.setString('shift', shift_in);
+              //               //
+              //               //     _saving = false;
+              //               //   }
+              //               //
+              //               //   print('con. 2 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //   //kondisi belum checkin
+              //               //
+              //               // }else if (dataClockOut == "--:--"){
+              //               //
+              //               //   if(_isCheckin == true){
+              //               //     setState(() {
+              //               //       _isCheckout = false;
+              //               //     });
+              //               //   }
+              //               //
+              //               //   if(_isCheckout == true && dataClockOut == "--:--"){
+              //               //     Future.delayed(const Duration(microseconds: 3000),(){
+              //               //       Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+              //               //     });
+              //               //   }else{
+              //               //     clockin = dataClockIn;
+              //               //     clockout = dataClockOut;
+              //               //     statusPhoto = true;
+              //               //     statusIcon = false;
+              //               //     imageUrl = dataImageUrl;
+              //               //     _colorButton = Colors.deepOrange;
+              //               //     _statusTotalWork = false;
+              //               //     _visibleButton = true;
+              //               //     _status = "checkout";
+              //               //     shift = shift_out;
+              //               //     pref.remove('shift');
+              //               //     pref.setString('shift', shift_out);
+              //               //
+              //               //     _saving = false;
+              //               //   }
+              //               //
+              //               //   print('con. 3 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //   //kondisi sudah checkin & belum checkout
+              //               //
+              //               // }else if (date_out != dateId){
+              //               //   clockin = dataClockIn;
+              //               //   clockout = "--:--";
+              //               //   date_out = "";
+              //               //   statusPhoto = true;
+              //               //   statusIcon = false;
+              //               //   imageUrl = dataImageUrl;
+              //               //   _colorButton = Colors.red[700];
+              //               //   _statusTotalWork = false;
+              //               //   _visibleButton = true;
+              //               //   _status = "checkin";
+              //               //   shift = shift_in;
+              //               //   pref.remove('shift');
+              //               //   pref.setString('shift', shift_in);
+              //               //
+              //               //   _saving = false;
+              //               //
+              //               //   print('con. 4 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //   //kondisi tanggal checkout sama tidak sama dengan tgl hari ini
+              //               //
+              //               // }else if(id_shift == '3'){
+              //               //   statusPhoto = true;
+              //               //   statusIcon = false;
+              //               //   clockin = dataClockIn;
+              //               //   clockout = dataClockOut;
+              //               //   imageUrl = dataImageUrl;
+              //               //   _visibleButton = true;
+              //               //   _statusTotalWork = true;
+              //               //   _status = "checkin";
+              //               //   shift = shift_in;
+              //               //   pref.remove('shift');
+              //               //   pref.setString('shift', shift_in);
+              //               //   _colorButton = Colors.red[700];
+              //               //
+              //               //   _saving = false;
+              //               //
+              //               //   print('con. 5 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //   //kondisi sift malam
+              //               //
+              //               // }else {
+              //               //
+              //               //   clockin = dataClockIn;
+              //               //   clockout = dataClockOut;
+              //               //   statusPhoto = true;
+              //               //   statusIcon = false;
+              //               //   imageUrl = dataImageUrl;
+              //               //   _colorButton = Colors.red[700];
+              //               //   _statusTotalWork = true;
+              //               //   _visibleButton = false;
+              //               //   _status = "checkin";
+              //               //   shift = shift_in;
+              //               //   pref.remove('shift');
+              //               //   pref.setString('shift', shift_in);
+              //               //
+              //               //   _saving = false;
+              //               //
+              //               //   print('con. 6 => dataClockIn = '+dataClockIn+' dataClockout = '+ dataClockOut);
+              //               //
+              //               // }
+              //
+              //             });
+              //           }else{
+              //             Future.delayed(const Duration(microseconds: 2000),(){
+              //               Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
+              //             });
+              //           }
               //   _colorButton = Colors.red[700];
               //   _statusTotalWork = true;
               //   _visibleButton = false;
