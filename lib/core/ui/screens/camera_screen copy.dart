@@ -2,17 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:login_absen/core/ui/screens/preview_screen.dart';
+import 'package:path/path.dart';
+import 'package:path_provider/path_provider.dart';
 import 'ScreenArguments.dart';
 
-List<CameraDescription> cameras;
-
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  cameras = await availableCameras();
-  runApp(CameraScreen());
-}
-
+//bool _saving = false;
 class CameraScreen extends StatefulWidget {
   @override
   _CameraScreenState createState() => _CameraScreenState();
@@ -31,7 +25,6 @@ class _CameraScreenState extends State<CameraScreen> {
   @override
   void initState() {
     super.initState();
-
     availableCameras().then((availableCameras) {
       cameras = availableCameras;
 
@@ -39,17 +32,19 @@ class _CameraScreenState extends State<CameraScreen> {
         setState(() {
           selectedCameraIndex = 1;
         });
-        _initCameraController(cameras[selectedCameraIndex]).then((void v) {
-          if (!mounted) {
-            return;
-          }
-        });
+        _initCameraController(cameras[selectedCameraIndex]).then((void v) {});
       } else {
         print('No camera available');
       }
     }).catchError((err) {
       print('Error :${err.code}Error message : ${err.message}');
     });
+
+//    getPref();
+
+//    setState(() {
+//      _saving = true;
+//    });
   }
 
   @override
@@ -57,6 +52,45 @@ class _CameraScreenState extends State<CameraScreen> {
     controller.dispose();
     super.dispose();
   }
+
+//  getPref()async {
+//    String ip;
+//    final dbHelper = DatabaseHelper.instance;
+//    final allRows = await dbHelper.queryAllRows();
+//
+//    if(allRows.length != 0){
+//
+//      allRows.forEach((row) => print(row));
+//      ip = allRows[0]['ip_address'];
+//      SharedPreferences pref = await SharedPreferences.getInstance();
+//      setState(() {
+//        username = pref.getString('username');
+//        userID = pref.getString('userID');
+//      });
+//
+//    }else{
+//      ip = Endpoint.base_url;
+//    }
+//
+//
+//    print('userId nyee '+userID);
+//    print('IP nyee '+ip);
+//    print('date nyee '+date);
+//
+//    ApiServices services = ApiServices();
+//    var response = await services.Profil(ip, userID, date);
+//    if (response == null) {
+//
+//      Future.delayed(const Duration(microseconds: 2000), () {
+//        Navigator.pushNamedAndRemoveUntil(
+//            this.context, "/invalid_ip", (Route<dynamic>routes) => false);
+//      });
+//    } else {
+//      setState(() {
+//        _saving = false;
+//      });
+//    }
+//  }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
     if (controller != null) {
@@ -86,28 +120,48 @@ class _CameraScreenState extends State<CameraScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      // crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        _cameraPreviewWidget(),
-        Padding(
-          padding: const EdgeInsets.only(bottom: 10.0),
-          child: Row(
-            children: <Widget>[
-              _cameraToggleRowWidget(),
-              _cameraControlWidget(context),
-              Spacer(),
-            ],
-          ),
-        )
-      ],
+    return Container(
+      color: Colors.black,
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            Expanded(
+              child: _cameraPreviewWidget(),
+            ),
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Container(
+                height: 120,
+                width: double.infinity,
+                color: Colors.black,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: <Widget>[
+                    _cameraToggleRowWidget(),
+                    _cameraControlWidget(context),
+                    Spacer()
+                  ],
+                ),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
+      return const Text(
+        'Loading',
+        style: TextStyle(
+          color: Colors.white,
+          fontSize: 20.0,
+          fontWeight: FontWeight.w900,
+        ),
+      );
     }
 
     final size = MediaQuery.of(this.context).size;
@@ -130,7 +184,7 @@ class _CameraScreenState extends State<CameraScreen> {
   Widget _cameraControlWidget(context) {
     return Expanded(
       child: Align(
-        alignment: Alignment.bottomCenter,
+        alignment: Alignment.center,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.max,
@@ -162,17 +216,17 @@ class _CameraScreenState extends State<CameraScreen> {
 
     return Expanded(
       child: Align(
-        alignment: Alignment.bottomLeft,
+        alignment: Alignment.centerLeft,
         child: TextButton.icon(
           onPressed: _onSwitchCamera,
           icon: Icon(
             _getCameraLensIcon(lensDirection),
-            color: Colors.black,
+            color: Colors.white,
             size: 24,
           ),
           label: Text(
             '${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w500),
+            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
           ),
         ),
       ),
@@ -199,22 +253,22 @@ class _CameraScreenState extends State<CameraScreen> {
 
   void _onCapturePressed(context) async {
     final ScreenArguments args = ModalRoute.of(context).settings.arguments;
-    final image = await controller.takePicture();
     try {
-      // final path =
-      //     join((await getTemporaryDirectory()).path, '${DateTime.now()}.png');
-      // await controller.takePicture().then((value) => path);
+      final path =
+          join((await getTemporaryDirectory()).path, '${DateTime.now()}.png');
+      await controller.takePicture();
 
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PreviewScreen(
-              imgPath: image.path,
-              userID: args.userID,
-              status: args.status,
-              clockIn: '${DateTime.now()}',
-              idShift: args.idShift,
-              shift: args.shift),
+            imgPath: path,
+            userID: args.userID,
+            status: args.status,
+            clockIn: '${DateTime.now()}',
+            idShift: args.idShift,
+            shift: args.shift,
+          ),
         ),
       );
     } catch (e) {

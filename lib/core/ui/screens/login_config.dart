@@ -1,4 +1,3 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/database/database_config.dart';
@@ -11,22 +10,18 @@ class LoginConfig extends StatefulWidget {
 }
 
 class _LoginConfigState extends State<LoginConfig> {
-
   @override
   void initState() {
     super.initState();
 //    checkConnection();
-
   }
-
 
   @override
   void dispose() {
     super.dispose();
-
   }
 
-  Future<void>checkConnection() async{
+  Future<void> checkConnection() async {
 //    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
@@ -40,53 +35,45 @@ class _LoginConfigState extends State<LoginConfig> {
 //    }
   }
 
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
-
-  void _onRefresh() async{
-
+  void _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
 
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
-  void _onLoading() async{
-
+  void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
-
 
     _refreshController.loadComplete();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
       footer: CustomFooter(
-        builder: (BuildContext context,LoadStatus mode){
-          Widget body ;
-          if(mode==LoadStatus.idle){
-            body =  Text("pull up load");
-          }
-          else if(mode==LoadStatus.loading){
-            body =  CupertinoActivityIndicator();
-          }
-          else if(mode == LoadStatus.failed){
+        builder: (BuildContext context, LoadStatus mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("pull up load");
+          } else if (mode == LoadStatus.loading) {
+            body = CupertinoActivityIndicator();
+          } else if (mode == LoadStatus.failed) {
             body = Text("Load Failed!Click retry!");
-          }
-          else if(mode == LoadStatus.canLoading){
+          } else if (mode == LoadStatus.canLoading) {
             body = Text("release to load more");
-          }
-          else{
+          } else {
             body = Text("No more Data");
           }
           return Container(
             height: 55.0,
-            child: Center(child:body),
+            child: Center(child: body),
           );
         },
       ),
@@ -113,39 +100,36 @@ class _LoginBodyState extends State<LoginBody> {
   String password = '';
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-
   }
 
-  Future<void> prosesLogin() async{
-
-    if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
-      String ip;
+  Future<void> prosesLogin() async {
+    if (usernameController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty) {
+      // String ip;
       ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseConfigHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      print('query all rows: '+allRows.toList().toString());
-      print('Length = '+allRows.length.toString());
+      print('query all rows: ' + allRows.toList().toString());
+      print('Length = ' + allRows.length.toString());
 
       allRows.forEach((row) => print(row));
       username = allRows[0]['username'];
       password = allRows[0]['password'];
 
-      if(usernameController.text == username && passwordController.text == password){
-        Future.delayed(const Duration(microseconds: 2000),(){
+      if (usernameController.text == username &&
+          passwordController.text == password) {
+        Future.delayed(const Duration(microseconds: 2000), () {
 //          Navigator.pushNamedAndRemoveUntil(context, "/ip_config", (Route<dynamic>routes)=>false);
           Navigator.pushNamed(context, '/ip_config');
         });
-      }else{
+      } else {
         ToastUtils.show("Username / password konfigurasi salah!");
       }
-
-
-    }else{
+    } else {
       ToastUtils.show("Please Input All Fields");
     }
-
   }
 
   @override
@@ -158,22 +142,23 @@ class _LoginBodyState extends State<LoginBody> {
           decoration: BoxDecoration(
               image: DecorationImage(
                   image: AssetImage('assets/background_login.png'),
-                  fit: BoxFit.cover
-              )
-          ),
+                  fit: BoxFit.cover)),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text('Login Configuration',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 20),
+                Text(
+                  'Login Configuration',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20),
                 )
               ],
             ),
           ),
         ),
-
         Padding(
           padding: EdgeInsets.only(left: 20, right: 20, top: 30),
           child: Column(
@@ -188,56 +173,58 @@ class _LoginBodyState extends State<LoginBody> {
     );
   }
 
-  Widget _username(BuildContext context){
+  Widget _username(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
         controller: usernameController,
         validator: validateUser,
-        onSaved: (String value){
+        onSaved: (String value) {
           username = value;
         },
         key: Key('username'),
         decoration: InputDecoration(
-            hintText: 'username', labelText: 'username',
+            hintText: 'username',
+            labelText: 'username',
             labelStyle: TextStyle(color: Colors.red[900]),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
-        ),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.red[900])),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.red[900]))),
         style: TextStyle(
-          fontSize: 20.0, color: Colors.black,
+          fontSize: 20.0,
+          color: Colors.black,
         ),
       ),
     );
   }
 
-  Widget _password(BuildContext context){
+  Widget _password(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
           controller: passwordController,
-          onSaved: (String value){
+          onSaved: (String value) {
             password = value;
           },
           key: Key('password'),
           decoration: InputDecoration(
-              hintText: 'password', labelText: 'password',
+              hintText: 'password',
+              labelText: 'password',
               labelStyle: TextStyle(color: Colors.red[900]),
-              enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
-              focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
-          ),
-          style: TextStyle(
-              fontSize: 20.0, color: Colors.black
-          ),
-          obscureText: true
-      ),
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red[900])),
+              focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red[900]))),
+          style: TextStyle(fontSize: 20.0, color: Colors.black),
+          obscureText: true),
     );
   }
 
-  Widget _buttonLogin(BuildContext context){
+  Widget _buttonLogin(BuildContext context) {
     return Padding(
         padding: EdgeInsets.all(8.0),
-        child:new InkWell(
+        child: new InkWell(
             onTap: () => prosesLogin(),
             child: new Container(
               height: 50.0,
@@ -247,24 +234,16 @@ class _LoginBodyState extends State<LoginBody> {
                 borderRadius: new BorderRadius.circular(10.0),
               ),
               child: new Center(
-                  child: new Text(
-                      'Login',
-                      style: new TextStyle(fontSize: 18.0, color: Colors.white)
-                  )
-              ),
-            )
-        )
-    );
+                  child: new Text('Login',
+                      style:
+                          new TextStyle(fontSize: 18.0, color: Colors.white))),
+            )));
   }
 
-  String validateUser(String value){
-    if(value.isEmpty){
+  String validateUser(String value) {
+    if (value.isEmpty) {
       return 'Username harus diisi';
     }
     return null;
   }
-
-
-
 }
-

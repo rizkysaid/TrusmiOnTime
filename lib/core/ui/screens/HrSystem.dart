@@ -1,11 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
-
-bool _saving = true;
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:webviewx/webviewx.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -13,25 +12,21 @@ Future main() async {
 }
 
 class HrSystem extends StatefulWidget {
-
-
   @override
   _HrSystemState createState() => new _HrSystemState();
 }
 
 class _HrSystemState extends State<HrSystem> {
-
-  InAppWebViewController webView;
+  // InAppWebViewController webView;
   String url = "";
   double progress = 0;
 
-  @override
-  void initState(){
-    super.initState();
-    setState(() {
-      _saving = true;
-    });
+  bool _loading = true;
 
+  @override
+  void initState() {
+    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    super.initState();
   }
 
   @override
@@ -44,84 +39,116 @@ class _HrSystemState extends State<HrSystem> {
     final PassParams args = ModalRoute.of(context).settings.arguments;
     String username = args.username;
     String password = args.password;
-    String urlAbsen = Endpoint.base_ip+"/hr/bypass/login/"+username.toString()+"/"+password.toString();
-    print("ip="+urlAbsen);
+    String urlAbsen = Endpoint.baseIp +
+        "/hr/bypass/login/" +
+        username.toString() +
+        "/" +
+        password.toString();
+    print("ip=" + urlAbsen);
 
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: ModalProgressHUD(
-          inAsyncCall: _saving,
-          child: Container(
-              child: Column(children: <Widget>[
-                Expanded(
-                  child: Container(
-                    child: InAppWebView(
-                      initialUrl: urlAbsen,
-                      initialHeaders: {},
-                      initialOptions: InAppWebViewGroupOptions(
-                          crossPlatform: InAppWebViewOptions(
-                            debuggingEnabled: true,
-                          )
-                      ),
-                      onWebViewCreated: (InAppWebViewController controller) {
-                        webView = controller;
-                      },
-                      onLoadStart: (InAppWebViewController controller, String url) {
-                        setState(() {
-                          this.url = url;
-                        });
-                      },
-                      onLoadStop: (InAppWebViewController controller, String url) async {
-                        setState(() {
-                          this.url = url;
-                          _saving = false;
-                        });
-                      },
-                      onProgressChanged: (InAppWebViewController controller, int progress) {
-                        setState(() {
-                          this.progress = progress / 100;
-                        });
-                      },
-                    ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Stack(
+        children: [
+          // WebView(
+          //   initialUrl: urlAbsen,
+          //   javascriptMode: JavascriptMode.unrestricted,
+          //   gestureNavigationEnabled: true,
+          //   onPageStarted: (String url) {
+          //     print('Page started loading: $url');
+          //   },
+          //   onPageFinished: (String url) {
+          //     setState(() {
+          //       _loading = false;
+          //     });
+          //     print('Page finished loading: $url');
+          //   },
+          // ),
+          // (_loading)
+          //     ? Container(
+          //         width: MediaQuery.of(context).size.width,
+          //         height: MediaQuery.of(context).size.height,
+          //         color: Colors.grey[100],
+          //         child: Center(
+          //           child: CircularProgressIndicator(),
+          //         ),
+          //       )
+          //     : SizedBox.shrink(),
+
+          WebViewX(
+            initialContent: urlAbsen,
+            initialSourceType: SourceType.url,
+            height: null,
+            width: null,
+            onPageFinished: (String url) {
+              setState(() {
+                _loading = false;
+              });
+            },
+          ),
+          (_loading)
+              ? Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: CircularProgressIndicator(),
                   ),
-                ),
-                Container(
-                    child: progress < 1.0
-                        ? LinearProgressIndicator(value: progress)
-                        : Container()),
-//              ButtonBar(
-//                alignment: MainAxisAlignment.center,
-//                children: <Widget>[
-//                  RaisedButton(
-//                    child: Icon(Icons.arrow_back),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.goBack();
-//                      }
-//                    },
-//                  ),
-//                  RaisedButton(
-//                    child: Icon(Icons.arrow_forward),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.goForward();
-//                      }
-//                    },
-//                  ),
-//                  RaisedButton(
-//                    child: Icon(Icons.refresh),
-//                    onPressed: () {
-//                      if (webView != null) {
-//                        webView.reload();
-//                      }
-//                    },
-//                  ),
-//                ],
-//              ),
-              ])),
-        ),
+                )
+              : SizedBox.shrink(),
+        ],
       ),
     );
+
+    // return MaterialApp(
+    //   debugShowCheckedModeBanner: false,
+    //   home: Scaffold(
+    //     body: ModalProgressHUD(
+    //       inAsyncCall: _saving,
+    //       child: Container(
+    //           child: Column(children: <Widget>[
+    //         Expanded(
+    //           child: Container(
+    //             child: InAppWebView(
+    //               initialUrl: urlAbsen,
+    //               initialHeaders: {},
+    //               initialOptions: InAppWebViewGroupOptions(
+    //                   crossPlatform: InAppWebViewOptions(
+    //                 debuggingEnabled: true,
+    //               )),
+    //               onWebViewCreated: (InAppWebViewController controller) {
+    //                 webView = controller;
+    //               },
+    //               onLoadStart: (InAppWebViewController controller, String url) {
+    //                 setState(() {
+    //                   this.url = url;
+    //                 });
+    //               },
+    //               onLoadStop:
+    //                   (InAppWebViewController controller, String url) async {
+    //                 setState(() {
+    //                   this.url = url;
+    //                   _saving = false;
+    //                 });
+    //               },
+    //               onProgressChanged:
+    //                   (InAppWebViewController controller, int progress) {
+    //                 setState(() {
+    //                   this.progress = progress / 100;
+    //                 });
+    //               },
+    //             ),
+    //           ),
+    //         ),
+    //         Container(
+    //             child: progress < 1.0
+    //                 ? LinearProgressIndicator(value: progress)
+    //                 : Container()),
+    //       ],
+    //       ),
+    //       ),
+    //     ),
+    //   ),
+    // );
   }
 }

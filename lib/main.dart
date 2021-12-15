@@ -1,9 +1,7 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
-import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/HrSystem.dart';
 import 'package:login_absen/core/ui/screens/Wfh.dart';
 import 'package:login_absen/core/ui/screens/invalid_ip.dart';
@@ -18,14 +16,8 @@ import 'dart:async';
 import 'core/ui/screens/invalid_ip.dart';
 import 'core/ui/screens/login_config.dart';
 //import 'core/utils/toast_util.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 
-
-void main() => runApp(
-    Phoenix(
-        child: MyApp()
-    )
-);
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
@@ -34,10 +26,10 @@ class MyApp extends StatelessWidget {
       title: "Login",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primaryColor: Colors.red[700],
-        accentColor: Colors.redAccent
-      ),
-      home: _cekLogin(),
+          primaryColor: Colors.red[700],
+          colorScheme:
+              ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent)),
+      home: CekLogin(),
 //      home: LoginScreen(),
       routes: {
         "/login": (context) => LoginScreen(),
@@ -55,20 +47,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class _cekLogin extends StatefulWidget {
+class CekLogin extends StatefulWidget {
   @override
-  __cekLoginState createState() => __cekLoginState();
+  _CekLoginState createState() => _CekLoginState();
 }
 
-class __cekLoginState extends State<_cekLogin> {
-
+class _CekLoginState extends State<CekLogin> {
   String userID;
   String username;
-  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+  // static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
   final dbConfig = DatabaseConfigHelper.instance;
 
-  String IpAddress;
+  String ipAddress;
 
   @override
   void initState() {
@@ -76,24 +67,21 @@ class __cekLoginState extends State<_cekLogin> {
 //    getPref();
     checkConnection();
     _deleteConfig();
-
   }
 
   @override
-  void dispose(){
+  void dispose() {
     super.dispose();
   }
 
-  getPref()async{
-
+  getPref() async {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows getPref Profil:' +allRows.toList().toString());
-    print('Length = '+allRows.length.toString());
+    print('query all rows getPref Profil:' + allRows.toList().toString());
+    print('Length = ' + allRows.length.toString());
 
-    if(allRows.length != 0){
-
+    if (allRows.length != 0) {
       allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
       SharedPreferences pref = await SharedPreferences.getInstance();
@@ -102,24 +90,26 @@ class __cekLoginState extends State<_cekLogin> {
         userID = pref.getString('userID');
       });
 
-      if(username == false){
-        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+      if (username.isEmpty) {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/login", (Route<dynamic> routes) => false);
         });
-      }else{
-        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+      } else {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/profile", (Route<dynamic> routes) => false);
         });
       }
-
-    }else{
-      ip = Endpoint.base_url;
-      Future.delayed(const Duration(microseconds: 2000),(){
-        Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
+    } else {
+      ip = Endpoint.baseUrl;
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic> routes) => false);
       });
     }
 
-    print("IP = "+ip);
+    print("IP = " + ip);
 //
 //    ApiServices services = ApiServices();
 //    print('servis');
@@ -154,11 +144,9 @@ class __cekLoginState extends State<_cekLogin> {
 //
 //
 //    }
-
   }
 
-  Future<void>checkConnection() async{
-
+  Future<void> checkConnection() async {
 //    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //      // I am connected to a mobile network.
@@ -167,43 +155,38 @@ class __cekLoginState extends State<_cekLogin> {
 //      });
 //
 //    } else if (connectivityResult == ConnectivityResult.wifi) {
-      getPref();
+    getPref();
 //    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       body: splashscreen(),
+      body: splashscreen(),
     );
   }
 
-  Widget splashscreen(){
+  Widget splashscreen() {
     return Container(
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-          decoration: BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage('assets/background.png'),
-                  fit: BoxFit.cover
-              )
-          ),
-          child: SafeArea(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-
-                Image(
-                    alignment: Alignment.center,
-                    height: MediaQuery.of(context).size.height / 4,
-                    width: MediaQuery.of(context).size.width / 2,
-                    image: AssetImage("assets/logo_png_ontime.png")
-                )
-              ],
-            ),
-          ),
-        );
+      width: MediaQuery.of(context).size.width,
+      height: MediaQuery.of(context).size.height,
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage('assets/background.png'), fit: BoxFit.cover)),
+      child: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image(
+                alignment: Alignment.center,
+                height: MediaQuery.of(context).size.height / 4,
+                width: MediaQuery.of(context).size.width / 2,
+                image: AssetImage("assets/logo_png_ontime.png"))
+          ],
+        ),
+      ),
+    );
   }
 
   void _deleteConfig() async {
@@ -217,20 +200,20 @@ class __cekLoginState extends State<_cekLogin> {
   void _insertConfig() async {
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseConfigHelper.columnUsername : 'admintrusmi',
-      DatabaseConfigHelper.columnPassword  : 'trusmiadmin'
+      DatabaseConfigHelper.columnUsername: 'admintrusmi',
+      DatabaseConfigHelper.columnPassword: 'trusmiadmin'
     };
     final id = await dbConfig.insert(row);
     print('inserted row id: $id');
     _showConfig();
   }
 
-  void _showConfig()async{
+  void _showConfig() async {
     final allRows = await dbConfig.queryAllRows();
-    allRows.forEach((row) => print("Config = "+row.toString()));
+    allRows.forEach((row) => print("Config = " + row.toString()));
   }
 
-  void show_ip() async {
+  void showIp() async {
     final allRows = await dbHelper.queryAllRows();
     print('query all rows show IP:');
     allRows.forEach((row) => print(row));

@@ -1,33 +1,27 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/database/database_helper.dart';
-import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 bool _saving = false;
+
 class InvalidIP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-        body: BodyInvalidIP()
-    );
+    return Scaffold(body: BodyInvalidIP());
   }
 }
 
 class BodyInvalidIP extends StatefulWidget {
-
   @override
   _BodyInvalidIPState createState() => _BodyInvalidIPState();
 }
 
 class _BodyInvalidIPState extends State<BodyInvalidIP> {
-
   String userID;
-  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+  // static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   final dbHelper = DatabaseHelper.instance;
 
@@ -43,29 +37,27 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
   @override
   void dispose() {
     super.dispose();
-
   }
 
-  getPref()async {
+  getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
     userID = pref.getString('userID');
 
-      if (username != null) {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic>routes) => false);
-        });
-      } else {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/login", (Route<dynamic>routes) => false);
-        });
-      }
+    if (username != null) {
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/profile", (Route<dynamic> routes) => false);
+      });
+    } else {
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic> routes) => false);
+      });
+    }
   }
 
-
-  Future<void>checkConnection() async{
+  Future<void> checkConnection() async {
 //    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
@@ -73,16 +65,16 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
 //
 //    } else if (connectivityResult == ConnectivityResult.wifi) {
 
-      setState(() {
-        _saving = false;
-      });
+    setState(() {
+      _saving = false;
+    });
 //    }
   }
 
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
-
-  void _onRefresh() async{
+  void _onRefresh() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use refreshFailed()
@@ -90,14 +82,13 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
     getPref();
   }
 
-  void _onLoading() async{
+  void _onLoading() async {
     // monitor network fetch
     await Future.delayed(Duration(milliseconds: 1000));
     // if failed,use loadFailed(),if no data return,use LoadNodata()
 
     _refreshController.loadComplete();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -106,26 +97,22 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
       footer: CustomFooter(
-        builder: (BuildContext context,LoadStatus mode){
-          Widget body ;
-          if(mode==LoadStatus.idle){
-            body =  Text("pull up load");
-          }
-          else if(mode==LoadStatus.loading){
-            body =  CupertinoActivityIndicator();
-          }
-          else if(mode == LoadStatus.failed){
+        builder: (BuildContext context, LoadStatus mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("pull up load");
+          } else if (mode == LoadStatus.loading) {
+            body = CupertinoActivityIndicator();
+          } else if (mode == LoadStatus.failed) {
             body = Text("Load Failed!Click retry!");
-          }
-          else if(mode == LoadStatus.canLoading){
+          } else if (mode == LoadStatus.canLoading) {
             body = Text("release to load more");
-          }
-          else{
+          } else {
             body = Text("No more Data");
           }
           return Container(
             height: 55.0,
-            child: Center(child:body),
+            child: Center(child: body),
           );
         },
       ),
@@ -137,25 +124,28 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
         child: Column(
           children: <Widget>[
             // bagian header
-            SizedBox(height: 50,),
+            SizedBox(
+              height: 50,
+            ),
             Container(
               child: Image(
                   alignment: Alignment.center,
-                  height: MediaQuery.of(context).size.height/2,
+                  height: MediaQuery.of(context).size.height / 2,
                   width: MediaQuery.of(context).size.width,
-                  image: AssetImage("assets/no_connection.png")
-              ),
+                  image: AssetImage("assets/no_connection.png")),
             ),
-            SizedBox(height: 20,),
-            RaisedButton(
+            SizedBox(
+              height: 20,
+            ),
+            ElevatedButton(
               onPressed: () {
-                Future.delayed(const Duration(microseconds: 2000),(){
+                Future.delayed(const Duration(microseconds: 2000), () {
 //                Navigator.pushNamedAndRemoveUntil(context, "/login_config", (Route<dynamic>routes)=>false);
                   Navigator.pushNamed(context, '/login_config');
                 });
               },
-              textColor: Colors.white,
-              padding: const EdgeInsets.all(0.0),
+              // textColor: Colors.white,
+              // padding: const EdgeInsets.all(0.0),
               child: Container(
                 decoration: const BoxDecoration(
                   gradient: LinearGradient(
@@ -167,8 +157,8 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
                   ),
                 ),
                 padding: const EdgeInsets.all(10.0),
-                child:
-                const Text('Setting IP Address', style: TextStyle(fontSize: 20)),
+                child: const Text('Setting IP Address',
+                    style: TextStyle(fontSize: 20, color: Colors.white)),
               ),
             ),
           ],
@@ -176,7 +166,4 @@ class _BodyInvalidIPState extends State<BodyInvalidIP> {
       ),
     );
   }
-
-
 }
-

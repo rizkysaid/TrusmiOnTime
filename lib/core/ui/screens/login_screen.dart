@@ -1,4 +1,3 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
@@ -18,21 +17,18 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-
   @override
   void initState() {
     super.initState();
 //    checkConnection();
   }
 
-
   @override
   void dispose() {
     super.dispose();
-
   }
 
-  Future<void>checkConnection() async{
+  Future<void> checkConnection() async {
 //    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
@@ -46,53 +42,45 @@ class _LoginScreenState extends State<LoginScreen> {
 //    }
   }
 
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
-
-  void _onRefresh() async{
-
+  void _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
 
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
-  void _onLoading() async{
-
+  void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
-
 
     _refreshController.loadComplete();
   }
 
   @override
   Widget build(BuildContext context) {
-
     return SmartRefresher(
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
       footer: CustomFooter(
-        builder: (BuildContext context,LoadStatus mode){
-          Widget body ;
-          if(mode==LoadStatus.idle){
-            body =  Text("pull up load");
-          }
-          else if(mode==LoadStatus.loading){
-            body =  CupertinoActivityIndicator();
-          }
-          else if(mode == LoadStatus.failed){
+        builder: (BuildContext context, LoadStatus mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("pull up load");
+          } else if (mode == LoadStatus.loading) {
+            body = CupertinoActivityIndicator();
+          } else if (mode == LoadStatus.failed) {
             body = Text("Load Failed!Click retry!");
-          }
-          else if(mode == LoadStatus.canLoading){
+          } else if (mode == LoadStatus.canLoading) {
             body = Text("release to load more");
-          }
-          else{
+          } else {
             body = Text("No more Data");
           }
           return Container(
             height: 55.0,
-            child: Center(child:body),
+            child: Center(child: body),
           );
         },
       ),
@@ -101,11 +89,8 @@ class _LoginScreenState extends State<LoginScreen> {
       onLoading: _onLoading,
       child: Scaffold(
         body: ModalProgressHUD(
-            child: SingleChildScrollView(
-                child: LoginBody()
-            ),
-            inAsyncCall: _saving
-        ),
+            child: SingleChildScrollView(child: LoginBody()),
+            inAsyncCall: _saving),
       ),
     );
   }
@@ -124,13 +109,12 @@ class _LoginBodyState extends State<LoginBody> {
   String password = '';
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
-     getPref();
+    getPref();
   }
 
-
-  savePref(String username, String userID, String pass) async{
+  savePref(String username, String userID, String pass) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString('username', username);
@@ -140,43 +124,38 @@ class _LoginBodyState extends State<LoginBody> {
     });
   }
 
-  getPref() async{
-
+  getPref() async {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows:' +allRows.toList().toString());
-    print('Length = '+allRows.length.toString());
+    print('query all rows:' + allRows.toList().toString());
+    print('Length = ' + allRows.length.toString());
 
-    if(allRows.length != 0){
-
+    if (allRows.length != 0) {
       allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
-
-    }else{
-      ip = Endpoint.base_url;
+    } else {
+      ip = Endpoint.baseUrl;
     }
 
-    print('Check IP in getPref LoginScreen = '+ip.toString());
+    print('Check IP in getPref LoginScreen = ' + ip.toString());
 
-    ApiServices services = ApiServices();
-    var response = await services.CheckKoneksi(ip);
+    // ApiServices services = ApiServices();
+    // var response = await services.CheckKoneksi(ip);
 
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      var username = pref.getString('username');
-      if(username != null){
-        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-        });
-
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    var username = pref.getString('username');
+    if (username != null) {
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/profile", (Route<dynamic> routes) => false);
+      });
     }
-
   }
 
-  Future<void> prosesLogin() async{
-    
-    if(usernameController.text.isNotEmpty && passwordController.text.isNotEmpty){
-
+  Future<void> prosesLogin() async {
+    if (usernameController.text.isNotEmpty &&
+        passwordController.text.isNotEmpty) {
       setState(() {
         _saving = true;
       });
@@ -185,42 +164,40 @@ class _LoginBodyState extends State<LoginBody> {
       ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      print('query all rows: '+allRows.toList().toString());
-      print('Length = '+allRows.length.toString());
+      print('query all rows: ' + allRows.toList().toString());
+      print('Length = ' + allRows.length.toString());
 
-      if(allRows.length != 0){
-
+      if (allRows.length != 0) {
         allRows.forEach((row) => print(row));
         ip = allRows[0]['ip_address'];
-
-      }else{
-        ip = Endpoint.base_url;
+      } else {
+        ip = Endpoint.baseUrl;
       }
 
-      print('ip='+ip);
+      print('ip=' + ip);
 
       ApiServices services = ApiServices();
-      var response = await services.Login(ip, usernameController.text, passwordController.text);
+      var response = await services.login(
+          ip, usernameController.text, passwordController.text);
       String usrId = response.data[0].userId.toString();
       String messageLogin = response.message.toString();
 
-
-      if(response.status == true){
-        savePref(usernameController.text.toString(), usrId, passwordController.text);
-        Future.delayed(const Duration(microseconds: 2000),(){
-          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
+      if (response.status == true) {
+        savePref(
+            usernameController.text.toString(), usrId, passwordController.text);
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/profile", (Route<dynamic> routes) => false);
         });
         setState(() {
           _saving = false;
         });
-      }else{
+      } else {
         ToastUtils.show(messageLogin);
       }
-
-    }else{
+    } else {
       ToastUtils.show("Please Input All Fields");
     }
-
   }
 
   @override
@@ -228,30 +205,24 @@ class _LoginBodyState extends State<LoginBody> {
     String version = About.version;
     return Column(
       children: <Widget>[
-
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.height / 6,
-
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/background_login.png'),
-              fit: BoxFit.cover
-            )
-          ),
+              image: DecorationImage(
+                  image: AssetImage('assets/background_login.png'),
+                  fit: BoxFit.cover)),
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 Image(
-                  alignment: Alignment.center,
+                    alignment: Alignment.center,
                     height: MediaQuery.of(context).size.width / 8,
                     width: MediaQuery.of(context).size.width / 2,
-                    image: AssetImage("assets/logo_png_ontime.png")
-                ),
-                Text(version,
-                    style: TextStyle(color: Colors.white)),
+                    image: AssetImage("assets/logo_png_ontime.png")),
+                Text(version, style: TextStyle(color: Colors.white)),
               ],
             ),
           ),
@@ -272,82 +243,77 @@ class _LoginBodyState extends State<LoginBody> {
     );
   }
 
-Widget _username(BuildContext context){
+  Widget _username(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
-          controller: usernameController,
-          validator: validateUser,
-          onSaved: (String value){
-            username = value;
-          },
-          key: Key('username'),
-          decoration: InputDecoration(
-            hintText: 'username', labelText: 'username',
-            labelStyle: TextStyle(color: Colors.red[900]),
-            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
-            focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
-          ),
-          style: TextStyle(
-            fontSize: 20.0, color: Colors.black,
-          ),
-        ),
-      );
-  }
-
-  Widget _password(BuildContext context){
-    return Padding(
-      padding: EdgeInsets.all(8.0),
-      child: TextFormField(
-        controller: passwordController,
-        onSaved: (String value){
-          password = value;
+        controller: usernameController,
+        validator: validateUser,
+        onSaved: (String value) {
+          username = value;
         },
-        key: Key('password'),
+        key: Key('username'),
         decoration: InputDecoration(
-          hintText: 'password', labelText: 'password',
-          labelStyle: TextStyle(color: Colors.red[900]),
-          enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900])),
-          focusedBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.red[900]))
-        ),
+            hintText: 'username',
+            labelText: 'username',
+            labelStyle: TextStyle(color: Colors.red[900]),
+            enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.red[900])),
+            focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.red[900]))),
         style: TextStyle(
-          fontSize: 20.0, color: Colors.black
+          fontSize: 20.0,
+          color: Colors.black,
         ),
-        obscureText: true
       ),
     );
   }
 
-  Widget _buttonLogin(BuildContext context){
+  Widget _password(BuildContext context) {
     return Padding(
       padding: EdgeInsets.all(8.0),
-      child:new InkWell(
-        onTap: () => prosesLogin(),
-        child: new Container(
-          height: 50.0,
-          decoration: new BoxDecoration(
-            color: Colors.red[800],
-            border: new Border.all(color: Colors.white, width: 2.0),
-            borderRadius: new BorderRadius.circular(10.0),
-          ),
-          child: new Center(
-            child: new Text(
-              'Login',
-              style: new TextStyle(fontSize: 18.0, color: Colors.white)
-            )
-          ),
-        )
-      )
+      child: TextFormField(
+          controller: passwordController,
+          onSaved: (String value) {
+            password = value;
+          },
+          key: Key('password'),
+          decoration: InputDecoration(
+              hintText: 'password',
+              labelText: 'password',
+              labelStyle: TextStyle(color: Colors.red[900]),
+              enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red[900])),
+              focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Colors.red[900]))),
+          style: TextStyle(fontSize: 20.0, color: Colors.black),
+          obscureText: true),
     );
   }
 
-  String validateUser(String value){
-    if(value.isEmpty){
+  Widget _buttonLogin(BuildContext context) {
+    return Padding(
+        padding: EdgeInsets.all(8.0),
+        child: new InkWell(
+            onTap: () => prosesLogin(),
+            child: new Container(
+              height: 50.0,
+              decoration: new BoxDecoration(
+                color: Colors.red[800],
+                border: new Border.all(color: Colors.white, width: 2.0),
+                borderRadius: new BorderRadius.circular(10.0),
+              ),
+              child: new Center(
+                  child: new Text('Login',
+                      style:
+                          new TextStyle(fontSize: 18.0, color: Colors.white))),
+            )));
+  }
+
+  String validateUser(String value) {
+    if (value.isEmpty) {
       return 'Username harus diisi';
     }
     return null;
   }
-
 }
-
- 

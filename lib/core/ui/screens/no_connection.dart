@@ -1,36 +1,27 @@
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class NoConnection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-
-    return Scaffold(
-      body: BodyNoConnection()
-    );
+    return Scaffold(body: BodyNoConnection());
   }
 }
 
 class BodyNoConnection extends StatefulWidget {
-
   @override
   _BodyNoConnectionState createState() => _BodyNoConnectionState();
 }
 
 class _BodyNoConnectionState extends State<BodyNoConnection> {
-
   String userID;
-  static String date = new DateTime.now().toIso8601String().substring(0, 10);
+  // static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   @override
   initState() {
     super.initState();
-
   }
 
   @override
@@ -39,7 +30,7 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 //    getPref();
   }
 
-  getPref()async {
+  getPref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     final username = pref.getString('username');
 //    userID = pref.getString('userID');
@@ -54,22 +45,21 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 //            context, "/invalid_ip", (Route<dynamic>routes) => false);
 //      });
 //    } else {
-      if (username != null) {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic>routes) => false);
-        });
-      } else {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/login", (Route<dynamic>routes) => false);
-        });
-      }
+    if (username != null) {
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/profile", (Route<dynamic> routes) => false);
+      });
+    } else {
+      Future.delayed(const Duration(microseconds: 2000), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic> routes) => false);
+      });
+    }
 //    }
   }
 
-
-  Future<void>checkConnection() async{
+  Future<void> checkConnection() async {
 //    var connectivityResult = await (Connectivity().checkConnectivity());
 //    if (connectivityResult == ConnectivityResult.mobile) {
 //
@@ -77,29 +67,25 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
 //
 //    } else if (connectivityResult == ConnectivityResult.wifi) {
 //
-      getPref();
+    getPref();
 //    }
   }
 
-  RefreshController _refreshController = RefreshController(initialRefresh: false);
+  RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
-
-  void _onRefresh() async{
-
+  void _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 1000));
 
     _refreshController.refreshCompleted();
     checkConnection();
   }
 
-  void _onLoading() async{
-
+  void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 1000));
-
 
     _refreshController.loadComplete();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -108,26 +94,22 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
       footer: CustomFooter(
-        builder: (BuildContext context,LoadStatus mode){
-          Widget body ;
-          if(mode==LoadStatus.idle){
-            body =  Text("pull up load");
-          }
-          else if(mode==LoadStatus.loading){
-            body =  CupertinoActivityIndicator();
-          }
-          else if(mode == LoadStatus.failed){
+        builder: (BuildContext context, LoadStatus mode) {
+          Widget body;
+          if (mode == LoadStatus.idle) {
+            body = Text("pull up load");
+          } else if (mode == LoadStatus.loading) {
+            body = CupertinoActivityIndicator();
+          } else if (mode == LoadStatus.failed) {
             body = Text("Load Failed!Click retry!");
-          }
-          else if(mode == LoadStatus.canLoading){
+          } else if (mode == LoadStatus.canLoading) {
             body = Text("release to load more");
-          }
-          else{
+          } else {
             body = Text("No more Data");
           }
           return Container(
             height: 55.0,
-            child: Center(child:body),
+            child: Center(child: body),
           );
         },
       ),
@@ -136,21 +118,22 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
       onLoading: _onLoading,
       child: Column(
         children: <Widget>[
-
-          SizedBox(height: 50,),
+          SizedBox(
+            height: 50,
+          ),
           Container(
             child: Image(
                 alignment: Alignment.center,
-                height: MediaQuery.of(context).size.height/2,
+                height: MediaQuery.of(context).size.height / 2,
                 width: MediaQuery.of(context).size.width,
-                image: AssetImage("assets/no_connection.png")
-            ),
+                image: AssetImage("assets/no_connection.png")),
           ),
-          SizedBox(height: 20,),
+          SizedBox(
+            height: 20,
+          ),
           Text("Please connect to the office WiFi and try again.")
         ],
       ),
     );
   }
 }
-
