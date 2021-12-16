@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +15,7 @@ class BodyNoConnection extends StatefulWidget {
 }
 
 class _BodyNoConnectionState extends State<BodyNoConnection> {
-  String userID;
+  late String userID;
   // static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   @override
@@ -93,26 +92,26 @@ class _BodyNoConnectionState extends State<BodyNoConnection> {
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
-      footer: CustomFooter(
-        builder: (BuildContext context, LoadStatus mode) {
-          Widget body;
-          if (mode == LoadStatus.idle) {
-            body = Text("pull up load");
-          } else if (mode == LoadStatus.loading) {
-            body = CupertinoActivityIndicator();
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load Failed!Click retry!");
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("release to load more");
-          } else {
-            body = Text("No more Data");
-          }
-          return Container(
-            height: 55.0,
-            child: Center(child: body),
-          );
-        },
-      ),
+      // footer: CustomFooter(
+      //   builder: (BuildContext context, LoadStatus mode) {
+      //     Widget body;
+      //     if (mode == LoadStatus.idle) {
+      //       body = Text("pull up load");
+      //     } else if (mode == LoadStatus.loading) {
+      //       body = CupertinoActivityIndicator();
+      //     } else if (mode == LoadStatus.failed) {
+      //       body = Text("Load Failed!Click retry!");
+      //     } else if (mode == LoadStatus.canLoading) {
+      //       body = Text("release to load more");
+      //     } else {
+      //       body = Text("No more Data");
+      //     }
+      //     return Container(
+      //       height: 55.0,
+      //       child: Center(child: body),
+      //     );
+      //   },
+      // ),
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,

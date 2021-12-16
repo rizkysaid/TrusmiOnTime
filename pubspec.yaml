@@ -14,7 +14,7 @@ description: Aplikasi absensi karyawan Trusmi Group.
 version: 1.3.1+1
 
 environment:
-  sdk: ">=2.2.2 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -36,10 +36,12 @@ dependencies:
   pull_to_refresh: ^2.0.0
   sqflite: ^2.0.1
   date_format: ^2.0.4
-  modal_progress_hud: ^0.1.3
-  giffy_dialog: ^1.8.0
+  # modal_progress_hud: ^0.1.3
+  # giffy_dialog: ^1.8.0
   webviewx: ^0.2.1
-  form_bloc: ^0.29.1
+  equatable: ^2.0.3
+  flutter_bloc: ^8.0.0
+  dio: ^4.0.4
 
 dev_dependencies:
   flutter_test:

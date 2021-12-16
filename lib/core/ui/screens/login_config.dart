@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -21,20 +20,6 @@ class _LoginConfigState extends State<LoginConfig> {
     super.dispose();
   }
 
-  Future<void> checkConnection() async {
-//    var connectivityResult = await (Connectivity().checkConnectivity());
-//    if (connectivityResult == ConnectivityResult.mobile) {
-//
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-//      });
-//
-//    } else if (connectivityResult == ConnectivityResult.wifi) {
-//
-//
-//    }
-  }
-
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
@@ -42,7 +27,6 @@ class _LoginConfigState extends State<LoginConfig> {
     await Future.delayed(Duration(milliseconds: 1000));
 
     _refreshController.refreshCompleted();
-    checkConnection();
   }
 
   void _onLoading() async {
@@ -57,26 +41,26 @@ class _LoginConfigState extends State<LoginConfig> {
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
-      footer: CustomFooter(
-        builder: (BuildContext context, LoadStatus mode) {
-          Widget body;
-          if (mode == LoadStatus.idle) {
-            body = Text("pull up load");
-          } else if (mode == LoadStatus.loading) {
-            body = CupertinoActivityIndicator();
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load Failed!Click retry!");
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("release to load more");
-          } else {
-            body = Text("No more Data");
-          }
-          return Container(
-            height: 55.0,
-            child: Center(child: body),
-          );
-        },
-      ),
+      // footer: CustomFooter(
+      //   builder: (BuildContext context, LoadStatus mode) {
+      //     Widget body;
+      //     if (mode == LoadStatus.idle) {
+      //       body = Text("pull up load");
+      //     } else if (mode == LoadStatus.loading) {
+      //       body = CupertinoActivityIndicator();
+      //     } else if (mode == LoadStatus.failed) {
+      //       body = Text("Load Failed!Click retry!");
+      //     } else if (mode == LoadStatus.canLoading) {
+      //       body = Text("release to load more");
+      //     } else {
+      //       body = Text("No more Data");
+      //     }
+      //     return Container(
+      //       height: 55.0,
+      //       child: Center(child: body),
+      //     );
+      //   },
+      // ),
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
@@ -98,6 +82,9 @@ class _LoginBodyState extends State<LoginBody> {
 
   String username = '';
   String password = '';
+
+  bool isvalidateUsername = false;
+  bool isvalidatePassword = false;
 
   @override
   void initState() {
@@ -178,23 +165,27 @@ class _LoginBodyState extends State<LoginBody> {
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
         controller: usernameController,
-        validator: validateUser,
-        onSaved: (String value) {
-          username = value;
+        onSaved: (value) {
+          username = value!;
         },
         key: Key('username'),
         decoration: InputDecoration(
-            hintText: 'username',
-            labelText: 'username',
-            labelStyle: TextStyle(color: Colors.red[900]),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.red[900])),
-            focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.red[900]))),
-        style: TextStyle(
-          fontSize: 20.0,
-          color: Colors.black,
+          hintText: 'username',
+          labelText: 'username',
+          labelStyle: TextStyle(color: Colors.red[900]),
+          enabledBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+          focusedBorder:
+              UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+          errorText: isvalidateUsername ? "Username harus diisi" : null,
         ),
+        onChanged: (value) {
+          if (value == '') {
+            isvalidateUsername = true;
+          } else {
+            isvalidateUsername = false;
+          }
+        },
       ),
     );
   }
@@ -204,18 +195,28 @@ class _LoginBodyState extends State<LoginBody> {
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
           controller: passwordController,
-          onSaved: (String value) {
-            password = value;
+          onSaved: (value) {
+            password = value!;
           },
           key: Key('password'),
           decoration: InputDecoration(
-              hintText: 'password',
-              labelText: 'password',
-              labelStyle: TextStyle(color: Colors.red[900]),
-              enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red[900])),
-              focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red[900]))),
+            hintText: 'password',
+            labelText: 'password',
+            labelStyle: TextStyle(color: Colors.red[900]),
+            enabledBorder:
+                UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+            focusedBorder:
+                UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
+            errorText:
+                isvalidatePassword ? "Password tidak boleh kosong" : null,
+          ),
+          onChanged: (value) {
+            if (value == '') {
+              isvalidatePassword = true;
+            } else {
+              isvalidatePassword = true;
+            }
+          },
           style: TextStyle(fontSize: 20.0, color: Colors.black),
           obscureText: true),
     );
@@ -238,12 +239,5 @@ class _LoginBodyState extends State<LoginBody> {
                       style:
                           new TextStyle(fontSize: 18.0, color: Colors.white))),
             )));
-  }
-
-  String validateUser(String value) {
-    if (value.isEmpty) {
-      return 'Username harus diisi';
-    }
-    return null;
   }
 }

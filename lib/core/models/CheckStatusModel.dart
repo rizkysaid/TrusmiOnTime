@@ -1,35 +1,37 @@
-
 import 'dart:convert';
 
-CheckStatusModel checkStatusModelFromJson(String str) => CheckStatusModel.fromJson(json.decode(str));
+CheckStatusModel checkStatusModelFromJson(String str) =>
+    CheckStatusModel.fromJson(json.decode(str));
 
-String checkStatusModelToJson(CheckStatusModel data) => json.encode(data.toJson());
+String checkStatusModelToJson(CheckStatusModel data) =>
+    json.encode(data.toJson());
 
 class CheckStatusModel {
   CheckStatusModel({
-    this.status,
-    this.data,
+    required this.status,
+    required this.data,
   });
 
   bool status;
   Data data;
 
-  factory CheckStatusModel.fromJson(Map<String, dynamic> json) => CheckStatusModel(
-    status: json["status"],
-    data: Data.fromJson(json["data"]),
-  );
+  factory CheckStatusModel.fromJson(Map<String, dynamic> json) =>
+      CheckStatusModel(
+        status: json["status"],
+        data: Data.fromJson(json["data"]),
+      );
 
   Map<String, dynamic> toJson() => {
-    "status": status,
-    "data": data.toJson(),
-  };
+        "status": status,
+        "data": data.toJson(),
+      };
 }
 
 class Data {
   Data({
-    this.aktif,
-    this.achive,
-    this.message,
+    required this.aktif,
+    required this.achive,
+    required this.message,
   });
 
   String aktif;
@@ -37,14 +39,14 @@ class Data {
   String message;
 
   factory Data.fromJson(Map<String, dynamic> json) => Data(
-    aktif: json["aktif"],
-    achive: json["achive"],
-    message: json["message"],
-  );
+        aktif: json["aktif"],
+        achive: json["achive"],
+        message: json["message"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "aktif": aktif,
-    "achive": achive,
-    "message": message,
-  };
+        "aktif": aktif,
+        "achive": achive,
+        "message": message,
+      };
 }

@@ -7,8 +7,75 @@ import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 class ApiServices {
+  Dio dio = new Dio();
+  late Response response;
+  String connErr = 'Please check your internet connection and try again';
+
+  Future<Response> getConnect(url, apiToken) async {
+    print('getConnect url : ' + url.toString());
+    try {
+      dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
+      dio.options.connectTimeout = 30000; //5s
+      dio.options.receiveTimeout = 25000;
+
+      return await dio.post(url, cancelToken: apiToken);
+    } on DioError catch (e) {
+      // print(e.toString() + ' | ' + url.toString());
+
+      if (e.type == DioErrorType.response) {
+        int? statusCode = e.response!.statusCode;
+        if (statusCode == 404) {
+          throw "Api not found";
+        } else if (statusCode == 500) {
+          throw "Internal Server Error";
+        } else {
+          throw e.error.message.toString();
+        }
+      } else if (e.type == DioErrorType.connectTimeout) {
+        throw e.message.toString();
+      } else if (e.type == DioErrorType.cancel) {
+        throw 'cancel';
+      }
+      throw connErr;
+    } finally {
+      dio.close();
+    }
+  }
+
+  Future<Response> postConnect(url, data, apiToken) async {
+    print('PostConnect url : ' + url.toString());
+    print('postData : ' + data.toString());
+    try {
+      dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
+      dio.options.connectTimeout = 30000; //5s
+      dio.options.receiveTimeout = 25000;
+
+      return await dio.post(url, data: data, cancelToken: apiToken);
+    } on DioError catch (e) {
+      //print(e.toString()+' | '+url.toString());
+      if (e.type == DioErrorType.response) {
+        int? statusCode = e.response!.statusCode;
+        if (statusCode == 404) {
+          throw "Api not found";
+        } else if (statusCode == 500) {
+          throw "Internal Server Error";
+        } else {
+          throw e.error.message.toString();
+        }
+      } else if (e.type == DioErrorType.connectTimeout) {
+        throw e.message.toString();
+      } else if (e.type == DioErrorType.cancel) {
+        throw 'cancel';
+      }
+      throw connErr;
+    } finally {
+      dio.close();
+    }
+  }
+
   Future<AuthModel> login(ip, username, password) async {
     try {
       var response = await http.post(Uri.parse(ip + '/login'),
@@ -24,91 +91,87 @@ class ApiServices {
         return responseRequest;
       }
     } catch (e) {
-      print("Error: " + e.toString());
-      return null;
+      throw response.data['message'];
     }
   }
 
-  Future<ProfileModel> profil(ip, userID, date) async {
-    print('ip => ' + ip);
-    print('userID => ' + userID);
-    print('date => ' + date);
+  Future<List<ProfileModel>> profil(
+      String ip, String userID, String date, apiToken) async {
+    String uri = ip + '/profil/' + userID + '/' + date;
     try {
-      var response =
-          await http.get(Uri.parse(ip + '/profil/' + userID + '/' + date));
-      print("Response Status : ${response.statusCode}");
-      print("Response Body : ${response.body}");
+      var response = await dio.post(uri, cancelToken: apiToken);
+      dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
+      dio.options.connectTimeout = 30000; //5s
+      dio.options.receiveTimeout = 25000;
+
       if (response.statusCode == 200) {
-        ProfileModel responseRequest =
-            ProfileModel.fromJson(jsonDecode(response.body));
-        return responseRequest;
+        List responseList = response.data['data'];
+        List<ProfileModel> listData =
+            responseList.map((f) => ProfileModel.fromJson(f)).toList();
+        return listData;
       } else {
-        return null;
+        throw response.data['message'];
       }
-    } catch (e) {
-      print("Error get profile: " + e.toString());
-      print('IP in ApiService - Profil - Error = ' + ip.toString());
-      return null;
+    } on DioError catch (e) {
+      //print(e.toString()+' | '+url.toString());
+      if (e.type == DioErrorType.response) {
+        int? statusCode = e.response!.statusCode;
+        if (statusCode == 404) {
+          throw "Api not found";
+        } else if (statusCode == 500) {
+          throw "Internal Server Error";
+        } else {
+          throw e.error.message.toString();
+        }
+      } else if (e.type == DioErrorType.connectTimeout) {
+        throw e.message.toString();
+      } else if (e.type == DioErrorType.cancel) {
+        throw 'cancel';
+      }
+      throw connErr;
+    } finally {
+      dio.close();
     }
   }
 
   Future<CheckKoneksiModel> checkKoneksi(ip) async {
-    try {
-      var response = await http.get(Uri.parse(ip + "/cek_con"));
-      print("Response Status : ${response.statusCode}");
-      print("Response Body : ${response.body}");
-      if (response.statusCode == 200) {
-        CheckKoneksiModel responseRequest =
-            CheckKoneksiModel.fromJson(jsonDecode(response.body));
-        return responseRequest;
-      } else {
-        print("No connection ");
-        return null;
-      }
-    } catch (e) {
-      print("Error Cek Koneksi: " + e.toString());
-      return null;
+    var response = await http.get(Uri.parse(ip + "/cek_con"));
+    // print("Response Status : ${response.statusCode}");
+    // print("Response Body : ${response.body}");
+    if (response.statusCode == 200) {
+      CheckKoneksiModel responseRequest =
+          CheckKoneksiModel.fromJson(jsonDecode(response.body));
+      return responseRequest;
+    } else {
+      throw response.statusCode;
     }
   }
 
   Future<CheckStatusModel> checkStatus(ip, userID) async {
-    try {
-      var response = await http.get(Uri.parse(ip + '/check_in/' + userID));
-      print("Response CekStatus Status : ${response.statusCode}");
-      print("Response CekStatus Body : ${response.body}");
-      if (response.statusCode == 200) {
-        CheckStatusModel responseRequest =
-            CheckStatusModel.fromJson(jsonDecode(response.body));
-        return responseRequest;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print("Error Check Status: " + e.toString());
-      print('IP in ApiService - CheckStatus - Error = ' + ip.toString());
-      return null;
+    var response = await http.get(Uri.parse(ip + '/check_in/' + userID));
+    // print("Response CekStatus Status : ${response.statusCode}");
+    // print("Response CekStatus Body : ${response.body}");
+    if (response.statusCode == 200) {
+      CheckStatusModel responseRequest =
+          CheckStatusModel.fromJson(jsonDecode(response.body));
+      return responseRequest;
+    } else {
+      throw response.statusCode;
     }
   }
 
   Future<CheckHolidaysModel> checkHolidays(ip, userID) async {
-    try {
-      var response =
-          await http.get(Uri.parse(ip + '/check_holidays/' + userID));
-      // print('ip => ' + ip);
-      // print('userId => ' + userID);
-      // print("Response CekHolidays Status : ${response.statusCode}");
-      // print("Response CekHolidays Body : ${response.body}");
-      if (response.statusCode == 200) {
-        CheckHolidaysModel responseBirthday =
-            CheckHolidaysModel.fromJson(jsonDecode(response.body));
-        return responseBirthday;
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print("Error Check Holidays: " + e.toString());
-      print('IP in ApiService - CheckHolidays - Error = ' + ip.toString());
-      return null;
+    var response = await http.get(Uri.parse(ip + '/check_holidays/' + userID));
+    // print('ip => ' + ip);
+    // print('userId => ' + userID);
+    // print("Response CekHolidays Status : ${response.statusCode}");
+    // print("Response CekHolidays Body : ${response.body}");
+    if (response.statusCode == 200) {
+      CheckHolidaysModel responseBirthday =
+          CheckHolidaysModel.fromJson(jsonDecode(response.body));
+      return responseBirthday;
+    } else {
+      throw response.statusCode;
     }
   }
 }

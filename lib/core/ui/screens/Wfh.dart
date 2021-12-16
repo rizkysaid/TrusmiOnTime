@@ -34,7 +34,7 @@ class _WfhState extends State<Wfh> {
 
   @override
   Widget build(BuildContext context) {
-    final PassParams args = ModalRoute.of(context).settings.arguments;
+    final args = ModalRoute.of(context)!.settings.arguments as PassParams;
     String username = args.username;
     String password = args.password;
     String urlAbsen = "https://trusmicorp.com/wfh/login/auth/" +

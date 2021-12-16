@@ -4,12 +4,9 @@ import 'package:camera/camera.dart';
 import 'package:login_absen/core/ui/screens/preview_screen.dart';
 import 'ScreenArguments.dart';
 
-List<CameraDescription> cameras;
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  cameras = await availableCameras();
   runApp(CameraScreen());
 }
 
@@ -19,10 +16,10 @@ class CameraScreen extends StatefulWidget {
 }
 
 class _CameraScreenState extends State<CameraScreen> {
-  CameraController controller;
-  List cameras;
-  int selectedCameraIndex;
-  String imgPath;
+  late CameraController controller;
+  late List cameras;
+  late int selectedCameraIndex;
+  late String imgPath;
 
 //  String userID;
 //  String username;
@@ -59,9 +56,6 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
-    if (controller != null) {
-      await controller.dispose();
-    }
     controller = CameraController(cameraDescription, ResolutionPreset.medium);
 
     controller.addListener(() {
@@ -106,7 +100,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
-    if (controller == null || !controller.value.isInitialized) {
+    if (!controller.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -154,7 +148,7 @@ class _CameraScreenState extends State<CameraScreen> {
   /// Display a row of toggle to select the camera (or a message if no camera is available).
 
   Widget _cameraToggleRowWidget() {
-    if (cameras == null || cameras.isEmpty) {
+    if (cameras.isEmpty) {
       return Spacer();
     }
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
@@ -198,7 +192,7 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   void _onCapturePressed(context) async {
-    final ScreenArguments args = ModalRoute.of(context).settings.arguments;
+    final args = ModalRoute.of(context)!.settings.arguments as ScreenArguments;
     final image = await controller.takePicture();
     try {
       // final path =
@@ -209,15 +203,17 @@ class _CameraScreenState extends State<CameraScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => PreviewScreen(
-              imgPath: image.path,
-              userID: args.userID,
-              status: args.status,
-              clockIn: '${DateTime.now()}',
-              idShift: args.idShift,
-              shift: args.shift),
+            imgPath: image.path,
+            userID: args.userID,
+            status: args.status,
+            clockIn: '${DateTime.now()}',
+            idShift: args.idShift,
+            shift: args.shift,
+            imageUrl: '',
+          ),
         ),
       );
-    } catch (e) {
+    } on CameraException catch (e) {
       _showCameraException(e);
     }
   }

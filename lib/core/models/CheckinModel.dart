@@ -1,7 +1,7 @@
-
 import 'dart:convert';
 
-CheckinModel checkinModelFromJson(String str) => CheckinModel.fromJson(json.decode(str));
+CheckinModel checkinModelFromJson(String str) =>
+    CheckinModel.fromJson(json.decode(str));
 
 String checkinModelToJson(CheckinModel data) => json.encode(data.toJson());
 
@@ -10,17 +10,17 @@ class CheckinModel {
   String message;
 
   CheckinModel({
-    this.status,
-    this.message,
+    required this.status,
+    required this.message,
   });
 
   factory CheckinModel.fromJson(Map<String, dynamic> json) => CheckinModel(
-    status: json["status"],
-    message: json["message"],
-  );
+        status: json["status"],
+        message: json["message"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "status": status,
-    "message": message,
-  };
+        "status": status,
+        "message": message,
+      };
 }

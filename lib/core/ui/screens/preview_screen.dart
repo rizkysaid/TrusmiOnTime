@@ -6,14 +6,12 @@ import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
-import 'package:giffy_dialog/giffy_dialog.dart';
 
-bool _saving = false;
+// bool _saving = false;
 bool hariBesar = false;
 
 class PreviewScreen extends StatefulWidget {
@@ -28,23 +26,23 @@ class PreviewScreen extends StatefulWidget {
   final String shift;
 
   PreviewScreen(
-      {this.imgPath,
-      this.userID,
-      this.clockIn,
-      this.imageUrl,
-      this.status,
-      this.idShift,
-      this.shift});
+      {required this.imgPath,
+      required this.userID,
+      required this.clockIn,
+      required this.imageUrl,
+      required this.status,
+      required this.idShift,
+      required this.shift});
 
   @override
   _PreviewScreenState createState() => _PreviewScreenState();
 }
 
 class _PreviewScreenState extends State<PreviewScreen> {
-  static bool statusHariBesar;
-  static String title;
-  static String msg;
-  static String gif;
+  late bool statusHariBesar;
+  late String title;
+  late String msg;
+  late String gif;
   // static bool status_get_profil;
 
   static String date = new DateTime.now().toIso8601String().substring(0, 10);
@@ -73,7 +71,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     ApiServices services = ApiServices();
     var response = await services.checkHolidays(ip, usrId);
 
-    if (response == null) {
+    if (response.data.isEmpty) {
       return null;
     } else {
       statusHariBesar = response.status;
@@ -115,209 +113,206 @@ class _PreviewScreenState extends State<PreviewScreen> {
           iconTheme: new IconThemeData(color: Colors.white),
           backgroundColor: Colors.red[700],
         ),
-        body: ModalProgressHUD(
-          inAsyncCall: _saving,
-          child: Container(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: <Widget>[
-                Expanded(
-                  flex: 2,
-                  child: Image.file(
-                    File(widget.imgPath),
-                    fit: BoxFit.cover,
-                  ),
+        body: Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: Image.file(
+                  File(widget.imgPath),
+                  fit: BoxFit.cover,
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    width: double.infinity,
-                    height: 60.0,
-                    color: Colors.red[700],
-                    child: Center(
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _saving = true;
-                          });
-                          FocusScope.of(context).requestFocus(new FocusNode());
-                          getBytesFromFile().then((bytes) {
-                            String clockIn = widget.clockIn.substring(0, 19);
-                            String usrId = basename(widget.userID);
-                            String idShift = basename(widget.idShift);
-                            String shift = basename(widget.shift);
-
-                            print('clockIn => ' + clockIn);
-                            print('usrId => ' + usrId);
-                            print('idShift => ' + idShift);
-                            print('shift => ' + shift);
-
-                            if (widget.status == "checkin") {
-                              if (prosesCheckin(usrId, clockIn,
-                                      File(widget.imgPath), idShift, shift) !=
-                                  null) {
-                                savePref(clockIn.substring(11, 16), true, false,
-                                    widget.imgPath, widget.status);
-                                Alert(
-                                    context: context,
-                                    style: alertStyle,
-                                    type: AlertType.success,
-                                    title: "Success Check In",
-                                    buttons: [
-                                      DialogButton(
-                                        child: Text(
-                                          "OK",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20),
-                                        ),
-                                        onPressed: () => {
-                                          if (hariBesar == true)
-                                            {
-                                              showDialog(
-                                                context: context,
-                                                builder: (_) =>
-                                                    NetworkGiffyDialog(
-                                                  image: Image.network(
-                                                      Endpoint.urlGif +
-                                                          "/" +
-                                                          gif),
-                                                  title: Text(
-                                                    title.toString(),
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize: 20.0,
-                                                        fontWeight:
-                                                            FontWeight.w700),
-                                                  ),
-                                                  description: Text(
-                                                    msg.toString(),
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        fontSize: 18.0,
-                                                        fontWeight:
-                                                            FontWeight.w400),
-                                                  ),
-                                                  entryAnimation: EntryAnimation
-                                                      .BOTTOM_RIGHT,
-                                                  // description: Text(
-                                                  //   msg.toString(),
-                                                  //   textAlign: TextAlign.center,
-                                                  //   style: TextStyle(),
-                                                  // ),
-                                                  onlyOkButton: true,
-                                                  onOkButtonPressed: () {
-                                                    Future.delayed(
-                                                        const Duration(
-                                                            seconds: 2), () {
-                                                      setState(() {
-                                                        _saving = false;
-                                                      });
-                                                      ProfileScreen()
-                                                          .createState()
-                                                          .getProfil(
-                                                              usrId, date);
-                                                      Navigator
-                                                          .pushNamedAndRemoveUntil(
-                                                              context,
-                                                              "/profile",
-                                                              (Route<dynamic>
-                                                                      routes) =>
-                                                                  false);
-                                                    });
-                                                  },
-                                                ),
-                                              )
-                                            }
-                                          else
-                                            {
-                                              Future.delayed(
-                                                  const Duration(seconds: 2),
-                                                  () {
-                                                setState(() {
-                                                  _saving = false;
-                                                });
-                                                ProfileScreen()
-                                                    .createState()
-                                                    .getProfil(usrId, date);
-                                                Navigator
-                                                    .pushNamedAndRemoveUntil(
-                                                        context,
-                                                        "/profile",
-                                                        (Route<dynamic>
-                                                                routes) =>
-                                                            false);
-                                              })
-                                            }
-                                        },
-                                        width: 120,
-                                      )
-                                    ]).show();
-                              }
-                            } else {
-                              if (prosesCheckout(usrId, clockIn,
-                                      File(widget.imgPath), idShift, shift) !=
-                                  null) {
-                                savePref(clockIn.substring(11, 16), true, true,
-                                    widget.imgPath, widget.status);
-                                Alert(
-                                    context: context,
-                                    style: alertStyle,
-                                    type: AlertType.success,
-                                    title: "Success Check Out",
-//                                    desc: "Thank you for your efforts, Your dedication is imperative for the growth of our company",
-                                    buttons: [
-                                      DialogButton(
-                                        child: Text(
-                                          "OK",
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 20),
-                                        ),
-                                        onPressed: () => {
-                                          // if(_get_profil == true){
-                                          Future.delayed(Duration(seconds: 2),
-                                              () {
-                                            setState(() {
-                                              _saving = false;
-                                            });
-                                            ProfileScreen()
-                                                .createState()
-                                                .getProfil(usrId, date);
-                                            Navigator.pushNamedAndRemoveUntil(
-                                                context,
-                                                "/profile",
-                                                (Route<dynamic> routes) =>
-                                                    false);
-                                          })
-                                          // }else{
-                                          //   Alert(
-                                          //     context: context,
-                                          //     style: alertStyle,
-                                          //     type: AlertType.error,
-                                          //     title: "Network Error!",
-                                          //     desc: "Network not connected! Reload and try again!",
-                                          //
-                                          //   )
-                                          // }
-                                        },
-                                        width: 120,
-                                      )
-                                    ]).show();
-                              }
-                            }
-                          });
-                        },
+              ),
+              Align(
+                alignment: Alignment.bottomCenter,
+                child: Container(
+                  width: double.infinity,
+                  height: 60.0,
+                  color: Colors.red[700],
+                  child: Center(
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.check,
+                        color: Colors.white,
                       ),
+                      onPressed: () {
+                        // setState(() {
+                        //   _saving = true;
+                        // });
+                        FocusScope.of(context).requestFocus(new FocusNode());
+                        getBytesFromFile().then((bytes) {
+                          String clockIn = widget.clockIn.substring(0, 19);
+                          String usrId = basename(widget.userID);
+                          String idShift = basename(widget.idShift);
+                          String shift = basename(widget.shift);
+
+                          print('clockIn => ' + clockIn);
+                          print('usrId => ' + usrId);
+                          print('idShift => ' + idShift);
+                          print('shift => ' + shift);
+
+                          if (widget.status == "checkin") {
+                            if (prosesCheckin(usrId, clockIn,
+                                    File(widget.imgPath), idShift, shift) ==
+                                true) {
+                              savePref(clockIn.substring(11, 16), true, false,
+                                  widget.imgPath, widget.status);
+                              Alert(
+                                  context: context,
+                                  style: alertStyle,
+                                  type: AlertType.success,
+                                  title: "Success Check In",
+                                  buttons: [
+                                    DialogButton(
+                                      child: Text(
+                                        "OK",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () => {
+                                        if (hariBesar == true)
+                                          {
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (BuildContext context) =>
+                                                  AlertDialog(
+                                                title: Text(
+                                                  title.toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                      fontSize: 20.0,
+                                                      fontWeight:
+                                                          FontWeight.w700),
+                                                ),
+                                                content: SingleChildScrollView(
+                                                  child: ListBody(
+                                                    children: [
+                                                      Image.network(
+                                                          Endpoint.urlGif +
+                                                              "/" +
+                                                              gif),
+                                                      Text(
+                                                        msg.toString(),
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: TextStyle(
+                                                            fontSize: 18.0,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w400),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                actions: <Widget>[
+                                                  TextButton(
+                                                    child: const Text('OK'),
+                                                    onPressed: () {
+                                                      Future.delayed(
+                                                          const Duration(
+                                                              seconds: 2), () {
+                                                        // setState(() {
+                                                        //   _saving = false;
+                                                        // });
+                                                        ProfileScreen()
+                                                            .createState()
+                                                            .getProfil(
+                                                                usrId, date);
+                                                        Navigator
+                                                            .pushNamedAndRemoveUntil(
+                                                                context,
+                                                                "/profile",
+                                                                (Route<dynamic>
+                                                                        routes) =>
+                                                                    false);
+                                                      });
+                                                    },
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          }
+                                        else
+                                          {
+                                            Future.delayed(
+                                                const Duration(seconds: 2), () {
+                                              // setState(() {
+                                              //   _saving = false;
+                                              // });
+                                              ProfileScreen()
+                                                  .createState()
+                                                  .getProfil(usrId, date);
+                                              Navigator.pushNamedAndRemoveUntil(
+                                                  context,
+                                                  "/profile",
+                                                  (Route<dynamic> routes) =>
+                                                      false);
+                                            })
+                                          }
+                                      },
+                                      width: 120,
+                                    )
+                                  ]).show();
+                            }
+                          } else {
+                            if (prosesCheckout(usrId, clockIn,
+                                    File(widget.imgPath), idShift, shift) ==
+                                true) {
+                              savePref(clockIn.substring(11, 16), true, true,
+                                  widget.imgPath, widget.status);
+                              Alert(
+                                  context: context,
+                                  style: alertStyle,
+                                  type: AlertType.success,
+                                  title: "Success Check Out",
+//                                    desc: "Thank you for your efforts, Your dedication is imperative for the growth of our company",
+                                  buttons: [
+                                    DialogButton(
+                                      child: Text(
+                                        "OK",
+                                        style: TextStyle(
+                                            color: Colors.white, fontSize: 20),
+                                      ),
+                                      onPressed: () => {
+                                        // if(_get_profil == true){
+                                        Future.delayed(Duration(seconds: 2),
+                                            () {
+                                          // setState(() {
+                                          //   _saving = false;
+                                          // });
+                                          ProfileScreen()
+                                              .createState()
+                                              .getProfil(usrId, date);
+                                          Navigator.pushNamedAndRemoveUntil(
+                                              context,
+                                              "/profile",
+                                              (Route<dynamic> routes) => false);
+                                        })
+                                        // }else{
+                                        //   Alert(
+                                        //     context: context,
+                                        //     style: alertStyle,
+                                        //     type: AlertType.error,
+                                        //     title: "Network Error!",
+                                        //     desc: "Network not connected! Reload and try again!",
+                                        //
+                                        //   )
+                                        // }
+                                      },
+                                      width: 120,
+                                    )
+                                  ]).show();
+                            }
+                          }
+                        });
+                      },
                     ),
                   ),
-                )
-              ],
-            ),
+                ),
+              )
+            ],
           ),
         ),
       ),
@@ -338,7 +333,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
   Future<Uint8List> getBytesFromFile() async {
     Uri myUri = Uri.parse(widget.imgPath);
     File photoFile = new File.fromUri(myUri);
-    Uint8List bytes;
+    late Uint8List bytes;
     await photoFile.readAsBytes().then((value) {
       bytes = Uint8List.fromList(value);
       print('reading of bytes is completed');
@@ -350,7 +345,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
     return bytes;
   }
 
-  Future prosesCheckin(String usrId, String clockIn, File imageFile,
+  Future<bool> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkin);
     var request = new http.MultipartRequest("POST", uri);
@@ -373,11 +368,11 @@ class _PreviewScreenState extends State<PreviewScreen> {
       return true;
     } else {
       print(response.statusCode);
-      return null;
+      return false;
     }
   }
 
-  Future prosesCheckout(String usrId, String clockIn, File imageFile,
+  Future<bool> prosesCheckout(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkout);
     var request = new http.MultipartRequest("POST", uri);
@@ -421,7 +416,7 @@ class _PreviewScreenState extends State<PreviewScreen> {
       return true;
     } else {
       print(response.statusCode);
-      return null;
+      return false;
     }
   }
 }

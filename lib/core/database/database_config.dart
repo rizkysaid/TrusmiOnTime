@@ -4,13 +4,13 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 
 class DatabaseConfigHelper {
-  static final _databaseName = "TrusmiOnTimeConfig.db";
-  static final _databaseVersion = 1;
+  late String _databaseName = "TrusmiOnTimeConfig.db";
+  late int _databaseVersion = 1;
 
-  static final table = 'tbl_user_config';
-  static final columnId = 'id_user';
-  static final columnUsername = 'username';
-  static final columnPassword = 'password';
+  late String table = 'tbl_user_config';
+  late String columnId = 'id_user';
+  late String columnUsername = 'username';
+  late String columnPassword = 'password';
 
   //make this a singleton class
   DatabaseConfigHelper._privateConstructor();
@@ -18,7 +18,7 @@ class DatabaseConfigHelper {
       DatabaseConfigHelper._privateConstructor();
 
   //only have a single app-wide reference to the database
-  static Database _database;
+  var _database;
   Future<Database> get database async {
     if (_database != null) return _database;
 
@@ -64,7 +64,7 @@ class DatabaseConfigHelper {
 
   // All of the methods (insert, query, update, delete) can also be done using
   // raw SQL commands. This method uses a raw query to give the row count.
-  Future<int> queryRowCount() async {
+  Future<int?> queryRowCount() async {
     Database db = await instance.database;
     return Sqflite.firstIntValue(
         await db.rawQuery('SELECT COUNT(*) FROM $table'));

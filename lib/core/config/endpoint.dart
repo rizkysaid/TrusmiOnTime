@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Endpoint {
-  String ip;
+  late String ip;
 
 //  static String _baseIP = "http://103.39.50.142"; //public
   static String _baseIP = "http://192.168.23.23"; //local
@@ -20,6 +20,6 @@ class Endpoint {
 
   getIP() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    ip = pref.getString('IpAddress');
+    ip = pref.getString('IpAddress')!;
   }
 }

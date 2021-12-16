@@ -17,7 +17,12 @@ import 'core/ui/screens/invalid_ip.dart';
 import 'core/ui/screens/login_config.dart';
 //import 'core/utils/toast_util.dart';
 
-void main() => runApp(MyApp());
+void main() {
+  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+  //     .then((_) {
+  runApp(MyApp());
+  // });
+}
 
 class MyApp extends StatelessWidget {
   @override
@@ -30,7 +35,6 @@ class MyApp extends StatelessWidget {
           colorScheme:
               ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent)),
       home: CekLogin(),
-//      home: LoginScreen(),
       routes: {
         "/login": (context) => LoginScreen(),
         // "/register": (context) => LoginScreen(),
@@ -53,13 +57,14 @@ class CekLogin extends StatefulWidget {
 }
 
 class _CekLoginState extends State<CekLogin> {
-  String userID;
-  String username;
+  late String ip;
+  late String userID;
+  late String username;
   // static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
   final dbConfig = DatabaseConfigHelper.instance;
 
-  String ipAddress;
+  late String ipAddress;
 
   @override
   void initState() {
@@ -75,19 +80,18 @@ class _CekLoginState extends State<CekLogin> {
   }
 
   getPref() async {
-    String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows getPref Profil:' + allRows.toList().toString());
-    print('Length = ' + allRows.length.toString());
+    // print('query all rows getPref Profil:' + allRows.toList().toString());
+    // print('Length = ' + allRows.length.toString());
 
     if (allRows.length != 0) {
       allRows.forEach((row) => print(row));
       ip = allRows[0]['ip_address'];
       SharedPreferences pref = await SharedPreferences.getInstance();
       setState(() {
-        username = pref.getString('username');
-        userID = pref.getString('userID');
+        username = pref.getString('username')!;
+        userID = pref.getString('userID')!;
       });
 
       if (username.isEmpty) {
@@ -109,7 +113,7 @@ class _CekLoginState extends State<CekLogin> {
       });
     }
 
-    print("IP = " + ip);
+    // print("IP = " + ip);
 //
 //    ApiServices services = ApiServices();
 //    print('servis');
@@ -200,8 +204,8 @@ class _CekLoginState extends State<CekLogin> {
   void _insertConfig() async {
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseConfigHelper.columnUsername: 'admintrusmi',
-      DatabaseConfigHelper.columnPassword: 'trusmiadmin'
+      DatabaseConfigHelper.instance.columnUsername: 'admintrusmi',
+      DatabaseConfigHelper.instance.columnPassword: 'trusmiadmin'
     };
     final id = await dbConfig.insert(row);
     print('inserted row id: $id');
@@ -215,7 +219,7 @@ class _CekLoginState extends State<CekLogin> {
 
   void showIp() async {
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows show IP:');
+    // print('query all rows show IP:');
     allRows.forEach((row) => print(row));
     var ip = '';
     ip = allRows[0]['ip_address'];

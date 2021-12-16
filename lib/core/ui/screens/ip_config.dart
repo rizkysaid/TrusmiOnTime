@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
@@ -19,7 +18,7 @@ class BodyIpConfig extends StatefulWidget {
 }
 
 class _BodyIpConfigState extends State<BodyIpConfig> {
-  String userID;
+  late String userID;
   // static String date = new DateTime.now().toIso8601String().substring(0, 10);
 
   final dbHelper = DatabaseHelper.instance;
@@ -45,7 +44,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
     ApiServices services = ApiServices();
     var response = await services.checkKoneksi(Endpoint.baseUrl);
-    if (response == null) {
+    if (response.data.userId.isEmpty) {
       Future.delayed(const Duration(microseconds: 2000), () {
         Navigator.pushNamedAndRemoveUntil(
             context, "/invalid_ip", (Route<dynamic> routes) => false);
@@ -89,26 +88,26 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
-      footer: CustomFooter(
-        builder: (BuildContext context, LoadStatus mode) {
-          Widget body;
-          if (mode == LoadStatus.idle) {
-            body = Text("pull up load");
-          } else if (mode == LoadStatus.loading) {
-            body = CupertinoActivityIndicator();
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load Failed!Click retry!");
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("release to load more");
-          } else {
-            body = Text("No more Data");
-          }
-          return Container(
-            height: 55.0,
-            child: Center(child: body),
-          );
-        },
-      ),
+      // footer: CustomFooter(
+      //   builder: (BuildContext context, LoadStatus mode) {
+      //     Widget body;
+      //     if (mode == LoadStatus.idle) {
+      //       body = Text("pull up load");
+      //     } else if (mode == LoadStatus.loading) {
+      //       body = CupertinoActivityIndicator();
+      //     } else if (mode == LoadStatus.failed) {
+      //       body = Text("Load Failed!Click retry!");
+      //     } else if (mode == LoadStatus.canLoading) {
+      //       body = Text("release to load more");
+      //     } else {
+      //       body = Text("No more Data");
+      //     }
+      //     return Container(
+      //       height: 55.0,
+      //       child: Center(child: body),
+      //     );
+      //   },
+      // ),
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
@@ -129,9 +128,9 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
                       labelText: 'IP Address',
                       labelStyle: TextStyle(color: Colors.red[900]),
                       enabledBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red[900])),
+                          borderSide: BorderSide(color: Colors.red)),
                       focusedBorder: UnderlineInputBorder(
-                          borderSide: BorderSide(color: Colors.red[900]))),
+                          borderSide: BorderSide(color: Colors.red))),
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.black,
@@ -211,7 +210,7 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
     var response = await services.checkKoneksi(ip);
     print('response check_connection ip_config = ' + response.toString());
 
-    if (response != null) {
+    if (response.data.userId.isEmpty) {
       print('stts sccss:' + showConSuccess.toString());
       setState(() {
         showConSuccess = true;
@@ -223,9 +222,9 @@ class _BodyIpConfigState extends State<BodyIpConfig> {
 
       //insert new IP
       Map<String, dynamic> row = {
-        DatabaseHelper.columnIpAddress: ip,
-        DatabaseHelper.columnName: '',
-        DatabaseHelper.columnIsActive: 1
+        DatabaseHelper.instance.columnIpAddress: ip,
+        DatabaseHelper.instance.columnName: '',
+        DatabaseHelper.instance.columnIsActive: 1
       };
       final id = await dbHelper.insert(row);
       print('inserted row id (ip_config/checkconnection): $id');

@@ -1,15 +1,13 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
-import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:login_absen/core/config/about.dart';
 
-bool _saving = false;
+// bool _saving = false;
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -64,33 +62,31 @@ class _LoginScreenState extends State<LoginScreen> {
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
-      footer: CustomFooter(
-        builder: (BuildContext context, LoadStatus mode) {
-          Widget body;
-          if (mode == LoadStatus.idle) {
-            body = Text("pull up load");
-          } else if (mode == LoadStatus.loading) {
-            body = CupertinoActivityIndicator();
-          } else if (mode == LoadStatus.failed) {
-            body = Text("Load Failed!Click retry!");
-          } else if (mode == LoadStatus.canLoading) {
-            body = Text("release to load more");
-          } else {
-            body = Text("No more Data");
-          }
-          return Container(
-            height: 55.0,
-            child: Center(child: body),
-          );
-        },
-      ),
+      // footer: CustomFooter(
+      //   builder: (BuildContext context, LoadStatus mode) {
+      //     Widget body;
+      //     if (mode == LoadStatus.idle) {
+      //       body = Text("pull up load");
+      //     } else if (mode == LoadStatus.loading) {
+      //       body = CupertinoActivityIndicator();
+      //     } else if (mode == LoadStatus.failed) {
+      //       body = Text("Load Failed!Click retry!");
+      //     } else if (mode == LoadStatus.canLoading) {
+      //       body = Text("release to load more");
+      //     } else {
+      //       body = Text("No more Data");
+      //     }
+      //     return Container(
+      //       height: 55.0,
+      //       child: Center(child: body),
+      //     );
+      //   },
+      // ),
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
       child: Scaffold(
-        body: ModalProgressHUD(
-            child: SingleChildScrollView(child: LoginBody()),
-            inAsyncCall: _saving),
+        body: SingleChildScrollView(child: LoginBody()),
       ),
     );
   }
@@ -125,20 +121,20 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   getPref() async {
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-    print('query all rows:' + allRows.toList().toString());
-    print('Length = ' + allRows.length.toString());
+    // String ip;
+    // final dbHelper = DatabaseHelper.instance;
+    // final allRows = await dbHelper.queryAllRows();
+    // print('query all rows:' + allRows.toList().toString());
+    // print('Length = ' + allRows.length.toString());
 
-    if (allRows.length != 0) {
-      allRows.forEach((row) => print(row));
-      ip = allRows[0]['ip_address'];
-    } else {
-      ip = Endpoint.baseUrl;
-    }
+    // if (allRows.length != 0) {
+    //   allRows.forEach((row) => print(row));
+    //   ip = allRows[0]['ip_address'];
+    // } else {
+    //   ip = Endpoint.baseUrl;
+    // }
 
-    print('Check IP in getPref LoginScreen = ' + ip.toString());
+    // print('Check IP in getPref LoginScreen = ' + ip.toString());
 
     // ApiServices services = ApiServices();
     // var response = await services.CheckKoneksi(ip);
@@ -156,16 +152,16 @@ class _LoginBodyState extends State<LoginBody> {
   Future<void> prosesLogin() async {
     if (usernameController.text.isNotEmpty &&
         passwordController.text.isNotEmpty) {
-      setState(() {
-        _saving = true;
-      });
+      // setState(() {
+      //   _saving = true;
+      // });
 
       String ip;
       ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      print('query all rows: ' + allRows.toList().toString());
-      print('Length = ' + allRows.length.toString());
+      // print('query all rows: ' + allRows.toList().toString());
+      // print('Length = ' + allRows.length.toString());
 
       if (allRows.length != 0) {
         allRows.forEach((row) => print(row));
@@ -174,7 +170,7 @@ class _LoginBodyState extends State<LoginBody> {
         ip = Endpoint.baseUrl;
       }
 
-      print('ip=' + ip);
+      // print('ip=' + ip);
 
       ApiServices services = ApiServices();
       var response = await services.login(
@@ -189,9 +185,9 @@ class _LoginBodyState extends State<LoginBody> {
           Navigator.pushNamedAndRemoveUntil(
               context, "/profile", (Route<dynamic> routes) => false);
         });
-        setState(() {
-          _saving = false;
-        });
+        // setState(() {
+        //   _saving = false;
+        // });
       } else {
         ToastUtils.show(messageLogin);
       }
@@ -244,23 +240,25 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   Widget _username(BuildContext context) {
+    var isValidateUsername = false;
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
         controller: usernameController,
-        validator: validateUser,
-        onSaved: (String value) {
-          username = value;
+        validator: (value) =>
+            isValidateUsername ? "Username harus diisi" : null,
+        onSaved: (value) {
+          username = value!;
         },
         key: Key('username'),
         decoration: InputDecoration(
             hintText: 'username',
             labelText: 'username',
             labelStyle: TextStyle(color: Colors.red[900]),
-            enabledBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.red[900])),
+            enabledBorder:
+                UnderlineInputBorder(borderSide: BorderSide(color: Colors.red)),
             focusedBorder: UnderlineInputBorder(
-                borderSide: BorderSide(color: Colors.red[900]))),
+                borderSide: BorderSide(color: Colors.red))),
         style: TextStyle(
           fontSize: 20.0,
           color: Colors.black,
@@ -274,8 +272,8 @@ class _LoginBodyState extends State<LoginBody> {
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
           controller: passwordController,
-          onSaved: (String value) {
-            password = value;
+          onSaved: (value) {
+            password = value!;
           },
           key: Key('password'),
           decoration: InputDecoration(
@@ -283,9 +281,9 @@ class _LoginBodyState extends State<LoginBody> {
               labelText: 'password',
               labelStyle: TextStyle(color: Colors.red[900]),
               enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red[900])),
+                  borderSide: BorderSide(color: Colors.red)),
               focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Colors.red[900]))),
+                  borderSide: BorderSide(color: Colors.red))),
           style: TextStyle(fontSize: 20.0, color: Colors.black),
           obscureText: true),
     );
@@ -308,12 +306,5 @@ class _LoginBodyState extends State<LoginBody> {
                       style:
                           new TextStyle(fontSize: 18.0, color: Colors.white))),
             )));
-  }
-
-  String validateUser(String value) {
-    if (value.isEmpty) {
-      return 'Username harus diisi';
-    }
-    return null;
   }
 }

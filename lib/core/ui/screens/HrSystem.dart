@@ -36,7 +36,7 @@ class _HrSystemState extends State<HrSystem> {
 
   @override
   Widget build(BuildContext context) {
-    final PassParams args = ModalRoute.of(context).settings.arguments;
+    final args = ModalRoute.of(context)!.settings.arguments as PassParams;
     String username = args.username;
     String password = args.password;
     String urlAbsen = Endpoint.baseIp +
@@ -78,8 +78,8 @@ class _HrSystemState extends State<HrSystem> {
           WebViewX(
             initialContent: urlAbsen,
             initialSourceType: SourceType.url,
-            height: null,
-            width: null,
+            height: MediaQuery.of(context).size.height,
+            width: MediaQuery.of(context).size.width,
             onPageFinished: (String url) {
               setState(() {
                 _loading = false;
