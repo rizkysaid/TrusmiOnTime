@@ -9,6 +9,7 @@ part 'profile_state.dart';
 class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
   ProfileBloc() : super(const ProfileState()) {
     on<GetProfile>(_onGetProfile);
+    on<InitialProfile>(_initialProfile);
   }
 
   Future<void> _onGetProfile(
@@ -46,5 +47,10 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       print('error');
       print(e.toString());
     }
+  }
+
+  Future<void> _initialProfile(
+      InitialProfile event, Emitter<ProfileState> emit) async {
+    return emit(state.copyWith(status: ProfileStatus.initial));
   }
 }

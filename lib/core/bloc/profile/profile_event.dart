@@ -19,3 +19,5 @@ class GetProfile extends ProfileEvent {
     required this.apiToken,
   });
 }
+
+class InitialProfile extends ProfileEvent {}

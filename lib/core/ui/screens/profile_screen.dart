@@ -74,17 +74,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
       maxWidth: 1080,
     );
 
-    setState(() {
-      // imageFile!.copy(pickedFile!.path);
+    // setState(() {
+    // imageFile!.copy(pickedFile!.path);
+
+    var picker = pickedFile;
+    if (picker != null) {
       imageFile = File(pickedFile!.path);
-    });
+    } else {
+      imageFile = null;
+      getProfil(userID, date);
+    }
 
     // PROSES CHECKIN / CHECKOUT
-    prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
-    print('userID=>' + userID);
-    print('${DateTime.now()}');
-    print('idShift=>' + idShift);
-    print('shift=>' + shift);
+    var image = imageFile;
+    if (image != null) {
+      if (_status == 'checkin') {
+        prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
+      } else {
+        prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
+      }
+    }
+
+    _profileBloc.add(InitialProfile());
   }
 
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
@@ -109,14 +120,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('proses checkin => ' + response.statusCode.toString());
 
     if (response.statusCode == 201) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/profile", (Route<dynamic> routes) => false);
+      getProfil(usrId, date);
     } else {
       print(response.statusCode);
     }
   }
 
-  Future<bool> prosesCheckout(String usrId, String clockIn, File imageFile,
+  Future<void> prosesCheckout(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkout);
     var request = new http.MultipartRequest("POST", uri);
@@ -135,32 +145,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    // if(response.statusCode == 201){
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   var ip = pref.getString('IpAddress');
-    //
-    //   ApiServices services = ApiServices();
-    //   var response = await services.Profil(ip, usrId, date);
-    //   try {
-    //     if (response.status == true) {
-    //       setState(() {
-    //         return true;
-    //       });
-    //     }
-    //   } catch (err) {
-    //     print("Cannot read");
-    //   }
-    //
-    // }else{
-    //   print(response.statusCode);
-    //   return null;
-    // }
+    print('response.status.checkout => ' + response.statusCode.toString());
 
-    if (response.statusCode == 201) {
-      return true;
+    if (response.statusCode == 200) {
+      getProfil(usrId, date);
     } else {
       print(response.statusCode);
-      return false;
     }
   }
 
@@ -244,11 +234,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Future.delayed(Duration(milliseconds: 3000));
 
     _refreshController.refreshCompleted();
-    // checkConnection();
+    // getPref();
+    _profileBloc.add(InitialProfile());
     getProfil(userID, date);
-    // setState(() {
-    //   _saving = true;
-    // });
   }
 
   void _onLoading() async {
@@ -857,10 +845,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 break;
               case ProfileStatus.failure:
                 print('listener failure ');
-                // Navigator.of(context, rootNavigator: true).pop();
+                Future.delayed(const Duration(microseconds: 2000), () {
+                  Navigator.pushNamedAndRemoveUntil(context, "/no_connection",
+                      (Route<dynamic> routes) => false);
+                });
                 break;
               default:
-                buildShowDialog(context);
                 print('initial');
             }
           },
@@ -878,9 +868,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   // );
                   return loadingScreen();
                 case ProfileStatus.failure:
-                  return Container(
-                    child: Text('failure'),
-                  );
+                  return Container();
                 default:
                   return Scaffold(
                     appBar: AppBar(
@@ -1282,10 +1270,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       SizedBox(height: 20),
-                      Text(
-                        "Loading ...",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      // Text(
+                      //   "Loading ...",
+                      //   style: TextStyle(color: Colors.white),
+                      // ),
+                      CircularProgressIndicator(),
                       SizedBox(height: 20),
                       // Visibility(
                       //   visible: statusTotalWork,
@@ -1420,6 +1409,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   checkStatus(userId) async {
+    _profileBloc.add(InitialProfile());
+
     // setState(() {
     //   _saving = true;
     // });

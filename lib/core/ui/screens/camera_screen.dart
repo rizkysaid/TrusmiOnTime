@@ -56,9 +56,9 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
-    if (controller != null) {
-      await controller.dispose();
-    }
+    // if (controller != null) {
+    //   await controller.dispose();
+    // }
     controller = CameraController(cameraDescription, ResolutionPreset.medium);
 
     controller.addListener(() {
@@ -103,9 +103,9 @@ class _CameraScreenState extends State<CameraScreen> {
 
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
-    if (controller == null || !controller.value.isInitialized) {
-      return const Center(child: CircularProgressIndicator());
-    }
+    // if (controller == null || !controller.value.isInitialized) {
+    //   return const Center(child: CircularProgressIndicator());
+    // }
 
     final size = MediaQuery.of(this.context).size;
     final deviceRatio = size.width / size.height;
@@ -151,9 +151,9 @@ class _CameraScreenState extends State<CameraScreen> {
   /// Display a row of toggle to select the camera (or a message if no camera is available).
 
   Widget _cameraToggleRowWidget() {
-    if (cameras == null || cameras.isEmpty) {
-      return Spacer();
-    }
+    // if (cameras == null || cameras.isEmpty) {
+    //   return Spacer();
+    // }
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
     CameraLensDirection lensDirection = selectedCamera.lensDirection;
 
