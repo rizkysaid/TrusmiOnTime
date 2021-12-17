@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +13,11 @@ import 'package:login_absen/core/services/ApiService.dart';
 import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'PassParams.dart';
-import 'ScreenArguments.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -25,24 +27,24 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   CancelToken apiToken = CancelToken();
 
-  late String username;
-  late String password;
-  late String userID;
-  static String nama = '';
-  static String jabatan = '';
+  String username = '';
+  String password = '';
+  String userID = '';
+  String nama = '';
+  String jabatan = '';
   String clockin = '--:--';
   String clockout = '--:--';
-  late String imageUrl;
-  static String message = '';
+  String imageUrl = '';
+  String message = '';
   // static String totalWork = '';
-  late String _status;
-  // static bool _isCheckin = false;
-  // static bool _isCheckout = false;
-  static bool statusPhoto = false;
-  static bool statusIcon = true;
-  static bool _visibleButton = true;
-  // static bool statusTotalWork = false;
-  static Color _colorButton = Colors.red;
+  String _status = '';
+  bool _isCheckin = false;
+  bool _isCheckout = false;
+  bool statusPhoto = false;
+  bool statusIcon = true;
+  bool _visibleButton = true;
+  // bool statusTotalWork = false;
+  Color _colorButton = Colors.red;
   late Timer timer;
 
   String dateIn = '';
@@ -52,14 +54,115 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String shiftOut = '';
   String shift = '';
 
-  static String date = new DateTime.now().toIso8601String().substring(0, 10);
-  static String _toolTip = "Check In";
-  late String photoProfile;
+  String date = new DateTime.now().toIso8601String().substring(0, 10);
+  String _toolTip = "Check In";
+  String photoProfile = '';
 
-  late String _timeString;
-  late String _hariTanggal;
+  String _timeString = '';
+  String _hariTanggal = '';
 
   String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
+
+  File? imageFile;
+
+  void _getFromCamera() async {
+    // Capture a photo
+    final ImagePicker _picker = ImagePicker();
+    final XFile? pickedFile = await _picker.pickImage(
+      source: ImageSource.camera,
+      maxHeight: 1080,
+      maxWidth: 1080,
+    );
+
+    setState(() {
+      // imageFile!.copy(pickedFile!.path);
+      imageFile = File(pickedFile!.path);
+    });
+
+    // PROSES CHECKIN / CHECKOUT
+    prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
+    print('userID=>' + userID);
+    print('${DateTime.now()}');
+    print('idShift=>' + idShift);
+    print('shift=>' + shift);
+  }
+
+  Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
+      String idShift, String shift) async {
+    var uri = Uri.parse(Endpoint.checkin);
+    var request = new http.MultipartRequest("POST", uri);
+
+    var multiPartFile = new http.MultipartFile.fromBytes(
+      "foto",
+      imageFile.readAsBytesSync(),
+      filename: imageFile.path,
+    );
+
+    request.files.add(multiPartFile);
+    request.fields['employee_id'] = usrId;
+    request.fields['clock_in'] = clockIn;
+    request.fields['id_shift'] = idShift;
+    request.fields['shift'] = shift;
+
+    var response = await request.send();
+
+    print('proses checkin => ' + response.statusCode.toString());
+
+    if (response.statusCode == 201) {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/profile", (Route<dynamic> routes) => false);
+    } else {
+      print(response.statusCode);
+    }
+  }
+
+  Future<bool> prosesCheckout(String usrId, String clockIn, File imageFile,
+      String idShift, String shift) async {
+    var uri = Uri.parse(Endpoint.checkout);
+    var request = new http.MultipartRequest("POST", uri);
+
+    var multiPartFile = new http.MultipartFile.fromBytes(
+      "foto",
+      imageFile.readAsBytesSync(),
+      filename: imageFile.path,
+    );
+
+    request.files.add(multiPartFile);
+    request.fields['employee_id'] = usrId;
+    request.fields['clock_out'] = clockIn;
+    request.fields['id_shift'] = idShift;
+    request.fields['shift'] = shift;
+
+    var response = await request.send();
+
+    // if(response.statusCode == 201){
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   var ip = pref.getString('IpAddress');
+    //
+    //   ApiServices services = ApiServices();
+    //   var response = await services.Profil(ip, usrId, date);
+    //   try {
+    //     if (response.status == true) {
+    //       setState(() {
+    //         return true;
+    //       });
+    //     }
+    //   } catch (err) {
+    //     print("Cannot read");
+    //   }
+    //
+    // }else{
+    //   print(response.statusCode);
+    //   return null;
+    // }
+
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      print(response.statusCode);
+      return false;
+    }
+  }
 
   // bool _saving = false;
 
@@ -447,7 +550,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       username = pref.getString('username')!;
       password = pref.getString('password')!;
-      userID = pref.getString('userID')!;
+      userID = pref.getString('userID').toString();
       // clockin = pref.getString('clock_in')!;
       imageUrl = pref.getString('imageUrl')!;
       _status = pref.getString('status')!;
@@ -519,33 +622,261 @@ class _ProfileScreenState extends State<ProfileScreen> {
       child: BlocProvider(
         create: (BuildContext context) => ProfileBloc(),
         child: BlocListener<ProfileBloc, ProfileState>(
-          bloc: ProfileBloc(),
+          bloc: _profileBloc,
           listener: (context, state) {
             switch (state.status) {
               case ProfileStatus.success:
-                print('listener success ');
-                print(state.profile);
+                // getPref();
+
+                setState(() {
+                  userID = state.userId;
+                  idShift = state.idShift;
+                });
+
+                if (state.idShift != '3') {
+                  if (state.clockIn != dateId) {
+                    if (state.clockIn == "--:--") {
+                      setState(() {
+                        _isCheckin = false;
+                        _isCheckout = false;
+                      });
+
+                      if (_isCheckin == true && state.clockIn == "--:--") {
+                        Future.delayed(const Duration(microseconds: 3000), () {
+                          Navigator.pushNamedAndRemoveUntil(context, "/profile",
+                              (Route<dynamic> routes) => false);
+                        });
+                      } else {
+                        statusPhoto = false;
+                        statusIcon = true;
+                        imageUrl = "";
+                        _colorButton = Colors.red;
+                        clockout = state.clockOut;
+                        clockin = state.clockIn;
+                        // statusTotalWork = false;
+                        _visibleButton = true;
+                        _status = "checkin";
+                        shift = shiftIn;
+                        // pref.remove('shift');
+                        // pref.setString('shift', shiftIn);
+
+                        // _saving = false;
+                      }
+
+                      print('con. 2 => state.clockIn = ' +
+                          state.clockIn +
+                          ' dataClockout = ' +
+                          state.clockOut);
+                      //kondisi belum checkin
+
+                    } else if (state.clockOut == "--:--") {
+                      if (_isCheckin == true) {
+                        setState(() {
+                          _isCheckout = false;
+                        });
+                      }
+
+                      if (_isCheckout == true && state.clockOut == "--:--") {
+                        Future.delayed(const Duration(microseconds: 3000), () {
+                          Navigator.pushNamedAndRemoveUntil(context, "/profile",
+                              (Route<dynamic> routes) => false);
+                        });
+                      } else {
+                        clockin = state.clockIn;
+                        clockout = state.clockOut;
+                        statusPhoto = true;
+                        statusIcon = false;
+                        imageUrl = state.photoIn;
+                        _colorButton = Colors.deepOrange;
+                        // statusTotalWork = false;
+                        _visibleButton = true;
+                        _status = "checkout";
+                        shift = shiftOut;
+                        // pref.remove('shift');
+                        // pref.setString('shift', shiftOut);
+
+                        // _saving = false;
+                      }
+
+                      print('con. 3 => state.clockIn = ' +
+                          state.clockIn +
+                          ' dataClockout = ' +
+                          state.clockOut);
+                      //kondisi sudah checkin & belum checkout
+
+                    } else {
+                      if (state.clockIn != "--:--" &&
+                          state.clockOut != "--:--") {
+                        clockin = state.clockIn;
+                        clockout = state.clockOut;
+                        statusPhoto = true;
+                        statusIcon = false;
+                        imageUrl = state.photoIn;
+                        _colorButton = Colors.red;
+                        // statusTotalWork = true;
+                        _visibleButton = false;
+                        _status = "checkin";
+                        shift = shiftIn;
+                        // pref.remove('shift');
+                        // pref.setString('shift', shiftIn);
+
+                        // _saving = false;
+
+                        print('con. 1 => state.clockIn = ' +
+                            state.clockIn +
+                            ' dataClockout = ' +
+                            state.clockOut);
+                        //kondisi sudah checkin & sudah checkout
+
+                      }
+                    }
+                  }
+                } else {
+                  //KONDISI SIFT 3
+
+                  if (state.clockIn == "--:--" && state.clockOut == "--:--") {
+                    setState(() {
+                      _isCheckin = false;
+                      _isCheckout = false;
+                    });
+
+                    if (_isCheckin == true && state.clockIn == "--:--") {
+                      Future.delayed(const Duration(microseconds: 3000), () {
+                        Navigator.pushNamedAndRemoveUntil(context, "/profile",
+                            (Route<dynamic> routes) => false);
+                      });
+                    } else {
+                      statusPhoto = false;
+                      statusIcon = true;
+                      imageUrl = "";
+                      _colorButton = Colors.red;
+                      clockout = state.clockOut;
+                      clockin = state.clockIn;
+                      // statusTotalWork = false;
+                      _visibleButton = true;
+                      _status = "checkin";
+                      shift = shiftIn;
+                      // pref.remove('shift');
+                      // pref.setString('shift', shiftIn);
+
+                      // _saving = false;
+                    }
+
+                    print('con. 2 => state.clockIn = ' +
+                        state.clockIn +
+                        ' dataClockout = ' +
+                        state.clockOut);
+                    //kondisi belum checkin
+
+                  } else if (state.clockIn != "--:--" &&
+                      state.clockOut == "--:--") {
+                    if (_isCheckin == true) {
+                      setState(() {
+                        _isCheckout = false;
+                      });
+                    }
+
+                    if (_isCheckout == true && state.clockOut == "--:--") {
+                      Future.delayed(const Duration(microseconds: 3000), () {
+                        Navigator.pushNamedAndRemoveUntil(context, "/profile",
+                            (Route<dynamic> routes) => false);
+                      });
+                    } else {
+                      clockin = state.clockIn;
+                      clockout = state.clockOut;
+                      statusPhoto = true;
+                      statusIcon = false;
+                      imageUrl = state.photoIn;
+                      _colorButton = Colors.deepOrange;
+                      // statusTotalWork = false;
+                      _visibleButton = true;
+                      _status = "checkout";
+                      shift = shiftOut;
+                      // pref.remove('shift');
+                      // pref.setString('shift', shiftOut);
+
+                      // _saving = false;
+                    }
+
+                    print('con. 3 => state.clockIn = ' +
+                        state.clockIn +
+                        ' dataClockout = ' +
+                        state.clockOut);
+                    //kondisi sudah checkin & belum checkout
+
+                  } else if (dateOut != dateId) {
+                    clockin = state.clockIn;
+                    clockout = state.clockOut;
+                    dateOut = "";
+                    dateIn = "";
+                    statusPhoto = true;
+                    statusIcon = false;
+                    imageUrl = state.photoIn;
+                    _colorButton = Colors.red;
+                    // statusTotalWork = false;
+                    _visibleButton = true;
+                    _status = "checkin";
+                    shift = shiftIn;
+                    // pref.remove('shift');
+                    // pref.setString('shift', shiftIn);
+
+                    // _saving = false;
+
+                    print('con. 4 => state.clockIn = ' +
+                        state.clockIn +
+                        ' dataClockout = ' +
+                        state.clockOut);
+                    //kondisi tanggal checkout tidak sama dengan tgl hari ini
+
+                  } else {
+                    statusPhoto = true;
+                    statusIcon = false;
+                    clockin = state.clockIn;
+                    clockout = state.clockOut;
+                    imageUrl = state.photoIn;
+                    _visibleButton = true;
+                    // statusTotalWork = true;
+                    _status = "checkin";
+                    shift = shiftIn;
+                    // pref.remove('shift');
+                    // pref.setString('shift', shiftIn);
+                    // _colorButton = Colors.red[700];
+
+                    // _saving = false;
+
+                    print('con. 5 => state.clockIn = ' +
+                        state.clockIn +
+                        ' dataClockout = ' +
+                        state.clockOut);
+                    //kondisi sift malam
+                  }
+                }
+
+                // print(state.profile.toString());
+                // Navigator.of(context, rootNavigator: true).pop();
                 break;
               case ProfileStatus.failure:
                 print('listener failure ');
+                // Navigator.of(context, rootNavigator: true).pop();
                 break;
               default:
+                buildShowDialog(context);
                 print('initial');
             }
           },
           child: BlocBuilder<ProfileBloc, ProfileState>(
-            bloc: ProfileBloc(),
+            bloc: _profileBloc,
             builder: (context, state) {
-              print('builder status => ' + state.status.toString());
               switch (state.status) {
                 case ProfileStatus.initial:
-                  return Container(
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        strokeWidth: 1.5,
-                      ),
-                    ),
-                  );
+                  // return Container(
+                  //   child: Center(
+                  //     child: CircularProgressIndicator(
+                  //       strokeWidth: 1.5,
+                  //     ),
+                  //   ),
+                  // );
+                  return loadingScreen();
                 case ProfileStatus.failure:
                   return Container(
                     child: Text('failure'),
@@ -596,7 +927,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     child: Image.network(
                                         Endpoint.urlProfile +
                                             "/" +
-                                            photoProfile.toString(),
+                                            state.fotoProfil,
                                         width: 125,
                                         height: 125,
                                         fit: BoxFit.cover),
@@ -609,7 +940,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Text(
-                                      nama.toString(),
+                                      state.nama,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontSize: 16,
@@ -617,7 +948,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           color: Colors.white),
                                     ),
                                     Text(
-                                      jabatan.toString(),
+                                      state.jabatan,
                                       textAlign: TextAlign.left,
                                       style: TextStyle(
                                           fontSize: 14, color: Colors.white),
@@ -737,12 +1068,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             ),
                                           ),
                                           SizedBox(height: 10),
-                                          Text(nama.toString(),
+                                          Text(state.nama,
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold)),
-                                          Text(jabatan.toString(),
+                                          Text(state.jabatan,
                                               style: TextStyle(
                                                   color: Colors.white)),
                                           SizedBox(height: 20),
@@ -760,7 +1091,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                     SizedBox(height: 20),
                                     Text(
-                                      message.toString(),
+                                      state.message,
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     SizedBox(height: 20),
@@ -795,7 +1126,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold)),
                                           Text(
-                                            dateIn.toString(),
+                                            state.dateIn,
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold),
@@ -808,12 +1139,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         Column(children: <Widget>[
                                           Text("End Time",
                                               style: TextStyle(fontSize: 18)),
-                                          Text(clockout.toString(),
+                                          Text(state.clockOut,
                                               style: TextStyle(
                                                   fontSize: 18,
                                                   fontWeight: FontWeight.bold)),
                                           Text(
-                                            dateOut.toString(),
+                                            state.dateOut,
                                             style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold),
@@ -855,6 +1186,194 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  Widget loadingScreen() {
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Image.asset(
+            'assets/logo_png_ontime.png',
+            fit: BoxFit.contain,
+            width: MediaQuery.of(context).size.width / 4,
+            height: MediaQuery.of(context).size.height / 14,
+          ),
+          Container(
+            padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+          )
+        ]),
+        iconTheme: new IconThemeData(color: Colors.white),
+        flexibleSpace: Container(
+          decoration: new BoxDecoration(
+              gradient: new LinearGradient(
+                  colors: [const Color(0xFFFF1744), const Color(0xFFF44336)],
+                  begin: const FractionalOffset(0.0, 0.0),
+                  end: const FractionalOffset(1.0, 0.0),
+                  stops: [0.0, 1.0],
+                  tileMode: TileMode.clamp)),
+        ),
+      ),
+      body: LayoutBuilder(
+          builder: (BuildContext context, BoxConstraints viewportConstraints) {
+        return SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints:
+                BoxConstraints(minHeight: viewportConstraints.maxHeight),
+            child: Column(
+              children: <Widget>[
+                Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: (MediaQuery.of(context).size.height / 2) +
+                      (MediaQuery.of(context).size.height / 6),
+                  decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage('assets/background.png'),
+                          fit: BoxFit.cover)),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      SizedBox(height: 20),
+                      Container(
+                        width: 300.0,
+                        height: 300.0,
+                        decoration: new BoxDecoration(
+                          color: Colors.lightBlue[50]!.withOpacity(0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Column(
+                          children: <Widget>[
+                            SizedBox(height: 20),
+                            Visibility(
+                              visible: statusPhoto,
+                              child: Container(
+                                width: 160.0,
+                                height: 160.0,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                  image: new DecorationImage(
+                                    fit: BoxFit.cover,
+                                    image: new NetworkImage(Endpoint.urlFoto +
+                                        "/" +
+                                        imageUrl.toString()),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Visibility(
+                              visible: statusIcon,
+                              child: Container(
+                                width: 160.0,
+                                height: 160.0,
+                                decoration: new BoxDecoration(
+                                  color: Colors.grey[300],
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.person_outline,
+                                  color: Colors.white,
+                                  size: 120.0,
+                                ),
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        "Loading ...",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      SizedBox(height: 20),
+                      // Visibility(
+                      //   visible: statusTotalWork,
+                      //   child: Column(children: <Widget>[
+                      //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
+                      //     Text(totalWork.toString(),
+                      //         style: TextStyle(
+                      //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
+                      //         )
+                      //     ),
+                      //   ]),
+                      // ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(left: 20, right: 20, top: 15),
+                  child: Column(
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: <Widget>[
+                          Column(children: <Widget>[
+                            Text("Start Time", style: TextStyle(fontSize: 18)),
+                            Text(clockin.toString(),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(
+                              dateIn.toString(),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                          Container(
+                            height: 10,
+                            width: 10,
+                          ),
+                          Column(children: <Widget>[
+                            Text("End Time", style: TextStyle(fontSize: 18)),
+                            Text(clockout.toString(),
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text(
+                              dateOut.toString(),
+                              style: TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold),
+                            ),
+                          ]),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          ),
+        );
+      }),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        child: Container(height: 50.0),
+      ),
+      // floatingActionButton: Visibility(
+      //   visible: _visibleButton,
+      //   child: Container(
+      //       height: 80,
+      //       width: 80,
+      //       child: FloatingActionButton(
+      //         onPressed: () => {checkStatus(userID)},
+      //         tooltip: _toolTip,
+      //         backgroundColor: _colorButton,
+      //         child: Icon(Icons.alarm_on,
+      //             color: Colors.white, size: 40),
+      //       )),
+      // ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+
+  buildShowDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        });
   }
 
   String _formatDateTime(DateTime dateTime) {
@@ -940,8 +1459,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.data.aktif == '1') {
         if (response.data.achive == true) {
-          Navigator.pushNamed(context, "/camera",
-              arguments: ScreenArguments(userID, _status, idShift, shift));
+          _getFromCamera();
+          // Navigator.pushNamed(context, "/camera",
+          //     arguments: ScreenArguments(userID, _status, idShift, shift));
         } else {
           Alert(
               context: context,

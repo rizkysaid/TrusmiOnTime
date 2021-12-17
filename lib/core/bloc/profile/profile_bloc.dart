@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:meta/meta.dart';
 
@@ -16,22 +15,35 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       GetProfile event, Emitter<ProfileState> emit) async {
     ApiServices apiServices = ApiServices();
     try {
-      if (state.status == ProfileStatus.initial) {
-        final profile = await apiServices.profil(
-            event.ip, event.userID, event.date, event.apiToken);
-        return emit(state.copyWith(
-          status: ProfileStatus.success,
-          profile: List.of(state.profile)..addAll(profile),
-        ));
-      }
+      final profile = await apiServices.profil(
+          event.ip, event.userID, event.date, event.apiToken);
+      print(profile);
+      return emit(state.copyWith(
+        status: ProfileStatus.success,
+        userId: profile['user_id'],
+        nama: profile['nama'],
+        idShift: profile['id_shift'],
+        fotoProfil: profile['foto_profil'],
+        jabatan: profile['jabatan'],
+        photoIn: profile['photo_in'],
+        dateIn: profile['date_in'],
+        clockIn: profile['clock_in'],
+        shiftIn: profile['shift_in'],
+        dateOut: profile['date_out'],
+        clockOut: profile['clock_out'],
+        shiftOut: profile['shift_out'],
+        totalWork: profile['total_work'],
+        message: profile['message'],
+      ));
     } catch (e) {
       if (e != 'cancel') {
         emit(state.copyWith(
           status: ProfileStatus.failure,
-          errorMessage: e.toString(),
+          message: e.toString(),
         ));
       }
       emit(state.copyWith(status: ProfileStatus.failure));
+      print('error');
       print(e.toString());
     }
   }

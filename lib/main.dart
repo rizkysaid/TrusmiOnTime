@@ -195,9 +195,9 @@ class _CekLoginState extends State<CekLogin> {
 
   void _deleteConfig() async {
 //     Assuming that the number of rows is the id for the last row.
-    final id = await dbConfig.queryRowCount();
-    final rowsDeleted = await dbConfig.deleteAll();
-    print('deleted $rowsDeleted row(s): row $id');
+    // final id = await dbConfig.queryRowCount();
+    await dbConfig.deleteAll();
+    // print('deleted $rowsDeleted row(s): row $id');
     _insertConfig();
   }
 
@@ -207,15 +207,15 @@ class _CekLoginState extends State<CekLogin> {
       DatabaseConfigHelper.instance.columnUsername: 'admintrusmi',
       DatabaseConfigHelper.instance.columnPassword: 'trusmiadmin'
     };
-    final id = await dbConfig.insert(row);
-    print('inserted row id: $id');
-    _showConfig();
+    await dbConfig.insert(row);
+    // print('inserted row id: $id');
+    // _showConfig();
   }
 
-  void _showConfig() async {
-    final allRows = await dbConfig.queryAllRows();
-    allRows.forEach((row) => print("Config = " + row.toString()));
-  }
+  // void _showConfig() async {
+  //   final allRows = await dbConfig.queryAllRows();
+  //   allRows.forEach((row) => print("Config = " + row.toString()));
+  // }
 
   void showIp() async {
     final allRows = await dbHelper.queryAllRows();

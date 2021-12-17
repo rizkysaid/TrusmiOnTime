@@ -1,49 +1,30 @@
+// To parse this JSON data, do
+//
+//     final profileModel = profileModelFromJson(jsonString);
+
 import 'dart:convert';
 
-ProfileModel profileModelFromJson(String str) =>
-    ProfileModel.fromJson(json.decode(str));
+List<ProfileModel> profileModelFromJson(String str) => List<ProfileModel>.from(
+    json.decode(str).map((x) => ProfileModel.fromJson(x)));
 
-String profileModelToJson(ProfileModel data) => json.encode(data.toJson());
+String profileModelToJson(List<ProfileModel> data) =>
+    json.encode(List<dynamic>.from(data.map((x) => x.toJson())));
 
 class ProfileModel {
   ProfileModel({
-    required this.status,
-    required this.data,
-    required this.message,
-  });
-
-  bool status;
-  Data data;
-  String message;
-
-  factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
-        status: json["status"],
-        data: Data.fromJson(json["data"]),
-        message: json["message"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "status": status,
-        "data": data.toJson(),
-        "message": message,
-      };
-}
-
-class Data {
-  Data({
-    required this.userId,
-    required this.nama,
-    required this.idShift,
-    required this.fotoProfil,
-    required this.jabatan,
-    required this.photoIn,
-    required this.dateIn,
-    required this.clockIn,
-    required this.shiftIn,
-    required this.dateOut,
-    required this.clockOut,
-    required this.shiftOut,
-    required this.totalWork,
+    this.userId = '',
+    this.nama = '',
+    this.idShift = '',
+    this.fotoProfil = '',
+    this.jabatan = '',
+    this.photoIn = '',
+    this.dateIn = '',
+    this.clockIn = '',
+    this.shiftIn = '',
+    this.dateOut = '',
+    this.clockOut = '',
+    this.shiftOut = '',
+    this.totalWork = '',
   });
 
   String userId;
@@ -60,7 +41,7 @@ class Data {
   String shiftOut;
   String totalWork;
 
-  factory Data.fromJson(Map<String, dynamic> json) => Data(
+  factory ProfileModel.fromJson(Map<String, dynamic> json) => ProfileModel(
         userId: json["user_id"],
         nama: json["nama"],
         idShift: json["id_shift"],

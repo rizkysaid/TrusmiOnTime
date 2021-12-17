@@ -56,6 +56,9 @@ class _CameraScreenState extends State<CameraScreen> {
   }
 
   Future _initCameraController(CameraDescription cameraDescription) async {
+    if (controller != null) {
+      await controller.dispose();
+    }
     controller = CameraController(cameraDescription, ResolutionPreset.medium);
 
     controller.addListener(() {
@@ -100,7 +103,7 @@ class _CameraScreenState extends State<CameraScreen> {
 
   /// Display Camera preview.
   Widget _cameraPreviewWidget() {
-    if (!controller.value.isInitialized) {
+    if (controller == null || !controller.value.isInitialized) {
       return const Center(child: CircularProgressIndicator());
     }
 
@@ -148,7 +151,7 @@ class _CameraScreenState extends State<CameraScreen> {
   /// Display a row of toggle to select the camera (or a message if no camera is available).
 
   Widget _cameraToggleRowWidget() {
-    if (cameras.isEmpty) {
+    if (cameras == null || cameras.isEmpty) {
       return Spacer();
     }
     CameraDescription selectedCamera = cameras[selectedCameraIndex];
@@ -203,18 +206,17 @@ class _CameraScreenState extends State<CameraScreen> {
         context,
         MaterialPageRoute(
           builder: (context) => PreviewScreen(
-            imgPath: image.path,
-            userID: args.userID,
-            status: args.status,
-            clockIn: '${DateTime.now()}',
-            idShift: args.idShift,
-            shift: args.shift,
-            imageUrl: '',
-          ),
+              imgPath: image.path,
+              userID: args.userID,
+              status: args.status,
+              clockIn: '${DateTime.now()}',
+              idShift: args.idShift,
+              shift: args.shift),
         ),
       );
     } on CameraException catch (e) {
-      _showCameraException(e);
+      print(e);
+      return null;
     }
   }
 

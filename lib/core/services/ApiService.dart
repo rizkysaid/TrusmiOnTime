@@ -5,7 +5,6 @@ import 'package:login_absen/core/models/CheckHolidaysModel.dart';
 
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
-import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:http/http.dart' as http;
 import 'package:dio/dio.dart';
 
@@ -95,42 +94,53 @@ class ApiServices {
     }
   }
 
-  Future<List<ProfileModel>> profil(
-      String ip, String userID, String date, apiToken) async {
-    String uri = ip + '/profil/' + userID + '/' + date;
-    try {
-      var response = await dio.post(uri, cancelToken: apiToken);
-      dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //5s
-      dio.options.receiveTimeout = 25000;
+  // Future<List<ProfileModel>> profil(
+  //     String ip, String userID, String date, CancelToken apiToken) async {
+  //   String uri = ip + '/profil/' + userID + '/' + date;
+  //   try {
+  //     var response = await dio.post(uri, cancelToken: apiToken);
+  //     dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
+  //     dio.options.connectTimeout = 30000; //5s
+  //     dio.options.receiveTimeout = 25000;
 
-      if (response.statusCode == 200) {
-        List responseList = response.data['data'];
-        List<ProfileModel> listData =
-            responseList.map((f) => ProfileModel.fromJson(f)).toList();
-        return listData;
-      } else {
-        throw response.data['message'];
-      }
-    } on DioError catch (e) {
-      //print(e.toString()+' | '+url.toString());
-      if (e.type == DioErrorType.response) {
-        int? statusCode = e.response!.statusCode;
-        if (statusCode == 404) {
-          throw "Api not found";
-        } else if (statusCode == 500) {
-          throw "Internal Server Error";
-        } else {
-          throw e.error.message.toString();
-        }
-      } else if (e.type == DioErrorType.connectTimeout) {
-        throw e.message.toString();
-      } else if (e.type == DioErrorType.cancel) {
-        throw 'cancel';
-      }
-      throw connErr;
-    } finally {
-      dio.close();
+  //     if (response.statusCode == 200) {
+  //       List responseList = response.data['data'];
+  //       List<ProfileModel> listData =
+  //           responseList.map((f) => ProfileModel.fromJson(f)).toList();
+  //       return listData;
+  //     } else {
+  //       throw response.data['message'];
+  //     }
+  //   } on DioError catch (e) {
+  //     //print(e.toString()+' | '+url.toString());
+  //     if (e.type == DioErrorType.response) {
+  //       int? statusCode = e.response!.statusCode;
+  //       if (statusCode == 404) {
+  //         throw "Api not found";
+  //       } else if (statusCode == 500) {
+  //         throw "Internal Server Error";
+  //       } else {
+  //         throw e.error.message.toString();
+  //       }
+  //     } else if (e.type == DioErrorType.connectTimeout) {
+  //       throw e.message.toString();
+  //     } else if (e.type == DioErrorType.cancel) {
+  //       throw 'cancel';
+  //     }
+  //     throw connErr;
+  //   } finally {
+  //     dio.close();
+  //   }
+  // }
+
+  Future<dynamic> profil(
+      String ip, String userID, String date, apiToken) async {
+    String url = ip + '/profil/' + userID + '/' + date;
+    response = await dio.get(url);
+    if (response.data['status'] == true) {
+      return response.data['data'];
+    } else {
+      throw response.data['message'];
     }
   }
 
@@ -143,7 +153,7 @@ class ApiServices {
           CheckKoneksiModel.fromJson(jsonDecode(response.body));
       return responseRequest;
     } else {
-      throw response.statusCode;
+      throw response.statusCode.toString();
     }
   }
 
@@ -156,7 +166,7 @@ class ApiServices {
           CheckStatusModel.fromJson(jsonDecode(response.body));
       return responseRequest;
     } else {
-      throw response.statusCode;
+      throw response.statusCode.toString();
     }
   }
 
