@@ -543,6 +543,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // print("_isCheckin = " + _isCheckin.toString());
     // print("_isCheckout = " + _isCheckout.toString());
 
+    print('userID => ' + userID);
+
     if (username != '') {
       timer = new Timer(new Duration(seconds: 1), () {
         // debugPrint("Print after 1 seconds");
@@ -842,6 +844,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 break;
               default:
                 // showProgressDialog(context);
+                getPref();
                 print('initial');
             }
           },
@@ -1324,6 +1327,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       shape: const CircularNotchedRectangle(),
                       child: Container(height: 50.0),
                     ),
+                    floatingActionButton: Container(
+                        height: 80,
+                        width: 80,
+                        child: FloatingActionButton(
+                          onPressed: () => {},
+                          tooltip: _toolTip,
+                          backgroundColor: _colorButton,
+                          child: CircularProgressIndicator(),
+                        )),
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerDocked,
                   );
               }
             },
