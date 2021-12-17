@@ -614,13 +614,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           listener: (context, state) {
             switch (state.status) {
               case ProfileStatus.success:
-                // getPref();
-
                 setState(() {
                   userID = state.userId;
                   idShift = state.idShift;
                 });
-
                 if (state.idShift != '3') {
                   if (state.clockIn != dateId) {
                     if (state.clockIn == "--:--") {
@@ -839,11 +836,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //kondisi sift malam
                   }
                 }
-
-                // print(state.profile.toString());
-                // Navigator.of(context, rootNavigator: true).pop();
+                Navigator.pop(context);
                 break;
               case ProfileStatus.failure:
+                Navigator.pop(context);
                 print('listener failure ');
                 Future.delayed(const Duration(microseconds: 2000), () {
                   Navigator.pushNamedAndRemoveUntil(context, "/no_connection",
@@ -851,6 +847,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
                 break;
               default:
+                showProgressDialog(context);
                 print('initial');
             }
           },
@@ -858,17 +855,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             bloc: _profileBloc,
             builder: (context, state) {
               switch (state.status) {
-                case ProfileStatus.initial:
-                  // return Container(
-                  //   child: Center(
-                  //     child: CircularProgressIndicator(
-                  //       strokeWidth: 1.5,
-                  //     ),
-                  //   ),
-                  // );
-                  return loadingScreen();
-                case ProfileStatus.failure:
-                  return Container();
                 default:
                   return Scaffold(
                     appBar: AppBar(
@@ -1176,193 +1162,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget loadingScreen() {
-    return Scaffold(
-      appBar: AppBar(
-        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Image.asset(
-            'assets/logo_png_ontime.png',
-            fit: BoxFit.contain,
-            width: MediaQuery.of(context).size.width / 4,
-            height: MediaQuery.of(context).size.height / 14,
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
-          )
-        ]),
-        iconTheme: new IconThemeData(color: Colors.white),
-        flexibleSpace: Container(
-          decoration: new BoxDecoration(
-              gradient: new LinearGradient(
-                  colors: [const Color(0xFFFF1744), const Color(0xFFF44336)],
-                  begin: const FractionalOffset(0.0, 0.0),
-                  end: const FractionalOffset(1.0, 0.0),
-                  stops: [0.0, 1.0],
-                  tileMode: TileMode.clamp)),
-        ),
-      ),
-      body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints viewportConstraints) {
-        return SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints:
-                BoxConstraints(minHeight: viewportConstraints.maxHeight),
-            child: Column(
-              children: <Widget>[
-                Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: (MediaQuery.of(context).size.height / 2) +
-                      (MediaQuery.of(context).size.height / 6),
-                  decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage('assets/background.png'),
-                          fit: BoxFit.cover)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      SizedBox(height: 20),
-                      Container(
-                        width: 300.0,
-                        height: 300.0,
-                        decoration: new BoxDecoration(
-                          color: Colors.lightBlue[50]!.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            SizedBox(height: 20),
-                            Visibility(
-                              visible: statusPhoto,
-                              child: Container(
-                                width: 160.0,
-                                height: 160.0,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[300],
-                                  shape: BoxShape.circle,
-                                  image: new DecorationImage(
-                                    fit: BoxFit.cover,
-                                    image: new NetworkImage(Endpoint.urlFoto +
-                                        "/" +
-                                        imageUrl.toString()),
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Visibility(
-                              visible: statusIcon,
-                              child: Container(
-                                width: 160.0,
-                                height: 160.0,
-                                decoration: new BoxDecoration(
-                                  color: Colors.grey[300],
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.person_outline,
-                                  color: Colors.white,
-                                  size: 120.0,
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 10),
-                          ],
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      // Text(
-                      //   "Loading ...",
-                      //   style: TextStyle(color: Colors.white),
-                      // ),
-                      CircularProgressIndicator(),
-                      SizedBox(height: 20),
-                      // Visibility(
-                      //   visible: statusTotalWork,
-                      //   child: Column(children: <Widget>[
-                      //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
-                      //     Text(totalWork.toString(),
-                      //         style: TextStyle(
-                      //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
-                      //         )
-                      //     ),
-                      //   ]),
-                      // ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 20, right: 20, top: 15),
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Column(children: <Widget>[
-                            Text("Start Time", style: TextStyle(fontSize: 18)),
-                            Text(clockin.toString(),
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text(
-                              dateIn.toString(),
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ]),
-                          Container(
-                            height: 10,
-                            width: 10,
-                          ),
-                          Column(children: <Widget>[
-                            Text("End Time", style: TextStyle(fontSize: 18)),
-                            Text(clockout.toString(),
-                                style: TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text(
-                              dateOut.toString(),
-                              style: TextStyle(
-                                  fontSize: 16, fontWeight: FontWeight.bold),
-                            ),
-                          ]),
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
+  Future showProgressDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: Center(
+            child: CircularProgressIndicator(),
           ),
         );
-      }),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        child: Container(height: 50.0),
-      ),
-      // floatingActionButton: Visibility(
-      //   visible: _visibleButton,
-      //   child: Container(
-      //       height: 80,
-      //       width: 80,
-      //       child: FloatingActionButton(
-      //         onPressed: () => {checkStatus(userID)},
-      //         tooltip: _toolTip,
-      //         backgroundColor: _colorButton,
-      //         child: Icon(Icons.alarm_on,
-      //             color: Colors.white, size: 40),
-      //       )),
-      // ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      },
     );
-  }
-
-  buildShowDialog(BuildContext context) {
-    return showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return Center(
-            child: CircularProgressIndicator(),
-          );
-        });
   }
 
   String _formatDateTime(DateTime dateTime) {

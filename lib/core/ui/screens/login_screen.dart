@@ -1,13 +1,18 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:login_absen/core/bloc/login/login_bloc.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_helper.dart';
-import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:login_absen/core/config/about.dart';
 
 // bool _saving = false;
+
+final LoginBloc _loginBloc = LoginBloc();
+CancelToken apiToken = CancelToken();
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -152,12 +157,8 @@ class _LoginBodyState extends State<LoginBody> {
   Future<void> prosesLogin() async {
     if (usernameController.text.isNotEmpty &&
         passwordController.text.isNotEmpty) {
-      // setState(() {
-      //   _saving = true;
-      // });
-
       String ip;
-      ToastUtils.show("Check Login ...");
+      // ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
       // print('query all rows: ' + allRows.toList().toString());
@@ -170,27 +171,29 @@ class _LoginBodyState extends State<LoginBody> {
         ip = Endpoint.baseUrl;
       }
 
-      // print('ip=' + ip);
+      // ApiServices services = ApiServices();
+      // var response = await services.login(ip, usernameController.text, passwordController.text);
+      // String usrId = response.data[0].userId.toString();
+      // String messageLogin = response.message.toString();
 
-      ApiServices services = ApiServices();
-      var response = await services.login(
-          ip, usernameController.text, passwordController.text);
-      String usrId = response.data[0].userId.toString();
-      String messageLogin = response.message.toString();
+      // if (response.status == true) {
+      //   savePref(
+      //       usernameController.text.toString(), usrId, passwordController.text);
+      //   Future.delayed(const Duration(microseconds: 2000), () {
+      //     Navigator.pushNamedAndRemoveUntil(
+      //         context, "/profile", (Route<dynamic> routes) => false);
+      //   });
 
-      if (response.status == true) {
-        savePref(
-            usernameController.text.toString(), usrId, passwordController.text);
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic> routes) => false);
-        });
-        // setState(() {
-        //   _saving = false;
-        // });
-      } else {
-        ToastUtils.show(messageLogin);
-      }
+      // } else {
+      //   ToastUtils.show(messageLogin);
+      // }
+      _loginBloc.add(LoadLogin());
+
+      _loginBloc.add(CheckAuth(
+          ip: ip,
+          username: usernameController.text,
+          password: passwordController.text,
+          apiToken: apiToken));
     } else {
       ToastUtils.show("Please Input All Fields");
     }
@@ -290,21 +293,87 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   Widget _buttonLogin(BuildContext context) {
-    return Padding(
+    return BlocListener<LoginBloc, LoginState>(
+      bloc: _loginBloc,
+      listener: (context, state) {
+        switch (state.status) {
+          case LoginStatus.success:
+            ToastUtils.show(state.message);
+            print('listener_success');
+            print(state.message);
+            Navigator.pop(context);
+            savePref(usernameController.text.toString(), state.userId,
+                passwordController.text);
+            Future.delayed(const Duration(microseconds: 2000), () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/profile", (Route<dynamic> routes) => false);
+            });
+            break;
+          case LoginStatus.failure:
+            ToastUtils.show(state.message);
+            print('listener_filure');
+            print(state.message);
+            Navigator.pop(context);
+            break;
+          case LoginStatus.loading:
+            // ToastUtils.show(state.message);
+            print('listener_filure');
+            print(state.message);
+            showProgressDialog(context);
+            break;
+          default:
+            Navigator.pop(context);
+            print('listener init');
+        }
+      },
+      child: Padding(
         padding: EdgeInsets.all(8.0),
         child: new InkWell(
-            onTap: () => prosesLogin(),
-            child: new Container(
-              height: 50.0,
-              decoration: new BoxDecoration(
-                color: Colors.red[800],
-                border: new Border.all(color: Colors.white, width: 2.0),
-                borderRadius: new BorderRadius.circular(10.0),
-              ),
-              child: new Center(
-                  child: new Text('Login',
-                      style:
-                          new TextStyle(fontSize: 18.0, color: Colors.white))),
-            )));
+          onTap: () {
+            prosesLogin();
+          },
+          child: new BlocBuilder<LoginBloc, LoginState>(
+            bloc: _loginBloc,
+            builder: (context, state) {
+              switch (state.status) {
+                default:
+                  return Container(
+                    height: 50.0,
+                    decoration: new BoxDecoration(
+                      color: Colors.red[800],
+                      border: new Border.all(color: Colors.white, width: 2.0),
+                      borderRadius: new BorderRadius.circular(10.0),
+                    ),
+                    child: new Center(
+                      child: new Text(
+                        'Login',
+                        style:
+                            new TextStyle(fontSize: 18.0, color: Colors.white),
+                      ),
+                    ),
+                  );
+              }
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future showProgressDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+    );
   }
 }
