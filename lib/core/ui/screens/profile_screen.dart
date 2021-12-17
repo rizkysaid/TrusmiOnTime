@@ -18,6 +18,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+// import 'package:shimmer/shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -163,13 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
-    // checkConnection();
-
     getPref();
-
-    // setState(() {
-    //   _saving = true;
-    // });
 
     _timeString = _formatDateTime(DateTime.now());
     _hariTanggal = _formatHariTanggal(DateTime.now());
@@ -234,7 +229,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Future.delayed(Duration(milliseconds: 3000));
 
     _refreshController.refreshCompleted();
-    // getPref();
     _profileBloc.add(InitialProfile());
     getProfil(userID, date);
   }
@@ -549,7 +543,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // print("_isCheckin = " + _isCheckin.toString());
     // print("_isCheckout = " + _isCheckout.toString());
 
-    if (username.isNotEmpty) {
+    if (username != '') {
       timer = new Timer(new Duration(seconds: 1), () {
         // debugPrint("Print after 1 seconds");
         getProfil(userID, date);
@@ -836,10 +830,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //kondisi sift malam
                   }
                 }
-                Navigator.pop(context);
+                // Navigator.pop(context);
                 break;
               case ProfileStatus.failure:
-                Navigator.pop(context);
+                // Navigator.pop(context);
                 print('listener failure ');
                 Future.delayed(const Duration(microseconds: 2000), () {
                   Navigator.pushNamedAndRemoveUntil(context, "/no_connection",
@@ -847,15 +841,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
                 break;
               default:
-                showProgressDialog(context);
+                // showProgressDialog(context);
                 print('initial');
             }
           },
           child: BlocBuilder<ProfileBloc, ProfileState>(
             bloc: _profileBloc,
             builder: (context, state) {
+              print('state.status => ' + state.status.toString());
               switch (state.status) {
-                default:
+                case ProfileStatus.success:
                   return Scaffold(
                     appBar: AppBar(
                       title: Row(
@@ -1153,6 +1148,182 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.centerDocked,
+                  );
+
+                default:
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/logo_png_ontime.png',
+                              fit: BoxFit.contain,
+                              width: MediaQuery.of(context).size.width / 4,
+                              height: MediaQuery.of(context).size.height / 14,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+                            )
+                          ]),
+                      iconTheme: new IconThemeData(color: Colors.white),
+                      flexibleSpace: Container(
+                        decoration: new BoxDecoration(
+                            gradient: new LinearGradient(
+                                colors: [
+                                  const Color(0xFFFF1744),
+                                  const Color(0xFFF44336)
+                                ],
+                                begin: const FractionalOffset(0.0, 0.0),
+                                end: const FractionalOffset(1.0, 0.0),
+                                stops: [0.0, 1.0],
+                                tileMode: TileMode.clamp)),
+                      ),
+                    ),
+                    body: LayoutBuilder(builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight),
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                height: (MediaQuery.of(context).size.height /
+                                        2) +
+                                    (MediaQuery.of(context).size.height / 6),
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image:
+                                            AssetImage('assets/background.png'),
+                                        fit: BoxFit.cover)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
+                                    SizedBox(height: 20),
+                                    Container(
+                                      width: 300.0,
+                                      height: 300.0,
+                                      decoration: new BoxDecoration(
+                                        color: Colors.lightBlue[50]!
+                                            .withOpacity(0.2),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Column(
+                                        children: <Widget>[
+                                          SizedBox(height: 20),
+                                          Container(
+                                            width: 160.0,
+                                            height: 160.0,
+                                            decoration: new BoxDecoration(
+                                              color: Colors.grey[300],
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: Icon(
+                                              Icons.person_outline,
+                                              color: Colors.white,
+                                              size: 120.0,
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Text('',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text('',
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                          SizedBox(height: 20),
+                                          Text('',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text('',
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12))
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 20),
+                                    Text(
+                                      'Loading ...',
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    SizedBox(height: 20),
+                                    // Visibility(
+                                    //   visible: statusTotalWork,
+                                    //   child: Column(children: <Widget>[
+                                    //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
+                                    //     Text(totalWork.toString(),
+                                    //         style: TextStyle(
+                                    //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
+                                    //         )
+                                    //     ),
+                                    //   ]),
+                                    // ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 20, right: 20, top: 15),
+                                child: Column(
+                                  children: <Widget>[
+                                    // Row(
+                                    //   mainAxisAlignment:
+                                    //       MainAxisAlignment.spaceEvenly,
+                                    //   children: <Widget>[
+                                    //     Column(children: <Widget>[
+                                    //       Text("Start Time",
+                                    //           style: TextStyle(fontSize: 18)),
+                                    //       Text(clockin.toString(),
+                                    //           style: TextStyle(
+                                    //               fontSize: 18,
+                                    //               fontWeight: FontWeight.bold)),
+                                    //       Text(
+                                    //         state.dateIn,
+                                    //         style: TextStyle(
+                                    //             fontSize: 16,
+                                    //             fontWeight: FontWeight.bold),
+                                    //       ),
+                                    //     ]),
+                                    //     Container(
+                                    //       height: 10,
+                                    //       width: 10,
+                                    //     ),
+                                    //     Column(children: <Widget>[
+                                    //       Text("End Time",
+                                    //           style: TextStyle(fontSize: 18)),
+                                    //       Text(state.clockOut,
+                                    //           style: TextStyle(
+                                    //               fontSize: 18,
+                                    //               fontWeight: FontWeight.bold)),
+                                    //       Text(
+                                    //         state.dateOut,
+                                    //         style: TextStyle(
+                                    //             fontSize: 16,
+                                    //             fontWeight: FontWeight.bold),
+                                    //       ),
+                                    //     ]),
+                                    //   ],
+                                    // ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                    bottomNavigationBar: BottomAppBar(
+                      shape: const CircularNotchedRectangle(),
+                      child: Container(height: 50.0),
+                    ),
                   );
               }
             },

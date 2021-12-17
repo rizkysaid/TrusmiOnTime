@@ -155,8 +155,7 @@ class _LoginBodyState extends State<LoginBody> {
   }
 
   Future<void> prosesLogin() async {
-    if (usernameController.text.isNotEmpty &&
-        passwordController.text.isNotEmpty) {
+    if (usernameController.text != '' && passwordController.text != '') {
       String ip;
       // ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;

@@ -14,7 +14,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Future<void> _checkAuth(CheckAuth event, Emitter<LoginState> emit) async {
     ApiServices apiServices = ApiServices();
-
+    emit(state.copyWith(status: LoginStatus.loading));
     try {
       final response = await apiServices.login(
           event.ip, event.username, event.password, event.apiToken);
