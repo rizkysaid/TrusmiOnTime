@@ -1300,39 +1300,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Column(
                                           children: <Widget>[
                                             SizedBox(height: 20),
-                                            Visibility(
-                                              visible: statusPhoto,
-                                              child: Container(
-                                                width: 160.0,
-                                                height: 160.0,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.grey[300],
-                                                  shape: BoxShape.circle,
-                                                  image: new DecorationImage(
-                                                    fit: BoxFit.cover,
-                                                    image: new NetworkImage(
-                                                        Endpoint.urlFoto +
-                                                            "/" +
-                                                            imageUrl
-                                                                .toString()),
-                                                  ),
-                                                ),
+                                            Container(
+                                              width: 160.0,
+                                              height: 160.0,
+                                              decoration: new BoxDecoration(
+                                                color: Colors.grey[300],
+                                                shape: BoxShape.circle,
                                               ),
-                                            ),
-                                            Visibility(
-                                              visible: statusIcon,
-                                              child: Container(
-                                                width: 160.0,
-                                                height: 160.0,
-                                                decoration: new BoxDecoration(
-                                                  color: Colors.grey[300],
-                                                  shape: BoxShape.circle,
-                                                ),
-                                                child: Icon(
-                                                  Icons.person_outline,
-                                                  color: Colors.white,
-                                                  size: 120.0,
-                                                ),
+                                              child: Icon(
+                                                Icons.person_outline,
+                                                color: Colors.white,
+                                                size: 120.0,
                                               ),
                                             ),
                                             SizedBox(height: 10),

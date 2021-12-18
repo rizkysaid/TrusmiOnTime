@@ -12,9 +12,11 @@ class ProfileState extends Equatable {
   final String photoIn;
   final String dateIn;
   final String clockIn;
+  final String fotoIn;
   final String shiftIn;
   final String dateOut;
   final String clockOut;
+  final String fotoOut;
   final String shiftOut;
   final String totalWork;
   final String statusBreak;
@@ -30,11 +32,13 @@ class ProfileState extends Equatable {
     this.fotoProfil = '',
     this.jabatan = '',
     this.photoIn = '',
+    this.fotoIn = '',
     this.dateIn = '',
     this.clockIn = '',
     this.shiftIn = '',
     this.dateOut = '',
     this.clockOut = '',
+    this.fotoOut = '',
     this.shiftOut = '',
     this.totalWork = '',
     this.statusBreak = '',
@@ -53,9 +57,11 @@ class ProfileState extends Equatable {
     String? photoIn,
     String? dateIn,
     String? clockIn,
+    String? fotoIn,
     String? shiftIn,
     String? dateOut,
     String? clockOut,
+    String? fotoOut,
     String? shiftOut,
     String? totalWork,
     String? statusBreak,
@@ -73,9 +79,11 @@ class ProfileState extends Equatable {
       photoIn: photoIn ?? this.photoIn,
       dateIn: dateIn ?? this.dateIn,
       clockIn: clockIn ?? this.clockIn,
+      fotoIn: fotoIn ?? this.fotoIn,
       shiftIn: shiftIn ?? this.shiftIn,
       dateOut: dateOut ?? this.dateOut,
       clockOut: clockOut ?? this.clockOut,
+      fotoOut: fotoOut ?? this.fotoOut,
       shiftOut: shiftOut ?? this.shiftOut,
       totalWork: totalWork ?? this.totalWork,
       statusBreak: statusBreak ?? this.statusBreak,
