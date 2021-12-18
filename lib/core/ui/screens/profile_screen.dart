@@ -529,13 +529,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   getPref() async {
     var pref = await SharedPreferences.getInstance();
-
+    print('pref=>' + pref.getString('username').toString());
     if (pref.getString('username') == null) {
-      _profileBloc.add(InitialProfile());
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/login", (Route<dynamic> routes) => false);
-      });
+      logout();
     } else {
       setState(() {
         username = pref.getString('username')!;
@@ -602,7 +598,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: _profileBloc,
           listener: (context, state) {
-            // print('listener =>' + state.status.toString());
+            print('listener =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
                 setState(() {
@@ -1251,7 +1247,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   logout() {
-    showProgressDialog(context);
+    _profileBloc.add(InitialProfile());
     savePref();
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.pushNamedAndRemoveUntil(
