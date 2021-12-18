@@ -18,10 +18,7 @@ import 'core/ui/screens/login_config.dart';
 //import 'core/utils/toast_util.dart';
 
 void main() {
-  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-  //     .then((_) {
   runApp(MyApp());
-  // });
 }
 
 class MyApp extends StatelessWidget {
@@ -57,20 +54,20 @@ class CekLogin extends StatefulWidget {
 }
 
 class _CekLoginState extends State<CekLogin> {
-  late String ip;
-  late String userID;
-  late String username;
+  String? ip;
+  String? userID;
+  String? username;
   // static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
   final dbConfig = DatabaseConfigHelper.instance;
 
-  late String ipAddress;
+  String? ipAddress;
 
   @override
   void initState() {
     super.initState();
-//    getPref();
-    checkConnection();
+    getPref();
+    // checkConnection();
     _deleteConfig();
   }
 
@@ -94,7 +91,7 @@ class _CekLoginState extends State<CekLogin> {
         userID = pref.getString('userID')!;
       });
 
-      if (username.isEmpty) {
+      if (username != null) {
         Future.delayed(const Duration(microseconds: 2000), () {
           Navigator.pushNamedAndRemoveUntil(
               context, "/login", (Route<dynamic> routes) => false);

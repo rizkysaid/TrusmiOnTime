@@ -18,7 +18,6 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
-import 'package:shimmer/shimmer.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -164,6 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
 
+    _profileBloc.add(InitialProfile());
     getPref();
     _onRefresh();
 
@@ -227,7 +227,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       RefreshController(initialRefresh: false);
 
   void _onRefresh() async {
-    await Future.delayed(Duration(milliseconds: 3000));
+    await Future.delayed(Duration(milliseconds: 2000));
 
     _refreshController.refreshCompleted();
     _profileBloc.add(InitialProfile());
@@ -235,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _onLoading() async {
-    await Future.delayed(Duration(milliseconds: 3000));
+    await Future.delayed(Duration(milliseconds: 2000));
 
     _refreshController.loadComplete();
   }
@@ -581,26 +581,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       enablePullDown: true,
       enablePullUp: false,
       header: WaterDropMaterialHeader(),
-      // footer: CustomFooter(
-      //   builder: (BuildContext context, LoadStatus mode) {
-      //     Widget body;
-      //     if (mode == LoadStatus.idle) {
-      //       body = Text("pull up load");
-      //     } else if (mode == LoadStatus.loading) {
-      //       body = CupertinoActivityIndicator();
-      //     } else if (mode == LoadStatus.failed) {
-      //       body = Text("Load Failed!Click retry!");
-      //     } else if (mode == LoadStatus.canLoading) {
-      //       body = Text("release to load more");
-      //     } else {
-      //       body = Text("No more Data");
-      //     }
-      //     return Container(
-      //       height: 55.0,
-      //       child: Center(child: body),
-      //     );
-      //   },
-      // ),
       controller: _refreshController,
       onRefresh: _onRefresh,
       onLoading: _onLoading,
@@ -609,6 +589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: _profileBloc,
           listener: (context, state) {
+            // print('listener =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
                 setState(() {
@@ -833,10 +814,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //kondisi sift malam
                   }
                 }
-                // Navigator.pop(context);
+                Navigator.of(context, rootNavigator: true).pop(context);
                 break;
               case ProfileStatus.failure:
-                // Navigator.pop(context);
+                Navigator.of(context, rootNavigator: true).pop(context);
                 print('listener failure ');
                 Future.delayed(const Duration(microseconds: 2000), () {
                   Navigator.pushNamedAndRemoveUntil(context, "/no_connection",
@@ -844,682 +825,386 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
                 break;
               default:
-                // showProgressDialog(context);
+                showProgressDialog(context);
                 getPref();
-                print('initial');
             }
           },
           child: BlocBuilder<ProfileBloc, ProfileState>(
             bloc: _profileBloc,
             builder: (context, state) {
-              print('state.status => ' + state.status.toString());
-              switch (state.status) {
-                case ProfileStatus.success:
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/logo_png_ontime.png',
-                              fit: BoxFit.contain,
-                              width: MediaQuery.of(context).size.width / 4,
-                              height: MediaQuery.of(context).size.height / 14,
+              return Scaffold(
+                appBar: AppBar(
+                  title: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          'assets/logo_png_ontime.png',
+                          fit: BoxFit.contain,
+                          width: MediaQuery.of(context).size.width / 4,
+                          height: MediaQuery.of(context).size.height / 14,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+                        )
+                      ]),
+                  iconTheme: new IconThemeData(color: Colors.white),
+                  flexibleSpace: Container(
+                    decoration: new BoxDecoration(
+                        gradient: new LinearGradient(
+                            colors: [
+                              const Color(0xFFFF1744),
+                              const Color(0xFFF44336)
+                            ],
+                            begin: const FractionalOffset(0.0, 0.0),
+                            end: const FractionalOffset(1.0, 0.0),
+                            stops: [0.0, 1.0],
+                            tileMode: TileMode.clamp)),
+                  ),
+                ),
+                drawer: Drawer(
+                  elevation: 1.5,
+                  child: Column(
+                    children: <Widget>[
+                      DrawerHeader(
+                        padding: EdgeInsets.zero,
+                        decoration: BoxDecoration(color: Colors.red[700]),
+                        child: Row(
+                          children: <Widget>[
+                            SizedBox(width: 15),
+                            new CircleAvatar(
+                              radius: 30.0,
+                              child: ClipOval(
+                                child: Image.network(
+                                    Endpoint.urlProfile +
+                                        "/" +
+                                        state.fotoProfil,
+                                    width: 125,
+                                    height: 125,
+                                    fit: BoxFit.cover),
+                              ),
+                              backgroundColor: Colors.transparent,
                             ),
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
-                            )
-                          ]),
-                      iconTheme: new IconThemeData(color: Colors.white),
-                      flexibleSpace: Container(
-                        decoration: new BoxDecoration(
-                            gradient: new LinearGradient(
-                                colors: [
-                                  const Color(0xFFFF1744),
-                                  const Color(0xFFF44336)
-                                ],
-                                begin: const FractionalOffset(0.0, 0.0),
-                                end: const FractionalOffset(1.0, 0.0),
-                                stops: [0.0, 1.0],
-                                tileMode: TileMode.clamp)),
+                            SizedBox(width: 10),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  state.nama,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                ),
+                                Text(
+                                  state.jabatan,
+                                  textAlign: TextAlign.left,
+                                  style: TextStyle(
+                                      fontSize: 14, color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    drawer: Drawer(
-                      elevation: 1.5,
+                      Expanded(
+                        child: ListView(
+                          padding: EdgeInsets.zero,
+                          children: <Widget>[
+                            ListTile(
+                                leading: Icon(Icons.alarm_on),
+                                title: Text('Absen'),
+                                onTap: () => absen()),
+                            ListTile(
+                                leading: Icon(Icons.add_to_home_screen),
+                                title: Text('HR System'),
+                                onTap: () => goToHR(context)),
+                            ListTile(
+                                leading: Icon(Icons.account_balance),
+                                title: Text('WFH'),
+                                onTap: () => wfh(context)),
+                            ListTile(
+                                leading: Icon(Icons.exit_to_app),
+                                title: Text('Log Out'),
+                                onTap: () => logout())
+                          ],
+                        ),
+                      ),
+                      Container(
+                        child: Align(
+                          alignment: FractionalOffset.bottomCenter,
+                          child: Container(
+                            child: Column(
+                              children: <Widget>[
+                                Divider(),
+                                ListTile(
+                                  title: new Center(child: Text(version)),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                body: LayoutBuilder(builder:
+                    (BuildContext context, BoxConstraints viewportConstraints) {
+                  return SingleChildScrollView(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                          minHeight: viewportConstraints.maxHeight),
                       child: Column(
                         children: <Widget>[
-                          DrawerHeader(
-                            padding: EdgeInsets.zero,
-                            decoration: BoxDecoration(color: Colors.red[700]),
-                            child: Row(
-                              children: <Widget>[
-                                SizedBox(width: 15),
-                                new CircleAvatar(
-                                  radius: 30.0,
-                                  child: ClipOval(
-                                    child: Image.network(
-                                        Endpoint.urlProfile +
-                                            "/" +
-                                            state.fotoProfil,
-                                        width: 125,
-                                        height: 125,
-                                        fit: BoxFit.cover),
-                                  ),
-                                  backgroundColor: Colors.transparent,
-                                ),
-                                SizedBox(width: 10),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      state.nama,
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white),
-                                    ),
-                                    Text(
-                                      state.jabatan,
-                                      textAlign: TextAlign.left,
-                                      style: TextStyle(
-                                          fontSize: 14, color: Colors.white),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          Expanded(
-                            child: ListView(
-                              padding: EdgeInsets.zero,
-                              children: <Widget>[
-                                ListTile(
-                                    leading: Icon(Icons.alarm_on),
-                                    title: Text('Absen'),
-                                    onTap: () => absen()),
-                                ListTile(
-                                    leading: Icon(Icons.add_to_home_screen),
-                                    title: Text('HR System'),
-                                    onTap: () => goToHR(context)),
-                                ListTile(
-                                    leading: Icon(Icons.account_balance),
-                                    title: Text('WFH'),
-                                    onTap: () => wfh(context)),
-                                ListTile(
-                                    leading: Icon(Icons.exit_to_app),
-                                    title: Text('Log Out'),
-                                    onTap: () => logout())
-                              ],
-                            ),
-                          ),
                           Container(
-                            child: Align(
-                              alignment: FractionalOffset.bottomCenter,
-                              child: Container(
-                                child: Column(
+                            width: MediaQuery.of(context).size.width,
+                            height: (MediaQuery.of(context).size.height / 2) +
+                                (MediaQuery.of(context).size.height / 8),
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                                    image: AssetImage('assets/background.png'),
+                                    fit: BoxFit.cover)),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                SizedBox(height: 20),
+                                Container(
+                                  width: 300.0,
+                                  height: 300.0,
+                                  decoration: new BoxDecoration(
+                                    color:
+                                        Colors.lightBlue[50]!.withOpacity(0.2),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Column(
+                                    children: <Widget>[
+                                      SizedBox(height: 20),
+                                      Visibility(
+                                        visible: statusPhoto,
+                                        child: Container(
+                                          width: 160.0,
+                                          height: 160.0,
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[300],
+                                            shape: BoxShape.circle,
+                                            image: new DecorationImage(
+                                              fit: BoxFit.cover,
+                                              image: new NetworkImage(
+                                                  Endpoint.urlFoto +
+                                                      "/" +
+                                                      imageUrl.toString()),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      Visibility(
+                                        visible: statusIcon,
+                                        child: Container(
+                                          width: 160.0,
+                                          height: 160.0,
+                                          decoration: new BoxDecoration(
+                                            color: Colors.grey[300],
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Icon(
+                                            Icons.person_outline,
+                                            color: Colors.white,
+                                            size: 120.0,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Text(state.nama,
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(state.jabatan,
+                                          style:
+                                              TextStyle(color: Colors.white)),
+                                      SizedBox(height: 20),
+                                      Text(_timeString.toString(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 25,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(_hariTanggal.toString(),
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12))
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(height: 20),
+                                Text(
+                                  state.message,
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                SizedBox(height: 20),
+                                // Visibility(
+                                //   visible: statusTotalWork,
+                                //   child: Column(children: <Widget>[
+                                //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
+                                //     Text(totalWork.toString(),
+                                //         style: TextStyle(
+                                //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
+                                //         )
+                                //     ),
+                                //   ]),
+                                // ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                EdgeInsets.only(left: 20, right: 20, top: 15),
+                            child: Column(
+                              children: <Widget>[
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   children: <Widget>[
-                                    Divider(),
-                                    ListTile(
-                                      title: new Center(child: Text(version)),
-                                    )
+                                    Column(children: <Widget>[
+                                      Text("Start Time",
+                                          style: TextStyle(fontSize: 18)),
+                                      Text(clockin.toString(),
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(
+                                        state.dateIn,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ]),
+                                    Container(
+                                      height: 10,
+                                      width: 10,
+                                    ),
+                                    Column(children: <Widget>[
+                                      Text("End Time",
+                                          style: TextStyle(fontSize: 18)),
+                                      Text(state.clockOut,
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold)),
+                                      Text(
+                                        state.dateOut,
+                                        style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ]),
                                   ],
                                 ),
-                              ),
+                              ],
                             ),
                           )
                         ],
                       ),
                     ),
-                    body: LayoutBuilder(builder: (BuildContext context,
-                        BoxConstraints viewportConstraints) {
-                      return SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                              minHeight: viewportConstraints.maxHeight),
+                  );
+                }),
+                bottomNavigationBar: BottomAppBar(
+                  // shape: const CircularNotchedRectangle(),
+                  child: Container(height: 50.0),
+                ),
+                floatingActionButton: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    Visibility(
+                      visible: state.statusBreak == '1' ? true : false,
+                      child: Visibility(
+                        visible: state.clockIn == '--:--' ? false : true,
+                        child: Positioned(
+                          left: 30,
+                          bottom: 20,
                           child: Column(
-                            children: <Widget>[
-                              Container(
-                                width: MediaQuery.of(context).size.width,
-                                height: (MediaQuery.of(context).size.height /
-                                        2) +
-                                    (MediaQuery.of(context).size.height / 10),
-                                decoration: BoxDecoration(
-                                    image: DecorationImage(
-                                        image:
-                                            AssetImage('assets/background.png'),
-                                        fit: BoxFit.cover)),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: <Widget>[
-                                    SizedBox(height: 20),
-                                    Container(
-                                      width: 300.0,
-                                      height: 300.0,
-                                      decoration: new BoxDecoration(
-                                        color: Colors.lightBlue[50]!
-                                            .withOpacity(0.2),
-                                        shape: BoxShape.circle,
-                                      ),
-                                      child: Column(
-                                        children: <Widget>[
-                                          SizedBox(height: 20),
-                                          Visibility(
-                                            visible: statusPhoto,
-                                            child: Container(
-                                              width: 160.0,
-                                              height: 160.0,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[300],
-                                                shape: BoxShape.circle,
-                                                image: new DecorationImage(
-                                                  fit: BoxFit.cover,
-                                                  image: new NetworkImage(
-                                                      Endpoint.urlFoto +
-                                                          "/" +
-                                                          imageUrl.toString()),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Visibility(
-                                            visible: statusIcon,
-                                            child: Container(
-                                              width: 160.0,
-                                              height: 160.0,
-                                              decoration: new BoxDecoration(
-                                                color: Colors.grey[300],
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.person_outline,
-                                                color: Colors.white,
-                                                size: 120.0,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 10),
-                                          Text(state.nama,
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(state.jabatan,
-                                              style: TextStyle(
-                                                  color: Colors.white)),
-                                          SizedBox(height: 20),
-                                          Text(_timeString.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 25,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(_hariTanggal.toString(),
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12))
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(height: 20),
-                                    Text(
-                                      state.message,
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    SizedBox(height: 20),
-                                    // Visibility(
-                                    //   visible: statusTotalWork,
-                                    //   child: Column(children: <Widget>[
-                                    //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
-                                    //     Text(totalWork.toString(),
-                                    //         style: TextStyle(
-                                    //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
-                                    //         )
-                                    //     ),
-                                    //   ]),
-                                    // ),
-                                  ],
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(state.breakOut),
+                              ),
+                              FloatingActionButton(
+                                backgroundColor:
+                                    state.breakOut != '' ? Colors.grey : null,
+                                heroTag: 'breakOut',
+                                onPressed: () {/* Do something */},
+                                // child: Icon(
+                                //   Icons.arrow_left,
+                                //   size: 40,
+                                // ),
+                                child: Text('Break\nOut',
+                                    textAlign: TextAlign.center),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                              Padding(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 20, top: 15),
-                                child: Column(
-                                  children: <Widget>[
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceEvenly,
-                                      children: <Widget>[
-                                        Column(children: <Widget>[
-                                          Text("Start Time",
-                                              style: TextStyle(fontSize: 18)),
-                                          Text(clockin.toString(),
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(
-                                            state.dateIn,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ]),
-                                        Container(
-                                          height: 10,
-                                          width: 10,
-                                        ),
-                                        Column(children: <Widget>[
-                                          Text("End Time",
-                                              style: TextStyle(fontSize: 18)),
-                                          Text(state.clockOut,
-                                              style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold)),
-                                          Text(
-                                            state.dateOut,
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ]),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
                             ],
                           ),
                         ),
-                      );
-                    }),
-                    bottomNavigationBar: BottomAppBar(
-                      // shape: const CircularNotchedRectangle(),
-                      child: Container(height: 50.0),
+                      ),
                     ),
-                    floatingActionButton: Stack(
-                      fit: StackFit.expand,
-                      children: [
-                        Visibility(
-                          visible: state.statusBreak == '1' ? true : false,
-                          child: Visibility(
-                            visible: state.clockIn == '--:--' ? false : true,
-                            child: Positioned(
-                              left: 30,
-                              bottom: 20,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Text(state.breakOut),
-                                  ),
-                                  FloatingActionButton(
-                                    backgroundColor: state.breakOut != ''
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 20,
+                      child: Visibility(
+                        visible: _visibleButton,
+                        child: Container(
+                            height: 80,
+                            width: 80,
+                            child: FloatingActionButton(
+                              onPressed: () => {checkStatus(userID)},
+                              tooltip: _toolTip,
+                              backgroundColor: _colorButton,
+                              child: Icon(Icons.alarm_on,
+                                  color: Colors.white, size: 40),
+                            )),
+                      ),
+                    ),
+                    Visibility(
+                      visible: state.statusBreak == '1' ? true : false,
+                      child: Visibility(
+                        visible: state.clockIn == '--:--' ? false : true,
+                        child: Positioned(
+                          bottom: 20,
+                          right: 30,
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: Text(state.breakIn),
+                              ),
+                              FloatingActionButton(
+                                backgroundColor: (state.breakOut == '')
+                                    ? Colors.grey
+                                    : (state.breakIn != '')
                                         ? Colors.grey
                                         : null,
-                                    heroTag: 'breakOut',
-                                    onPressed: () {/* Do something */},
-                                    // child: Icon(
-                                    //   Icons.arrow_left,
-                                    //   size: 40,
-                                    // ),
-                                    child: Text('Break\nOut',
-                                        textAlign: TextAlign.center),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Positioned(
-                          left: 0,
-                          right: 0,
-                          bottom: 20,
-                          child: Visibility(
-                            visible: _visibleButton,
-                            child: Container(
-                                height: 80,
-                                width: 80,
-                                child: FloatingActionButton(
-                                  onPressed: () => {checkStatus(userID)},
-                                  tooltip: _toolTip,
-                                  backgroundColor: _colorButton,
-                                  child: Icon(Icons.alarm_on,
-                                      color: Colors.white, size: 40),
-                                )),
-                          ),
-                        ),
-                        Visibility(
-                          visible: state.statusBreak == '1' ? true : false,
-                          child: Visibility(
-                            visible: state.clockIn == '--:--' ? false : true,
-                            child: Positioned(
-                              bottom: 20,
-                              right: 30,
-                              child: Column(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 8.0),
-                                    child: Text(state.breakIn),
-                                  ),
-                                  FloatingActionButton(
-                                    backgroundColor: (state.breakOut == '')
-                                        ? Colors.grey
-                                        : (state.breakIn != '')
-                                            ? Colors.grey
-                                            : null,
-                                    heroTag: 'breakIn',
-                                    onPressed: (state.breakOut == '')
-                                        ? () {/* Button must disabled */}
-                                        : () {/* Do something */},
-                                    child: Text('Break\nIn',
-                                        textAlign: TextAlign.center),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    floatingActionButtonLocation:
-                        FloatingActionButtonLocation.centerDocked,
-                  );
-
-                default:
-                  return Scaffold(
-                    appBar: AppBar(
-                      title: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Image.asset(
-                              'assets/logo_png_ontime.png',
-                              fit: BoxFit.contain,
-                              width: MediaQuery.of(context).size.width / 4,
-                              height: MediaQuery.of(context).size.height / 14,
-                            ),
-                            Container(
-                              padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
-                            )
-                          ]),
-                      iconTheme: new IconThemeData(color: Colors.white),
-                      flexibleSpace: Container(
-                        decoration: new BoxDecoration(
-                            gradient: new LinearGradient(
-                                colors: [
-                                  const Color(0xFFFF1744),
-                                  const Color(0xFFF44336)
-                                ],
-                                begin: const FractionalOffset(0.0, 0.0),
-                                end: const FractionalOffset(1.0, 0.0),
-                                stops: [0.0, 1.0],
-                                tileMode: TileMode.clamp)),
-                      ),
-                    ),
-                    body: Shimmer.fromColors(
-                      baseColor: Colors.red,
-                      highlightColor: Colors.grey,
-                      child: LayoutBuilder(builder: (BuildContext context,
-                          BoxConstraints viewportConstraints) {
-                        return SingleChildScrollView(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                                minHeight: viewportConstraints.maxHeight),
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  height: (MediaQuery.of(context).size.height /
-                                          2) +
-                                      (MediaQuery.of(context).size.height / 10),
-                                  decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                          image: AssetImage(
-                                              'assets/background.png'),
-                                          fit: BoxFit.cover)),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      SizedBox(height: 20),
-                                      Container(
-                                        width: 300.0,
-                                        height: 300.0,
-                                        decoration: new BoxDecoration(
-                                          color: Colors.lightBlue[50]!
-                                              .withOpacity(0.2),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Column(
-                                          children: <Widget>[
-                                            SizedBox(height: 20),
-                                            Container(
-                                              width: 160.0,
-                                              height: 160.0,
-                                              decoration: new BoxDecoration(
-                                                color: Colors.grey[300],
-                                                shape: BoxShape.circle,
-                                              ),
-                                              child: Icon(
-                                                Icons.person_outline,
-                                                color: Colors.white,
-                                                size: 120.0,
-                                              ),
-                                            ),
-                                            SizedBox(height: 10),
-                                            Text(state.nama,
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text(state.jabatan,
-                                                style: TextStyle(
-                                                    color: Colors.white)),
-                                            SizedBox(height: 20),
-                                            Text(_timeString.toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 25,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text(_hariTanggal.toString(),
-                                                style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12))
-                                          ],
-                                        ),
-                                      ),
-                                      SizedBox(height: 20),
-                                      Text(
-                                        state.message,
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                      SizedBox(height: 20),
-                                      // Visibility(
-                                      //   visible: statusTotalWork,
-                                      //   child: Column(children: <Widget>[
-                                      //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
-                                      //     Text(totalWork.toString(),
-                                      //         style: TextStyle(
-                                      //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
-                                      //         )
-                                      //     ),
-                                      //   ]),
-                                      // ),
-                                    ],
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 20, right: 20, top: 15),
-                                  child: Column(
-                                    children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        children: <Widget>[
-                                          Column(children: <Widget>[
-                                            Text("Start Time",
-                                                style: TextStyle(fontSize: 18)),
-                                            Text(clockin.toString(),
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text(
-                                              state.dateIn,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ]),
-                                          Container(
-                                            height: 10,
-                                            width: 10,
-                                          ),
-                                          Column(children: <Widget>[
-                                            Text("End Time",
-                                                style: TextStyle(fontSize: 18)),
-                                            Text(state.clockOut,
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight:
-                                                        FontWeight.bold)),
-                                            Text(
-                                              state.dateOut,
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ]),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
-                        );
-                      }),
-                    ),
-                    bottomNavigationBar: Shimmer.fromColors(
-                      baseColor: Colors.white,
-                      highlightColor: Colors.grey,
-                      child: BottomAppBar(
-                        // shape: const CircularNotchedRectangle(),
-                        child: Container(height: 50.0),
-                      ),
-                    ),
-                    floatingActionButton: Shimmer.fromColors(
-                      baseColor: Colors.white,
-                      highlightColor: Colors.grey,
-                      child: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          Visibility(
-                            visible: state.statusBreak == '1' ? true : false,
-                            child: Visibility(
-                              visible: state.clockIn == '--:--' ? false : true,
-                              child: Positioned(
-                                left: 30,
-                                bottom: 20,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: Text(state.breakOut),
-                                    ),
-                                    FloatingActionButton(
-                                      backgroundColor: state.breakOut != ''
-                                          ? Colors.grey
-                                          : null,
-                                      heroTag: 'breakOut',
-                                      onPressed: () {/* Do something */},
-                                      // child: Icon(
-                                      //   Icons.arrow_left,
-                                      //   size: 40,
-                                      // ),
-                                      child: Text('Break\nOut',
-                                          textAlign: TextAlign.center),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  ],
+                                heroTag: 'breakIn',
+                                onPressed: (state.breakOut == '')
+                                    ? () {/* Button must disabled */}
+                                    : () {/* Do something */},
+                                child: Text('Break\nIn',
+                                    textAlign: TextAlign.center),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
                                 ),
                               ),
-                            ),
+                            ],
                           ),
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            bottom: 20,
-                            child: Visibility(
-                              visible: _visibleButton,
-                              child: Container(
-                                  height: 80,
-                                  width: 80,
-                                  child: FloatingActionButton(
-                                    onPressed: () => {checkStatus(userID)},
-                                    tooltip: _toolTip,
-                                    backgroundColor: _colorButton,
-                                    child: Icon(Icons.alarm_on,
-                                        color: Colors.white, size: 40),
-                                  )),
-                            ),
-                          ),
-                          Visibility(
-                            visible: state.statusBreak == '1' ? true : false,
-                            child: Visibility(
-                              visible: state.clockIn == '--:--' ? false : true,
-                              child: Positioned(
-                                bottom: 20,
-                                right: 30,
-                                child: Column(
-                                  children: [
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 8.0),
-                                      child: Text(state.breakIn),
-                                    ),
-                                    FloatingActionButton(
-                                      backgroundColor: (state.breakOut == '')
-                                          ? Colors.grey
-                                          : (state.breakIn != '')
-                                              ? Colors.grey
-                                              : null,
-                                      heroTag: 'breakIn',
-                                      onPressed: (state.breakOut == '')
-                                          ? () {/* Button must disabled */}
-                                          : () {/* Do something */},
-                                      child: Text('Break\nIn',
-                                          textAlign: TextAlign.center),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
-                    floatingActionButtonLocation:
-                        FloatingActionButtonLocation.centerDocked,
-                  );
-              }
+                  ],
+                ),
+                floatingActionButtonLocation:
+                    FloatingActionButtonLocation.centerDocked,
+              );
             },
           ),
         ),
@@ -1527,9 +1212,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Future showProgressDialog(BuildContext context) {
+  Future showProgressDialog(BuildContext loadContext) {
     return showDialog(
-      context: context,
+      context: loadContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
         return WillPopScope(
