@@ -66,9 +66,8 @@ class _CekLoginState extends State<CekLogin> {
   @override
   void initState() {
     super.initState();
-    getPref();
-    // checkConnection();
     _deleteConfig();
+    getPref();
   }
 
   @override
@@ -79,8 +78,8 @@ class _CekLoginState extends State<CekLogin> {
   getPref() async {
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    // print('query all rows getPref Profil:' + allRows.toList().toString());
-    // print('Length = ' + allRows.length.toString());
+    print('query all rows getPref Profil:' + allRows.toList().toString());
+    print('Length = ' + allRows.length.toString());
 
     if (allRows.length != 0) {
       allRows.forEach((row) => print(row));
@@ -91,73 +90,26 @@ class _CekLoginState extends State<CekLogin> {
         userID = pref.getString('userID')!;
       });
 
-      if (username != null) {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/login", (Route<dynamic> routes) => false);
-        });
-      } else {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic> routes) => false);
-        });
-      }
+      Future.delayed(const Duration(seconds: 3), () {
+        if (username != null) {
+          Future.delayed(const Duration(microseconds: 2000), () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/login", (Route<dynamic> routes) => false);
+          });
+        } else {
+          Future.delayed(const Duration(microseconds: 2000), () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/profile", (Route<dynamic> routes) => false);
+          });
+        }
+      });
     } else {
       ip = Endpoint.baseUrl;
       Future.delayed(const Duration(microseconds: 2000), () {
         Navigator.pushNamedAndRemoveUntil(
-            context, "/login", (Route<dynamic> routes) => false);
+            context, "/profile", (Route<dynamic> routes) => false);
       });
     }
-
-    // print("IP = " + ip);
-//
-//    ApiServices services = ApiServices();
-//    print('servis');
-//    var response = await services.CheckKoneksi(ip);
-//    print('checkKoneksi');
-//    print('Response service = '+response.toString());
-//    if(response == null){
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/invalid_ip", (Route<dynamic>routes)=>false);
-//      });
-//      final id = await dbHelper.queryRowCount();
-//      final rowsDeleted = await dbHelper.deleteAll();
-//      print('deleted $rowsDeleted row(s): row $id');
-//
-//    }else{
-//      SharedPreferences pref = await SharedPreferences.getInstance();
-//      setState(() {
-//        username = pref.getString('username');
-//        userID = pref.getString('userID');
-//      });
-//
-//      if(username == false){
-//        Future.delayed(const Duration(microseconds: 2000),(){
-//          Navigator.pushNamedAndRemoveUntil(context, "/login", (Route<dynamic>routes)=>false);
-//        });
-//      }else{
-//        Future.delayed(const Duration(microseconds: 2000),(){
-//          Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-//        });
-//      }
-//
-//
-//
-//    }
-  }
-
-  Future<void> checkConnection() async {
-//    var connectivityResult = await (Connectivity().checkConnectivity());
-//    if (connectivityResult == ConnectivityResult.mobile) {
-//      // I am connected to a mobile network.
-//      Future.delayed(const Duration(microseconds: 2000),(){
-//        Navigator.pushNamedAndRemoveUntil(context, "/no_connection", (Route<dynamic>routes)=>false);
-//      });
-//
-//    } else if (connectivityResult == ConnectivityResult.wifi) {
-    getPref();
-//    }
   }
 
   @override

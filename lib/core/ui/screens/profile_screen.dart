@@ -528,33 +528,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   getPref() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
+    var pref = await SharedPreferences.getInstance();
 
-    setState(() {
-      username = pref.getString('username')!;
-      password = pref.getString('password')!;
-      userID = pref.getString('userID').toString();
-      // clockin = pref.getString('clock_in')!;
-      imageUrl = pref.getString('imageUrl')!;
-      _status = pref.getString('status')!;
-      // _isCheckin = pref.getBool('isCheckin');
-      // _isCheckout = pref.getBool('isCheckout');
-    });
+    if (pref.getString('username') == null) {
+      _profileBloc.add(InitialProfile());
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.pushNamedAndRemoveUntil(
+            context, "/login", (Route<dynamic> routes) => false);
+      });
+    } else {
+      setState(() {
+        username = pref.getString('username')!;
+        password = pref.getString('password')!;
+        userID = pref.getString('userID').toString();
+        // clockin = pref.getString('clock_in')!;
+        imageUrl = pref.getString('imageUrl')!;
+        _status = pref.getString('status')!;
+        // _isCheckin = pref.getBool('isCheckin');
+        // _isCheckout = pref.getBool('isCheckout');
+      });
+
+      timer = new Timer(new Duration(seconds: 1), () {
+        // debugPrint("Print after 1 seconds");
+        getProfil(userID, date);
+      });
+    }
 
     // print("_isCheckin = " + _isCheckin.toString());
     // print("_isCheckout = " + _isCheckout.toString());
 
     print('userID => ' + userID);
 
-    if (username != '') {
-      timer = new Timer(new Duration(seconds: 1), () {
-        // debugPrint("Print after 1 seconds");
-        getProfil(userID, date);
-      });
-    } else {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/login", (Route<dynamic> routes) => false);
-    }
+    // if (username != '') {
+    //   timer = new Timer(new Duration(seconds: 1), () {
+    //     // debugPrint("Print after 1 seconds");
+    //     getProfil(userID, date);
+    //   });
+    // } else {
+    //   Navigator.pushNamedAndRemoveUntil(
+    //       context, "/login", (Route<dynamic> routes) => false);
+    // }
 
     if (clockin.isEmpty) {
       clockin = "--:--";
@@ -1238,9 +1251,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   logout() {
+    showProgressDialog(context);
     savePref();
-
-    Future.delayed(const Duration(microseconds: 2000), () {
+    Future.delayed(const Duration(seconds: 1), () {
       Navigator.pushNamedAndRemoveUntil(
           context, "/login", (Route<dynamic> routes) => false);
     });
