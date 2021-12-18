@@ -17,6 +17,9 @@ class ProfileState extends Equatable {
   final String clockOut;
   final String shiftOut;
   final String totalWork;
+  final String statusBreak;
+  final String breakOut;
+  final String breakIn;
   final String message;
 
   const ProfileState({
@@ -34,6 +37,9 @@ class ProfileState extends Equatable {
     this.clockOut = '',
     this.shiftOut = '',
     this.totalWork = '',
+    this.statusBreak = '',
+    this.breakOut = '',
+    this.breakIn = '',
     this.message = '',
   });
 
@@ -52,6 +58,9 @@ class ProfileState extends Equatable {
     String? clockOut,
     String? shiftOut,
     String? totalWork,
+    String? statusBreak,
+    String? breakOut,
+    String? breakIn,
     String? message,
   }) {
     return ProfileState(
@@ -69,6 +78,9 @@ class ProfileState extends Equatable {
       clockOut: clockOut ?? this.clockOut,
       shiftOut: shiftOut ?? this.shiftOut,
       totalWork: totalWork ?? this.totalWork,
+      statusBreak: statusBreak ?? this.statusBreak,
+      breakOut: breakOut ?? this.breakOut,
+      breakIn: breakIn ?? this.breakIn,
       message: message ?? this.message,
     );
   }
@@ -89,6 +101,9 @@ class ProfileState extends Equatable {
         this.clockOut,
         this.shiftOut,
         this.totalWork,
+        this.statusBreak,
+        this.breakOut,
+        this.breakIn,
         this.message
       ];
 }

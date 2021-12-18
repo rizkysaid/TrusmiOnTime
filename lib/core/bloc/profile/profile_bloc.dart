@@ -34,6 +34,9 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         clockOut: profile['clock_out'],
         shiftOut: profile['shift_out'],
         totalWork: profile['total_work'],
+        statusBreak: profile['status_break'],
+        breakOut: profile['break_out'],
+        breakIn: profile['break_in'],
         message: profile['message'],
       ));
     } catch (e) {
