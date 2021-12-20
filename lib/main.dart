@@ -78,8 +78,8 @@ class _CekLoginState extends State<CekLogin> {
   getPref() async {
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    print('query all rows getPref Profil:' + allRows.toList().toString());
-    print('Length = ' + allRows.length.toString());
+    // print('query all rows getPref Profil:' + allRows.toList().toString());
+    // print('Length = ' + allRows.length.toString());
 
     if (allRows.length != 0) {
       allRows.forEach((row) => print(row));

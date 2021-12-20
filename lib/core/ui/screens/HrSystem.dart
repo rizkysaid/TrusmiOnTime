@@ -40,9 +40,9 @@ class _HrSystemState extends State<HrSystem> {
     String username = args.username;
     String password = args.password;
     String urlAbsen = Endpoint.baseIp +
-        "/hr/bypass/login/" +
+        "/hr/bypass/login2?a=" +
         username.toString() +
-        "/" +
+        "&z=" +
         password.toString();
     print("ip=" + urlAbsen);
 

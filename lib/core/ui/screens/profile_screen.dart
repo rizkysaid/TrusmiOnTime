@@ -10,7 +10,7 @@ import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'PassParams.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +18,7 @@ import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -39,7 +40,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // static String totalWork = '';
   String _status = '';
   bool _isCheckin = false;
-  bool _isCheckout = false;
+  // bool _isCheckout = false;
   bool statusPhoto = false;
   bool statusIcon = true;
   bool _visibleButton = true;
@@ -66,6 +67,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? imageFile;
 
   void _getFromCamera() async {
+    _profileBloc.add(InitialProfile());
     // Capture a photo
     final ImagePicker _picker = ImagePicker();
     final XFile? pickedFile = await _picker.pickImage(
@@ -93,9 +95,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       } else {
         prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
       }
+      print('inititall');
+      _profileBloc.add(InitialProfile());
     }
-
-    _profileBloc.add(InitialProfile());
   }
 
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
@@ -120,13 +122,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('proses checkin => ' + response.statusCode.toString());
 
     if (response.statusCode == 201) {
+      _profileBloc.add(InitialProfile());
       getProfil(usrId, date);
     } else {
       print(response.statusCode);
     }
   }
 
-  Future<void> prosesCheckout(String usrId, String clockIn, File imageFile,
+  Future<void> prosesCheckout(String usrId, String clockOut, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkout);
     var request = new http.MultipartRequest("POST", uri);
@@ -139,7 +142,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     request.files.add(multiPartFile);
     request.fields['employee_id'] = usrId;
-    request.fields['clock_out'] = clockIn;
+    request.fields['clock_out'] = clockOut;
     request.fields['id_shift'] = idShift;
     request.fields['shift'] = shift;
 
@@ -148,13 +151,63 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('response.status.checkout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
+      _profileBloc.add(InitialProfile());
       getProfil(usrId, date);
     } else {
       print(response.statusCode);
     }
   }
 
-  // bool _saving = false;
+  // BREAK OUT
+  Future<void> prosesBreakOut(
+      String usrId, String breakOut, String idShift, String shift) async {
+    _profileBloc.add(InitialProfile());
+
+    var uri = Uri.parse(Endpoint.breakout);
+    var request = new http.MultipartRequest("POST", uri);
+
+    request.fields['employee_id'] = usrId;
+    request.fields['break_out'] = breakOut;
+    request.fields['id_shift'] = idShift;
+    request.fields['shift'] = shift;
+
+    var response = await request.send();
+
+    print('response.status.breakout => ' + response.statusCode.toString());
+
+    if (response.statusCode == 200) {
+      getProfil(usrId, date);
+      ToastUtils.show(
+          "Selamat istirahat, manfaatkan waktu istirahatmu dengan baik");
+    } else {
+      print(response.statusCode);
+    }
+  }
+
+  // BREAK OUT
+  Future<void> prosesBreakIn(
+      String usrId, String breakIn, String idShift, String shift) async {
+    _profileBloc.add(InitialProfile());
+
+    var uri = Uri.parse(Endpoint.breakin);
+    var request = new http.MultipartRequest("POST", uri);
+
+    request.fields['employee_id'] = usrId;
+    request.fields['break_in'] = breakIn;
+    request.fields['id_shift'] = idShift;
+    request.fields['shift'] = shift;
+
+    var response = await request.send();
+
+    print('response.status.breakout => ' + response.statusCode.toString());
+
+    if (response.statusCode == 200) {
+      getProfil(usrId, date);
+      ToastUtils.show("Selamat bekerja kembali");
+    } else {
+      print(response.statusCode);
+    }
+  }
 
   List<ProfileModel> productProfile = [];
   final ProfileBloc _profileBloc = ProfileBloc();
@@ -244,8 +297,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    // print('query all rows get profil profile screen:');
-    // print('Length = ' + allRows.length.toString());
 
     if (allRows.length != 0) {
       ip = allRows[0]['ip_address'];
@@ -528,8 +579,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   getPref() async {
+    _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
-    print('pref=>' + pref.getString('username').toString());
     if (pref.getString('username') == null) {
       logout();
     } else {
@@ -538,7 +589,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         password = pref.getString('password')!;
         userID = pref.getString('userID').toString();
         // clockin = pref.getString('clock_in')!;
-        imageUrl = pref.getString('imageUrl')!;
+        // imageUrl = pref.getString('imageUrl')!;
         _status = pref.getString('status')!;
         // _isCheckin = pref.getBool('isCheckin');
         // _isCheckout = pref.getBool('isCheckout');
@@ -552,8 +603,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // print("_isCheckin = " + _isCheckin.toString());
     // print("_isCheckout = " + _isCheckout.toString());
-
-    print('userID => ' + userID);
 
     // if (username != '') {
     //   timer = new Timer(new Duration(seconds: 1), () {
@@ -598,7 +647,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: _profileBloc,
           listener: (context, state) {
-            print('listener =>' + state.status.toString());
+            print('listener status =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
                 setState(() {
@@ -610,30 +659,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (state.clockIn == "--:--") {
                       setState(() {
                         _isCheckin = false;
-                        _isCheckout = false;
+                        // _isCheckout = false;
                       });
 
-                      if (_isCheckin == true && state.clockIn == "--:--") {
-                        Future.delayed(const Duration(microseconds: 3000), () {
-                          Navigator.pushNamedAndRemoveUntil(context, "/profile",
-                              (Route<dynamic> routes) => false);
-                        });
-                      } else {
+                      setState(() {
                         statusPhoto = false;
                         statusIcon = true;
                         imageUrl = "";
                         _colorButton = Colors.red;
                         clockout = state.clockOut;
                         clockin = state.clockIn;
-                        // statusTotalWork = false;
                         _visibleButton = true;
                         _status = "checkin";
-                        shift = shiftIn;
-                        // pref.remove('shift');
-                        // pref.setString('shift', shiftIn);
-
-                        // _saving = false;
-                      }
+                        shift = state.shiftIn;
+                      });
 
                       print('con. 2 => state.clockIn = ' +
                           state.clockIn +
@@ -644,31 +683,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     } else if (state.clockOut == "--:--") {
                       if (_isCheckin == true) {
                         setState(() {
-                          _isCheckout = false;
+                          // _isCheckout = false;
                         });
                       }
 
-                      if (_isCheckout == true && state.clockOut == "--:--") {
-                        Future.delayed(const Duration(microseconds: 3000), () {
-                          Navigator.pushNamedAndRemoveUntil(context, "/profile",
-                              (Route<dynamic> routes) => false);
-                        });
-                      } else {
+                      setState(() {
                         clockin = state.clockIn;
                         clockout = state.clockOut;
                         statusPhoto = true;
                         statusIcon = false;
                         imageUrl = state.photoIn;
                         _colorButton = Colors.deepOrange;
-                        // statusTotalWork = false;
                         _visibleButton = true;
                         _status = "checkout";
-                        shift = shiftOut;
-                        // pref.remove('shift');
-                        // pref.setString('shift', shiftOut);
-
-                        // _saving = false;
-                      }
+                        shift = state.shiftOut;
+                      });
 
                       print('con. 3 => state.clockIn = ' +
                           state.clockIn +
@@ -679,27 +708,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     } else {
                       if (state.clockIn != "--:--" &&
                           state.clockOut != "--:--") {
-                        clockin = state.clockIn;
-                        clockout = state.clockOut;
-                        statusPhoto = true;
-                        statusIcon = false;
-                        imageUrl = state.photoIn;
-                        _colorButton = Colors.red;
-                        // statusTotalWork = true;
-                        _visibleButton = false;
-                        _status = "checkin";
-                        shift = shiftIn;
-                        // pref.remove('shift');
-                        // pref.setString('shift', shiftIn);
-
-                        // _saving = false;
-
                         print('con. 1 => state.clockIn = ' +
                             state.clockIn +
                             ' dataClockout = ' +
                             state.clockOut);
                         //kondisi sudah checkin & sudah checkout
 
+                        setState(() {
+                          clockin = state.clockIn;
+                          clockout = state.clockOut;
+                          statusPhoto = true;
+                          statusIcon = false;
+                          imageUrl = state.photoIn;
+                          _colorButton = Colors.red;
+                          _visibleButton = false;
+                          _status = "checkin";
+                          shift = state.shiftIn;
+                        });
                       }
                     }
                   }
@@ -709,30 +734,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   if (state.clockIn == "--:--" && state.clockOut == "--:--") {
                     setState(() {
                       _isCheckin = false;
-                      _isCheckout = false;
+                      // _isCheckout = false;
                     });
 
-                    if (_isCheckin == true && state.clockIn == "--:--") {
-                      Future.delayed(const Duration(microseconds: 3000), () {
-                        Navigator.pushNamedAndRemoveUntil(context, "/profile",
-                            (Route<dynamic> routes) => false);
-                      });
-                    } else {
+                    setState(() {
                       statusPhoto = false;
                       statusIcon = true;
                       imageUrl = "";
                       _colorButton = Colors.red;
                       clockout = state.clockOut;
                       clockin = state.clockIn;
-                      // statusTotalWork = false;
                       _visibleButton = true;
                       _status = "checkin";
-                      shift = shiftIn;
-                      // pref.remove('shift');
-                      // pref.setString('shift', shiftIn);
-
-                      // _saving = false;
-                    }
+                      shift = state.shiftIn;
+                    });
 
                     print('con. 2 => state.clockIn = ' +
                         state.clockIn +
@@ -744,31 +759,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       state.clockOut == "--:--") {
                     if (_isCheckin == true) {
                       setState(() {
-                        _isCheckout = false;
+                        // _isCheckout = false;
                       });
                     }
 
-                    if (_isCheckout == true && state.clockOut == "--:--") {
-                      Future.delayed(const Duration(microseconds: 3000), () {
-                        Navigator.pushNamedAndRemoveUntil(context, "/profile",
-                            (Route<dynamic> routes) => false);
-                      });
-                    } else {
+                    setState(() {
                       clockin = state.clockIn;
                       clockout = state.clockOut;
                       statusPhoto = true;
                       statusIcon = false;
                       imageUrl = state.photoIn;
                       _colorButton = Colors.deepOrange;
-                      // statusTotalWork = false;
                       _visibleButton = true;
                       _status = "checkout";
-                      shift = shiftOut;
-                      // pref.remove('shift');
-                      // pref.setString('shift', shiftOut);
-
-                      // _saving = false;
-                    }
+                      shift = state.shiftOut;
+                    });
 
                     print('con. 3 => state.clockIn = ' +
                         state.clockIn +
@@ -777,22 +782,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //kondisi sudah checkin & belum checkout
 
                   } else if (dateOut != dateId) {
-                    clockin = state.clockIn;
-                    clockout = state.clockOut;
-                    dateOut = "";
-                    dateIn = "";
-                    statusPhoto = true;
-                    statusIcon = false;
-                    imageUrl = state.photoIn;
-                    _colorButton = Colors.red;
-                    // statusTotalWork = false;
-                    _visibleButton = true;
-                    _status = "checkin";
-                    shift = shiftIn;
-                    // pref.remove('shift');
-                    // pref.setString('shift', shiftIn);
-
-                    // _saving = false;
+                    setState(() {
+                      clockin = state.clockIn;
+                      clockout = state.clockOut;
+                      dateOut = "";
+                      dateIn = "";
+                      statusPhoto = true;
+                      statusIcon = false;
+                      imageUrl = state.photoIn;
+                      _colorButton = Colors.red;
+                      _visibleButton = true;
+                      _status = "checkin";
+                      shift = state.shiftIn;
+                    });
 
                     print('con. 4 => state.clockIn = ' +
                         state.clockIn +
@@ -801,20 +803,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     //kondisi tanggal checkout tidak sama dengan tgl hari ini
 
                   } else {
-                    statusPhoto = true;
-                    statusIcon = false;
-                    clockin = state.clockIn;
-                    clockout = state.clockOut;
-                    imageUrl = state.photoIn;
-                    _visibleButton = true;
-                    // statusTotalWork = true;
-                    _status = "checkin";
-                    shift = shiftIn;
-                    // pref.remove('shift');
-                    // pref.setString('shift', shiftIn);
-                    // _colorButton = Colors.red[700];
-
-                    // _saving = false;
+                    setState(() {
+                      statusPhoto = true;
+                      statusIcon = false;
+                      clockin = state.clockIn;
+                      clockout = state.clockOut;
+                      imageUrl = state.photoIn;
+                      _visibleButton = true;
+                      _status = "checkin";
+                      shift = state.shiftIn;
+                    });
 
                     print('con. 5 => state.clockIn = ' +
                         state.clockIn +
@@ -824,6 +822,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }
                 }
                 Navigator.of(context, rootNavigator: true).pop(context);
+
                 break;
               case ProfileStatus.failure:
                 Navigator.of(context, rootNavigator: true).pop(context);
@@ -841,6 +840,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: BlocBuilder<ProfileBloc, ProfileState>(
             bloc: _profileBloc,
             builder: (context, state) {
+              print('status buider => ' + state.status.toString());
               return Scaffold(
                 appBar: AppBar(
                   title: Row(
@@ -960,6 +960,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 body: LayoutBuilder(builder:
                     (BuildContext context, BoxConstraints viewportConstraints) {
+                  String networkImageUrl = Endpoint.urlFoto + '/' + imageUrl;
                   return SingleChildScrollView(
                     child: ConstrainedBox(
                       constraints: BoxConstraints(
@@ -998,12 +999,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
                                             shape: BoxShape.circle,
-                                            image: new DecorationImage(
+                                            image: DecorationImage(
                                               fit: BoxFit.cover,
                                               image: new NetworkImage(
-                                                  Endpoint.urlFoto +
-                                                      "/" +
-                                                      imageUrl.toString()),
+                                                networkImageUrl,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -1138,14 +1138,32 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 child: Text(state.breakOut),
                               ),
                               FloatingActionButton(
-                                backgroundColor:
-                                    state.breakOut != '' ? Colors.grey : null,
+                                backgroundColor: state.breakOut != ''
+                                    ? Colors.grey
+                                    : Color(0xff12cad6),
                                 heroTag: 'breakOut',
-                                onPressed: () {/* Do something */},
-                                // child: Icon(
-                                //   Icons.arrow_left,
-                                //   size: 40,
-                                // ),
+                                onPressed: (state.breakOut == '')
+                                    ? () {
+                                        AwesomeDialog(
+                                          context: context,
+                                          dialogType: DialogType.QUESTION,
+                                          animType: AnimType.BOTTOMSLIDE,
+                                          title: 'Break Out',
+                                          desc:
+                                              'Apakah anda yakin sudah masuk jam istirahat?',
+                                          btnCancelText: "Belum",
+                                          btnOkText: "Sudah",
+                                          btnCancelOnPress: () {},
+                                          btnOkOnPress: () {
+                                            prosesBreakOut(
+                                                state.userId,
+                                                '${DateTime.now()}',
+                                                state.idShift,
+                                                state.shiftOut);
+                                          },
+                                        )..show();
+                                      }
+                                    : () {/*Button break out disabled*/},
                                 child: Text('Break\nOut',
                                     textAlign: TextAlign.center),
                                 shape: RoundedRectangleBorder(
@@ -1158,8 +1176,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     Positioned(
-                      left: 0,
-                      right: 0,
+                      left: 100,
+                      right: 100,
                       bottom: 20,
                       child: Visibility(
                         visible: _visibleButton,
@@ -1193,11 +1211,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ? Colors.grey
                                     : (state.breakIn != '')
                                         ? Colors.grey
-                                        : null,
+                                        : Color(0xff12cad6),
                                 heroTag: 'breakIn',
-                                onPressed: (state.breakOut == '')
+                                onPressed: (state.breakIn != '')
                                     ? () {/* Button must disabled */}
-                                    : () {/* Do something */},
+                                    : () {
+                                        AwesomeDialog(
+                                          context: context,
+                                          dialogType: DialogType.QUESTION,
+                                          animType: AnimType.BOTTOMSLIDE,
+                                          title: 'Break In',
+                                          desc:
+                                              'Waktu istirahat sudah selesai?',
+                                          btnCancelText: "Belum",
+                                          btnOkText: "Sudah",
+                                          btnCancelOnPress: () {},
+                                          btnOkOnPress: () {
+                                            prosesBreakIn(
+                                                state.userId,
+                                                '${DateTime.now()}',
+                                                state.idShift,
+                                                state.shiftOut);
+                                          },
+                                        )..show();
+                                      },
                                 child: Text('Break\nIn',
                                     textAlign: TextAlign.center),
                                 shape: RoundedRectangleBorder(
@@ -1238,6 +1275,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  showSuccessDialog(BuildContext successContext, status) {
+    String title = '';
+    if (status == 'checkin') {
+      title = "Success Check In";
+    } else {
+      title = "Success Check Out";
+    }
+
+    return AwesomeDialog(
+      context: successContext,
+      dialogType: DialogType.SUCCES,
+      animType: AnimType.BOTTOMSLIDE,
+      title: title,
+      // desc: 'Ingin istirahat sekarang?',
+      // btnCancelText: "Nanti",
+      // btnOkText: "Ya",
+      // btnCancelOnPress: () {},
+      btnOkOnPress: () {},
+    )..show();
+  }
+
   String _formatDateTime(DateTime dateTime) {
     return DateFormat('HH:mm:ss').format(dateTime);
   }
@@ -1248,7 +1306,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   logout() {
     _profileBloc.add(InitialProfile());
-    savePref();
+    removePref();
     Future.delayed(const Duration(seconds: 1), () {
       Navigator.pushNamedAndRemoveUntil(
           context, "/login", (Route<dynamic> routes) => false);
@@ -1272,7 +1330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         arguments: PassParams(username, password));
   }
 
-  savePref() async {
+  removePref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.remove('username');
@@ -1282,6 +1340,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   checkStatus(userId) async {
+    // print(userId);
     _profileBloc.add(InitialProfile());
 
     // setState(() {
@@ -1296,8 +1355,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
-    // print('query all rows check status profil screen:' + dbHelper.toString());
-    // print('Length = ' + allRows.length.toString());
 
     if (allRows.length != 0) {
       ip = allRows[0]['ip_address'];
@@ -1321,65 +1378,66 @@ class _ProfileScreenState extends State<ProfileScreen> {
       //   _saving = false;
       // });
 
+      _profileBloc.add(InitialProfile());
+
       if (response.data.aktif == '1') {
         if (response.data.achive == true) {
           _getFromCamera();
           // Navigator.pushNamed(context, "/camera",
           //     arguments: ScreenArguments(userID, _status, idShift, shift));
         } else {
-          Alert(
-              context: context,
-              style: alertStyle,
-              type: AlertType.error,
-              title: "Anda tidak bisa melakukan absen!",
-              desc: response.data.message,
-              buttons: [
-                DialogButton(
-                  child: Text(
-                    "Kembali",
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                  ),
-                  onPressed: () => {
-                    Future.delayed(const Duration(microseconds: 2000), () {
-                      Navigator.pushNamedAndRemoveUntil(context, "/profile",
-                          (Route<dynamic> routes) => false);
-                    })
-                  },
-                  width: 120,
-                )
-              ]).show();
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.ERROR,
+            title: "Anda tidak bisa melakukan absen!",
+            desc: response.data.message,
+            btnOkText: "Kembali",
+            btnOkOnPress: () {
+              Future.delayed(const Duration(microseconds: 2000), () {
+                Navigator.pushNamedAndRemoveUntil(
+                    context, "/profile", (Route<dynamic> routes) => false);
+              });
+            },
+            // buttons: [
+            //   DialogButton(
+            //     child: Text(
+            //       "Kembali",
+            //       style: TextStyle(color: Colors.white, fontSize: 20),
+            //     ),
+            //     onPressed: () => {
+            //       Future.delayed(const Duration(microseconds: 2000), () {
+            //         Navigator.pushNamedAndRemoveUntil(context, "/profile",
+            //             (Route<dynamic> routes) => false);
+            //       })
+            //     },
+            //     width: 120,
+            //   )
+            // ]
+          )..show();
         }
       } else {
-        Alert(
-            context: context,
-            style: alertStyle,
-            type: AlertType.error,
-            title: "Anda tidak bisa melakukan absen!",
-            desc: "Akun anda telah dinonaktifkan.",
-            buttons: [
-              DialogButton(
-                child: Text(
-                  "Logout",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),
-                onPressed: () => {logout()},
-                width: 120,
-              )
-            ]).show();
+        AwesomeDialog(
+          context: context,
+          dialogType: DialogType.ERROR,
+          title: "Anda tidak bisa melakukan absen!",
+          desc: "Akun anda telah dinonaktifkan.",
+          btnOkText: "Logout",
+          btnOkOnPress: () {
+            logout();
+          },
+          // buttons: [
+          //   DialogButton(
+          //     child: Text(
+          //       "Logout",
+          //       style: TextStyle(color: Colors.white, fontSize: 20),
+          //     ),
+          //     onPressed: () => {logout()},
+          //     width: 120,
+          //   )
+          // ]
+        )..show();
       }
     }
     // }
   }
-
-  var alertStyle = AlertStyle(
-      animationType: AnimationType.fromTop,
-      isCloseButton: false,
-      isOverlayTapDismiss: false,
-      descStyle: TextStyle(fontWeight: FontWeight.bold),
-      animationDuration: Duration(milliseconds: 400),
-      alertBorder: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(0.0),
-        side: BorderSide(color: Colors.grey),
-      ),
-      titleStyle: TextStyle(color: Colors.red));
 }

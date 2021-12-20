@@ -17,6 +17,8 @@ class Endpoint {
   static String urlFoto = "$_baseIP/hr_upload";
   static String urlGif = "$_baseIP/img";
   static String urlProfile = "$_baseIP/hr/uploads/profile/";
+  static String breakout = "$_baseURL/break_out";
+  static String breakin = "$_baseURL/break_in";
 
   getIP() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
