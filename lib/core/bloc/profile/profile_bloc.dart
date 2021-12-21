@@ -18,7 +18,6 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     try {
       final profile = await apiServices.profil(
           event.ip, event.userID, event.date, event.apiToken);
-      // print(profile);
       return emit(state.copyWith(
         status: ProfileStatus.success,
         userId: profile['user_id'],

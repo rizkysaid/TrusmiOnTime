@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:login_absen/core/models/CheckHolidaysModel.dart';
-
 import 'package:login_absen/core/models/CheckKoneksiModel.dart';
 import 'package:login_absen/core/models/CheckStatusModel.dart';
 import 'package:http/http.dart' as http;
@@ -134,18 +132,16 @@ class ApiServices {
     }
   }
 
-  Future<CheckHolidaysModel> checkHolidays(ip, userID) async {
-    var response = await http.get(Uri.parse(ip + '/check_holidays/' + userID));
-    // print('ip => ' + ip);
-    // print('userId => ' + userID);
-    // print("Response CekHolidays Status : ${response.statusCode}");
-    // print("Response CekHolidays Body : ${response.body}");
-    if (response.statusCode == 200) {
-      CheckHolidaysModel responseBirthday =
-          CheckHolidaysModel.fromJson(jsonDecode(response.body));
-      return responseBirthday;
-    } else {
-      throw response.statusCode;
+  Future<dynamic> checkHolidays(ip, userID) async {
+    try {
+      var response = await dio.get(ip + '/check_holidays/' + userID);
+      print('ip => ' + ip);
+      print('userId => ' + userID);
+      print("Response CekHolidays Status : ${response.data['status']}");
+      print("Response CekHolidays Body : ${response.data}");
+      return response.data;
+    } catch (e) {
+      return null;
     }
   }
 }

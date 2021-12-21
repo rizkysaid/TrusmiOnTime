@@ -43,6 +43,7 @@ dependencies:
   dio: ^4.0.4
   shimmer: ^2.0.0
   awesome_dialog: ^2.1.2
+  material_dialogs: ^1.1.1
 
 dev_dependencies:
   flutter_test:

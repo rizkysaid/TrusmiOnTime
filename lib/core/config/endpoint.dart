@@ -16,6 +16,7 @@ class Endpoint {
   static String baseIp = "$_baseIP";
   static String urlFoto = "$_baseIP/hr_upload";
   static String urlGif = "$_baseIP/img";
+  static String urlLottie = "$_baseIP/lottie/";
   static String urlProfile = "$_baseIP/hr/uploads/profile/";
   static String breakout = "$_baseURL/break_out";
   static String breakin = "$_baseURL/break_in";

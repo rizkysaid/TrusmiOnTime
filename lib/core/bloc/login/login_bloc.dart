@@ -26,7 +26,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           ctmPassword: response[0]['ctm_password'],
           userId: response[0]['user_id'],
           officeShiftId: response[0]['office_shift_id'],
-          message: "Login success",
+          message: "Welcome " + response[0]['name'],
         ));
       } else {
         emit(state.copyWith(

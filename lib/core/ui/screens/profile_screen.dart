@@ -19,6 +19,8 @@ import 'package:date_format/date_format.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -100,6 +102,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  bool isShowSuccessCheckin = false;
+  bool isShowSuccessCheckout = false;
+
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkin);
@@ -124,6 +129,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response.statusCode == 201) {
       _profileBloc.add(InitialProfile());
       getProfil(usrId, date);
+      if (!isShowSuccessCheckin) {
+        showSuccessDialog(context, 'checkin');
+      }
     } else {
       print(response.statusCode);
     }
@@ -153,6 +161,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response.statusCode == 200) {
       _profileBloc.add(InitialProfile());
       getProfil(usrId, date);
+      if (!isShowSuccessCheckout) {
+        showSuccessDialog(context, 'checkout');
+      }
     } else {
       print(response.statusCode);
     }
@@ -294,6 +305,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> getProfil(userID, date) async {
+    _profileBloc.add(InitialProfile());
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
@@ -312,270 +324,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         apiToken: apiToken,
       ),
     );
-
-    // ApiServices services = ApiServices();
-    // var response = await services.profil(ip, userID, date, apiToken);
-
-    // if (response == null) {
-    //   Future.delayed(const Duration(microseconds: 2000), () {
-    //     Navigator.pushNamedAndRemoveUntil(
-    //         context, "/invalid_ip", (Route<dynamic> routes) => false);
-    //   });
-    // } else {
-    //   // print('Ini responsnya : '+response.toString());
-    //   String dataNama = response[0].data.nama.toString();
-    //   String dataJabatan = response[0].data.jabatan.toString();
-    //   String dataClockIn = response[0].data.clockIn.toString();
-    //   String dataClockOut = response[0].data.clockOut.toString();
-    //   String dataImageUrl = response[0].data.photoIn.toString();
-    //   message = response[0].message.toString();
-    //   // totalWork = response[0].data.totalWork.toString();
-    //   photoProfile = response[0].data.fotoProfil.toString();
-    //   dateIn = response[0].data.dateIn.toString();
-    //   dateOut = response[0].data.dateOut.toString();
-
-    //   idShift = response[0].data.idShift.toString();
-    //   shiftIn = response[0].data.shiftIn.toString();
-    //   shiftOut = response[0].data.shiftOut.toString();
-
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-
-    //   try {
-    //     if (response[0].status == true) {
-
-    //       setState(() {
-    //         // _saving = true;
-    //         nama = dataNama;
-    //         jabatan = dataJabatan;
-    //         pref.setString('idShift', idShift);
-
-    //         if (idShift != '3') {
-    //           if (dataClockIn != dateId) {
-    //             if (dataClockIn == "--:--") {
-    //               setState(() {
-    //                 _isCheckin = false;
-    //                 _isCheckout = false;
-    //               });
-
-    //               if (_isCheckin == true && dataClockIn == "--:--") {
-    //                 Future.delayed(const Duration(microseconds: 3000), () {
-    //                   Navigator.pushNamedAndRemoveUntil(context, "/profile",
-    //                       (Route<dynamic> routes) => false);
-    //                 });
-    //               } else {
-    //                 statusPhoto = false;
-    //                 statusIcon = true;
-    //                 imageUrl = "";
-    //                 _colorButton = Colors.red[700];
-    //                 clockout = dataClockOut;
-    //                 clockin = dataClockIn;
-    //                 // statusTotalWork = false;
-    //                 _visibleButton = true;
-    //                 _status = "checkin";
-    //                 shift = shiftIn;
-    //                 pref.remove('shift');
-    //                 pref.setString('shift', shiftIn);
-
-    //                 _saving = false;
-    //               }
-
-    //               print('con. 2 => dataClockIn = ' +
-    //                   dataClockIn +
-    //                   ' dataClockout = ' +
-    //                   dataClockOut);
-    //               //kondisi belum checkin
-
-    //             } else if (dataClockOut == "--:--") {
-    //               if (_isCheckin == true) {
-    //                 setState(() {
-    //                   _isCheckout = false;
-    //                 });
-    //               }
-
-    //               if (_isCheckout == true && dataClockOut == "--:--") {
-    //                 Future.delayed(const Duration(microseconds: 3000), () {
-    //                   Navigator.pushNamedAndRemoveUntil(context, "/profile",
-    //                       (Route<dynamic> routes) => false);
-    //                 });
-    //               } else {
-    //                 clockin = dataClockIn;
-    //                 clockout = dataClockOut;
-    //                 statusPhoto = true;
-    //                 statusIcon = false;
-    //                 imageUrl = dataImageUrl;
-    //                 _colorButton = Colors.deepOrange;
-    //                 // statusTotalWork = false;
-    //                 _visibleButton = true;
-    //                 _status = "checkout";
-    //                 shift = shiftOut;
-    //                 pref.remove('shift');
-    //                 pref.setString('shift', shiftOut);
-
-    //                 _saving = false;
-    //               }
-
-    //               print('con. 3 => dataClockIn = ' +
-    //                   dataClockIn +
-    //                   ' dataClockout = ' +
-    //                   dataClockOut);
-    //               //kondisi sudah checkin & belum checkout
-
-    //             } else {
-    //               if (dataClockIn != "--:--" && dataClockOut != "--:--") {
-    //                 clockin = dataClockIn;
-    //                 clockout = dataClockOut;
-    //                 statusPhoto = true;
-    //                 statusIcon = false;
-    //                 imageUrl = dataImageUrl;
-    //                 _colorButton = Colors.red[700];
-    //                 // statusTotalWork = true;
-    //                 _visibleButton = false;
-    //                 _status = "checkin";
-    //                 shift = shiftIn;
-    //                 pref.remove('shift');
-    //                 pref.setString('shift', shiftIn);
-
-    //                 _saving = false;
-
-    //                 print('con. 1 => dataClockIn = ' +
-    //                     dataClockIn +
-    //                     ' dataClockout = ' +
-    //                     dataClockOut);
-    //                 //kondisi sudah checkin & sudah checkout
-
-    //               }
-    //             }
-    //           }
-    //         } else {
-    //           //KONDISI SIFT 3
-
-    //           if (dataClockIn == "--:--" && dataClockOut == "--:--") {
-    //             setState(() {
-    //               _isCheckin = false;
-    //               _isCheckout = false;
-    //             });
-
-    //             if (_isCheckin == true && dataClockIn == "--:--") {
-    //               Future.delayed(const Duration(microseconds: 3000), () {
-    //                 Navigator.pushNamedAndRemoveUntil(
-    //                     context, "/profile", (Route<dynamic> routes) => false);
-    //               });
-    //             } else {
-    //               statusPhoto = false;
-    //               statusIcon = true;
-    //               imageUrl = "";
-    //               _colorButton = Colors.red[700];
-    //               clockout = dataClockOut;
-    //               clockin = dataClockIn;
-    //               // statusTotalWork = false;
-    //               _visibleButton = true;
-    //               _status = "checkin";
-    //               shift = shiftIn;
-    //               pref.remove('shift');
-    //               pref.setString('shift', shiftIn);
-
-    //               _saving = false;
-    //             }
-
-    //             print('con. 2 => dataClockIn = ' +
-    //                 dataClockIn +
-    //                 ' dataClockout = ' +
-    //                 dataClockOut);
-    //             //kondisi belum checkin
-
-    //           } else if (dataClockIn != "--:--" && dataClockOut == "--:--") {
-    //             if (_isCheckin == true) {
-    //               setState(() {
-    //                 _isCheckout = false;
-    //               });
-    //             }
-
-    //             if (_isCheckout == true && dataClockOut == "--:--") {
-    //               Future.delayed(const Duration(microseconds: 3000), () {
-    //                 Navigator.pushNamedAndRemoveUntil(
-    //                     context, "/profile", (Route<dynamic> routes) => false);
-    //               });
-    //             } else {
-    //               clockin = dataClockIn;
-    //               clockout = dataClockOut;
-    //               statusPhoto = true;
-    //               statusIcon = false;
-    //               imageUrl = dataImageUrl;
-    //               _colorButton = Colors.deepOrange;
-    //               // statusTotalWork = false;
-    //               _visibleButton = true;
-    //               _status = "checkout";
-    //               shift = shiftOut;
-    //               pref.remove('shift');
-    //               pref.setString('shift', shiftOut);
-
-    //               _saving = false;
-    //             }
-
-    //             print('con. 3 => dataClockIn = ' +
-    //                 dataClockIn +
-    //                 ' dataClockout = ' +
-    //                 dataClockOut);
-    //             //kondisi sudah checkin & belum checkout
-
-    //           } else if (dateOut != dateId) {
-    //             clockin = dataClockIn;
-    //             clockout = dataClockOut;
-    //             dateOut = "";
-    //             dateIn = "";
-    //             statusPhoto = true;
-    //             statusIcon = false;
-    //             imageUrl = dataImageUrl;
-    //             _colorButton = Colors.red[700];
-    //             // statusTotalWork = false;
-    //             _visibleButton = true;
-    //             _status = "checkin";
-    //             shift = shiftIn;
-    //             pref.remove('shift');
-    //             pref.setString('shift', shiftIn);
-
-    //             _saving = false;
-
-    //             print('con. 4 => dataClockIn = ' +
-    //                 dataClockIn +
-    //                 ' dataClockout = ' +
-    //                 dataClockOut);
-    //             //kondisi tanggal checkout tidak sama dengan tgl hari ini
-
-    //           } else {
-    //             statusPhoto = true;
-    //             statusIcon = false;
-    //             clockin = dataClockIn;
-    //             clockout = dataClockOut;
-    //             imageUrl = dataImageUrl;
-    //             _visibleButton = true;
-    //             // statusTotalWork = true;
-    //             _status = "checkin";
-    //             shift = shiftIn;
-    //             pref.remove('shift');
-    //             pref.setString('shift', shiftIn);
-    //             _colorButton = Colors.red[700];
-
-    //             _saving = false;
-
-    //             print('con. 5 => dataClockIn = ' +
-    //                 dataClockIn +
-    //                 ' dataClockout = ' +
-    //                 dataClockOut);
-    //             //kondisi sift malam
-    //           }
-    //         }
-    //       });
-    //     } else {
-    //       Future.delayed(const Duration(microseconds: 2000), () {
-    //         Navigator.pushNamedAndRemoveUntil(
-    //             context, "/no_connection", (Route<dynamic> routes) => false);
-    //       });
-    //     }
-    //   } catch (err) {
-    //     print('err => '+err.toString());
-    //   }
-    // }
   }
 
   getPref() async {
@@ -595,24 +343,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         // _isCheckout = pref.getBool('isCheckout');
       });
 
-      timer = new Timer(new Duration(seconds: 1), () {
-        // debugPrint("Print after 1 seconds");
-        getProfil(userID, date);
-      });
+      // timer = new Timer(new Duration(seconds: 1), () {
+      // debugPrint("Print after 1 seconds");
+      getProfil(userID, date);
+      // });
     }
-
-    // print("_isCheckin = " + _isCheckin.toString());
-    // print("_isCheckout = " + _isCheckout.toString());
-
-    // if (username != '') {
-    //   timer = new Timer(new Duration(seconds: 1), () {
-    //     // debugPrint("Print after 1 seconds");
-    //     getProfil(userID, date);
-    //   });
-    // } else {
-    //   Navigator.pushNamedAndRemoveUntil(
-    //       context, "/login", (Route<dynamic> routes) => false);
-    // }
 
     if (clockin.isEmpty) {
       clockin = "--:--";
@@ -628,6 +363,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     if (_status.isEmpty) {
       _status = "checkin";
+    }
+  }
+
+  bool isShowHariBesar = false;
+  bool statusHariBesar = false;
+  String title = '';
+  String msg = '';
+  String gif = '';
+  bool hariBesar = false;
+
+  Future<void> checkHolidays() async {
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    ApiServices services = ApiServices();
+    var response = await services.checkHolidays(ip, userID);
+
+    print('checkHolidays => ' + response.toString());
+    if (response == null) {
+      return null;
+    } else {
+      statusHariBesar = response['status'];
+      print(response['data']);
+      if (statusHariBesar == true) {
+        setState(() {
+          hariBesar = true;
+          title = response['title'];
+          msg = response['message'];
+          gif = response['gif'];
+        });
+        if (!isShowHariBesar) {
+          showHariBesar(
+              response['lottie'], response['title'], response['message']);
+        }
+      } else {
+        setState(() {
+          hariBesar = false;
+        });
+      }
     }
   }
 
@@ -650,179 +432,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             print('listener status =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
-                setState(() {
-                  userID = state.userId;
-                  idShift = state.idShift;
-                });
-                if (state.idShift != '3') {
-                  if (state.clockIn != dateId) {
-                    if (state.clockIn == "--:--") {
-                      setState(() {
-                        _isCheckin = false;
-                        // _isCheckout = false;
-                      });
-
-                      setState(() {
-                        statusPhoto = false;
-                        statusIcon = true;
-                        imageUrl = "";
-                        _colorButton = Colors.red;
-                        clockout = state.clockOut;
-                        clockin = state.clockIn;
-                        _visibleButton = true;
-                        _status = "checkin";
-                        shift = state.shiftIn;
-                      });
-
-                      print('con. 2 => state.clockIn = ' +
-                          state.clockIn +
-                          ' dataClockout = ' +
-                          state.clockOut);
-                      //kondisi belum checkin
-
-                    } else if (state.clockOut == "--:--") {
-                      if (_isCheckin == true) {
-                        setState(() {
-                          // _isCheckout = false;
-                        });
-                      }
-
-                      setState(() {
-                        clockin = state.clockIn;
-                        clockout = state.clockOut;
-                        statusPhoto = true;
-                        statusIcon = false;
-                        imageUrl = state.photoIn;
-                        _colorButton = Colors.deepOrange;
-                        _visibleButton = true;
-                        _status = "checkout";
-                        shift = state.shiftOut;
-                      });
-
-                      print('con. 3 => state.clockIn = ' +
-                          state.clockIn +
-                          ' dataClockout = ' +
-                          state.clockOut);
-                      //kondisi sudah checkin & belum checkout
-
-                    } else {
-                      if (state.clockIn != "--:--" &&
-                          state.clockOut != "--:--") {
-                        print('con. 1 => state.clockIn = ' +
-                            state.clockIn +
-                            ' dataClockout = ' +
-                            state.clockOut);
-                        //kondisi sudah checkin & sudah checkout
-
-                        setState(() {
-                          clockin = state.clockIn;
-                          clockout = state.clockOut;
-                          statusPhoto = true;
-                          statusIcon = false;
-                          imageUrl = state.photoIn;
-                          _colorButton = Colors.red;
-                          _visibleButton = false;
-                          _status = "checkin";
-                          shift = state.shiftIn;
-                        });
-                      }
-                    }
-                  }
-                } else {
-                  //KONDISI SIFT 3
-
-                  if (state.clockIn == "--:--" && state.clockOut == "--:--") {
-                    setState(() {
-                      _isCheckin = false;
-                      // _isCheckout = false;
-                    });
-
-                    setState(() {
-                      statusPhoto = false;
-                      statusIcon = true;
-                      imageUrl = "";
-                      _colorButton = Colors.red;
-                      clockout = state.clockOut;
-                      clockin = state.clockIn;
-                      _visibleButton = true;
-                      _status = "checkin";
-                      shift = state.shiftIn;
-                    });
-
-                    print('con. 2 => state.clockIn = ' +
-                        state.clockIn +
-                        ' dataClockout = ' +
-                        state.clockOut);
-                    //kondisi belum checkin
-
-                  } else if (state.clockIn != "--:--" &&
-                      state.clockOut == "--:--") {
-                    if (_isCheckin == true) {
-                      setState(() {
-                        // _isCheckout = false;
-                      });
-                    }
-
-                    setState(() {
-                      clockin = state.clockIn;
-                      clockout = state.clockOut;
-                      statusPhoto = true;
-                      statusIcon = false;
-                      imageUrl = state.photoIn;
-                      _colorButton = Colors.deepOrange;
-                      _visibleButton = true;
-                      _status = "checkout";
-                      shift = state.shiftOut;
-                    });
-
-                    print('con. 3 => state.clockIn = ' +
-                        state.clockIn +
-                        ' dataClockout = ' +
-                        state.clockOut);
-                    //kondisi sudah checkin & belum checkout
-
-                  } else if (dateOut != dateId) {
-                    setState(() {
-                      clockin = state.clockIn;
-                      clockout = state.clockOut;
-                      dateOut = "";
-                      dateIn = "";
-                      statusPhoto = true;
-                      statusIcon = false;
-                      imageUrl = state.photoIn;
-                      _colorButton = Colors.red;
-                      _visibleButton = true;
-                      _status = "checkin";
-                      shift = state.shiftIn;
-                    });
-
-                    print('con. 4 => state.clockIn = ' +
-                        state.clockIn +
-                        ' dataClockout = ' +
-                        state.clockOut);
-                    //kondisi tanggal checkout tidak sama dengan tgl hari ini
-
-                  } else {
-                    setState(() {
-                      statusPhoto = true;
-                      statusIcon = false;
-                      clockin = state.clockIn;
-                      clockout = state.clockOut;
-                      imageUrl = state.photoIn;
-                      _visibleButton = true;
-                      _status = "checkin";
-                      shift = state.shiftIn;
-                    });
-
-                    print('con. 5 => state.clockIn = ' +
-                        state.clockIn +
-                        ' dataClockout = ' +
-                        state.clockOut);
-                    //kondisi sift malam
-                  }
-                }
                 Navigator.of(context, rootNavigator: true).pop(context);
-
+                setKondisi(state);
                 break;
               case ProfileStatus.failure:
                 Navigator.of(context, rootNavigator: true).pop(context);
@@ -969,15 +580,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: <Widget>[
                           Container(
                             width: MediaQuery.of(context).size.width,
-                            height: (MediaQuery.of(context).size.height / 2) +
-                                (MediaQuery.of(context).size.height / 8),
+                            height: (MediaQuery.of(context).size.height / 1.5),
                             decoration: BoxDecoration(
                                 image: DecorationImage(
                                     image: AssetImage('assets/background.png'),
                                     fit: BoxFit.cover)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
-                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
                                 SizedBox(height: 20),
                                 Container(
@@ -985,7 +595,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   height: 300.0,
                                   decoration: new BoxDecoration(
                                     color:
-                                        Colors.lightBlue[50]!.withOpacity(0.2),
+                                        Colors.lightBlue[50]!.withOpacity(0.25),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Column(
@@ -994,8 +604,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Visibility(
                                         visible: statusPhoto,
                                         child: Container(
-                                          width: 160.0,
-                                          height: 160.0,
+                                          width: 150.0,
+                                          height: 150.0,
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
                                             shape: BoxShape.circle,
@@ -1011,8 +621,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       Visibility(
                                         visible: statusIcon,
                                         child: Container(
-                                          width: 160.0,
-                                          height: 160.0,
+                                          width: 150.0,
+                                          height: 150.0,
                                           decoration: new BoxDecoration(
                                             color: Colors.grey[300],
                                             shape: BoxShape.circle,
@@ -1046,23 +656,160 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ],
                                   ),
                                 ),
-                                SizedBox(height: 20),
+                                SizedBox(height: 10),
                                 Text(
                                   state.message,
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                SizedBox(height: 20),
-                                // Visibility(
-                                //   visible: statusTotalWork,
-                                //   child: Column(children: <Widget>[
-                                //     Text("Total Work", style: TextStyle(fontSize: 16, color: Colors.white)),
-                                //     Text(totalWork.toString(),
-                                //         style: TextStyle(
-                                //             fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white
-                                //         )
-                                //     ),
-                                //   ]),
-                                // ),
+                                Expanded(child: SizedBox()),
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 15.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Visibility(
+                                        visible: state.statusBreak == '1'
+                                            ? true
+                                            : false,
+                                        child: Visibility(
+                                          visible: state.clockIn == '--:--'
+                                              ? false
+                                              : true,
+                                          child: Column(
+                                            children: [
+                                              FloatingActionButton(
+                                                backgroundColor:
+                                                    state.breakOut != ''
+                                                        ? Colors.grey
+                                                        : Color(0xff12cad6),
+                                                heroTag: 'breakOut',
+                                                onPressed: (state.breakOut ==
+                                                        '')
+                                                    ? () {
+                                                        AwesomeDialog(
+                                                          context: context,
+                                                          dialogType: DialogType
+                                                              .QUESTION,
+                                                          animType: AnimType
+                                                              .BOTTOMSLIDE,
+                                                          title: 'Break Out',
+                                                          desc:
+                                                              'Apakah anda yakin sudah masuk jam istirahat?',
+                                                          btnCancelText:
+                                                              "Belum",
+                                                          btnOkText: "Sudah",
+                                                          btnCancelOnPress:
+                                                              () {},
+                                                          btnOkOnPress: () {
+                                                            prosesBreakOut(
+                                                                state.userId,
+                                                                '${DateTime.now()}',
+                                                                state.idShift,
+                                                                state.shiftOut);
+                                                          },
+                                                        )..show();
+                                                      }
+                                                    : () {
+                                                        /*Button break out disabled*/
+                                                      },
+                                                child: Text('Break\nOut',
+                                                    textAlign:
+                                                        TextAlign.center),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  state.breakOut,
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width /
+                                              3),
+                                      Visibility(
+                                        visible: state.statusBreak == '1'
+                                            ? true
+                                            : false,
+                                        child: Visibility(
+                                          visible: state.clockIn == '--:--'
+                                              ? false
+                                              : true,
+                                          child: Column(
+                                            children: [
+                                              FloatingActionButton(
+                                                backgroundColor:
+                                                    (state.breakOut == '')
+                                                        ? Colors.grey
+                                                        : (state.breakIn != '')
+                                                            ? Colors.grey
+                                                            : Color(0xff12cad6),
+                                                heroTag: 'breakIn',
+                                                onPressed: (state.breakOut ==
+                                                            '' ||
+                                                        state.breakIn != '')
+                                                    ? () {
+                                                        /* Button must disabled */
+                                                      }
+                                                    : () {
+                                                        AwesomeDialog(
+                                                          context: context,
+                                                          dialogType: DialogType
+                                                              .QUESTION,
+                                                          animType: AnimType
+                                                              .BOTTOMSLIDE,
+                                                          title: 'Break In',
+                                                          desc:
+                                                              'Waktu istirahat sudah selesai?',
+                                                          btnCancelText:
+                                                              "Belum",
+                                                          btnOkText: "Sudah",
+                                                          btnCancelOnPress:
+                                                              () {},
+                                                          btnOkOnPress: () {
+                                                            prosesBreakIn(
+                                                                state.userId,
+                                                                '${DateTime.now()}',
+                                                                state.idShift,
+                                                                state.shiftOut);
+                                                          },
+                                                        )..show();
+                                                      },
+                                                child: Text('Break\nIn',
+                                                    textAlign:
+                                                        TextAlign.center),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    top: 8.0),
+                                                child: Text(
+                                                  state.breakIn,
+                                                  style: TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
                               ],
                             ),
                           ),
@@ -1118,135 +865,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   );
                 }),
                 bottomNavigationBar: BottomAppBar(
-                  // shape: const CircularNotchedRectangle(),
+                  shape: const CircularNotchedRectangle(),
                   child: Container(height: 50.0),
                 ),
-                floatingActionButton: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Visibility(
-                      visible: state.statusBreak == '1' ? true : false,
-                      child: Visibility(
-                        visible: state.clockIn == '--:--' ? false : true,
-                        child: Positioned(
-                          left: 30,
-                          bottom: 20,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(state.breakOut),
-                              ),
-                              FloatingActionButton(
-                                backgroundColor: state.breakOut != ''
-                                    ? Colors.grey
-                                    : Color(0xff12cad6),
-                                heroTag: 'breakOut',
-                                onPressed: (state.breakOut == '')
-                                    ? () {
-                                        AwesomeDialog(
-                                          context: context,
-                                          dialogType: DialogType.QUESTION,
-                                          animType: AnimType.BOTTOMSLIDE,
-                                          title: 'Break Out',
-                                          desc:
-                                              'Apakah anda yakin sudah masuk jam istirahat?',
-                                          btnCancelText: "Belum",
-                                          btnOkText: "Sudah",
-                                          btnCancelOnPress: () {},
-                                          btnOkOnPress: () {
-                                            prosesBreakOut(
-                                                state.userId,
-                                                '${DateTime.now()}',
-                                                state.idShift,
-                                                state.shiftOut);
-                                          },
-                                        )..show();
-                                      }
-                                    : () {/*Button break out disabled*/},
-                                child: Text('Break\nOut',
-                                    textAlign: TextAlign.center),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    Positioned(
-                      left: 100,
-                      right: 100,
-                      bottom: 20,
-                      child: Visibility(
-                        visible: _visibleButton,
-                        child: Container(
-                            height: 80,
-                            width: 80,
-                            child: FloatingActionButton(
-                              onPressed: () => {checkStatus(userID)},
-                              tooltip: _toolTip,
-                              backgroundColor: _colorButton,
-                              child: Icon(Icons.alarm_on,
-                                  color: Colors.white, size: 40),
-                            )),
-                      ),
-                    ),
-                    Visibility(
-                      visible: state.statusBreak == '1' ? true : false,
-                      child: Visibility(
-                        visible: state.clockIn == '--:--' ? false : true,
-                        child: Positioned(
-                          bottom: 20,
-                          right: 30,
-                          child: Column(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(bottom: 8.0),
-                                child: Text(state.breakIn),
-                              ),
-                              FloatingActionButton(
-                                backgroundColor: (state.breakOut == '')
-                                    ? Colors.grey
-                                    : (state.breakIn != '')
-                                        ? Colors.grey
-                                        : Color(0xff12cad6),
-                                heroTag: 'breakIn',
-                                onPressed: (state.breakIn != '')
-                                    ? () {/* Button must disabled */}
-                                    : () {
-                                        AwesomeDialog(
-                                          context: context,
-                                          dialogType: DialogType.QUESTION,
-                                          animType: AnimType.BOTTOMSLIDE,
-                                          title: 'Break In',
-                                          desc:
-                                              'Waktu istirahat sudah selesai?',
-                                          btnCancelText: "Belum",
-                                          btnOkText: "Sudah",
-                                          btnCancelOnPress: () {},
-                                          btnOkOnPress: () {
-                                            prosesBreakIn(
-                                                state.userId,
-                                                '${DateTime.now()}',
-                                                state.idShift,
-                                                state.shiftOut);
-                                          },
-                                        )..show();
-                                      },
-                                child: Text('Break\nIn',
-                                    textAlign: TextAlign.center),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                floatingActionButton: Visibility(
+                  visible: _visibleButton,
+                  child: Container(
+                      height: 80,
+                      width: 80,
+                      child: FloatingActionButton(
+                        onPressed: () => {checkStatus(userID)},
+                        tooltip: _toolTip,
+                        backgroundColor: _colorButton,
+                        child:
+                            Icon(Icons.alarm_on, color: Colors.white, size: 40),
+                      )),
                 ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
@@ -1256,6 +889,178 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  setKondisi(state) {
+    setState(() {
+      userID = state.userId;
+      idShift = state.idShift;
+    });
+    if (state.idShift != '3') {
+      if (state.clockIn != dateId) {
+        if (state.clockIn == "--:--") {
+          setState(() {
+            _isCheckin = false;
+            // _isCheckout = false;
+          });
+
+          setState(() {
+            statusPhoto = false;
+            statusIcon = true;
+            imageUrl = "";
+            _colorButton = Colors.red;
+            clockout = state.clockOut;
+            clockin = state.clockIn;
+            _visibleButton = true;
+            _status = "checkin";
+            shift = state.shiftIn;
+          });
+
+          print('con. 2 => state.clockIn = ' +
+              state.clockIn +
+              ' dataClockout = ' +
+              state.clockOut);
+          //kondisi belum checkin
+
+        } else if (state.clockOut == "--:--") {
+          if (_isCheckin == true) {
+            setState(() {
+              // _isCheckout = false;
+            });
+          }
+
+          setState(() {
+            clockin = state.clockIn;
+            clockout = state.clockOut;
+            statusPhoto = true;
+            statusIcon = false;
+            imageUrl = state.photoIn;
+            _colorButton = Colors.deepOrange;
+            _visibleButton = true;
+            _status = "checkout";
+            shift = state.shiftOut;
+          });
+
+          print('con. 3 => state.clockIn = ' +
+              state.clockIn +
+              ' dataClockout = ' +
+              state.clockOut);
+          //kondisi sudah checkin & belum checkout
+
+        } else {
+          if (state.clockIn != "--:--" && state.clockOut != "--:--") {
+            print('con. 1 => state.clockIn = ' +
+                state.clockIn +
+                ' dataClockout = ' +
+                state.clockOut);
+            //kondisi sudah checkin & sudah checkout
+
+            setState(() {
+              clockin = state.clockIn;
+              clockout = state.clockOut;
+              statusPhoto = true;
+              statusIcon = false;
+              imageUrl = state.photoIn;
+              _colorButton = Colors.red;
+              _visibleButton = false;
+              _status = "checkin";
+              shift = state.shiftIn;
+            });
+          }
+        }
+      }
+    } else {
+      //KONDISI SIFT 3
+
+      if (state.clockIn == "--:--" && state.clockOut == "--:--") {
+        setState(() {
+          _isCheckin = false;
+          // _isCheckout = false;
+        });
+
+        setState(() {
+          statusPhoto = false;
+          statusIcon = true;
+          imageUrl = "";
+          _colorButton = Colors.red;
+          clockout = state.clockOut;
+          clockin = state.clockIn;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+
+        print('con. 2 => state.clockIn = ' +
+            state.clockIn +
+            ' dataClockout = ' +
+            state.clockOut);
+        //kondisi belum checkin
+
+      } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
+        if (_isCheckin == true) {
+          setState(() {
+            // _isCheckout = false;
+          });
+        }
+
+        setState(() {
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = state.photoIn;
+          _colorButton = Colors.deepOrange;
+          _visibleButton = true;
+          _status = "checkout";
+          shift = state.shiftOut;
+        });
+
+        print('con. 3 => state.clockIn = ' +
+            state.clockIn +
+            ' dataClockout = ' +
+            state.clockOut);
+        //kondisi sudah checkin & belum checkout
+
+      } else if (dateOut != dateId) {
+        setState(() {
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          dateOut = "";
+          dateIn = "";
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = state.photoIn;
+          _colorButton = Colors.red;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+
+        print('con. 4 => state.clockIn = ' +
+            state.clockIn +
+            ' dataClockout = ' +
+            state.clockOut);
+        //kondisi tanggal checkout tidak sama dengan tgl hari ini
+
+      } else {
+        setState(() {
+          statusPhoto = true;
+          statusIcon = false;
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          imageUrl = state.photoIn;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+
+        print('con. 5 => state.clockIn = ' +
+            state.clockIn +
+            ' dataClockout = ' +
+            state.clockOut);
+        //kondisi sift malam
+      }
+    }
   }
 
   Future showProgressDialog(BuildContext loadContext) {
@@ -1275,7 +1080,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  showSuccessDialog(BuildContext successContext, status) {
+  showSuccessDialog(context, status) {
     String title = '';
     if (status == 'checkin') {
       title = "Success Check In";
@@ -1284,7 +1089,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     return AwesomeDialog(
-      context: successContext,
+      context: context,
       dialogType: DialogType.SUCCES,
       animType: AnimType.BOTTOMSLIDE,
       title: title,
@@ -1292,8 +1097,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // btnCancelText: "Nanti",
       // btnOkText: "Ya",
       // btnCancelOnPress: () {},
-      btnOkOnPress: () {},
+      btnOkOnPress: () {
+        if (status == 'checkin') {
+          setState(() {
+            isShowSuccessCheckin = true;
+          });
+          checkHolidays();
+        } else {
+          setState(() {
+            isShowSuccessCheckout = true;
+          });
+        }
+      },
     )..show();
+  }
+
+  showHariBesar(lottie, title, message) {
+    isShowHariBesar = true;
+    return Dialogs.materialDialog(
+      color: Colors.white,
+      msg: message,
+      title: title,
+      lottieBuilder: Lottie.network(
+        Endpoint.urlLottie + lottie,
+        fit: BoxFit.contain,
+      ),
+      context: context,
+      actions: [
+        IconsButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          text: '',
+          iconData: Icons.done,
+          color: Colors.blue,
+          textStyle: TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+        ),
+      ],
+    );
   }
 
   String _formatDateTime(DateTime dateTime) {
