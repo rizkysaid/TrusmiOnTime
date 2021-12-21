@@ -12,6 +12,7 @@ import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'PassParams.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -69,7 +70,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   File? imageFile;
 
   void _getFromCamera() async {
-    _profileBloc.add(InitialProfile());
     // Capture a photo
     final ImagePicker _picker = ImagePicker();
     final XFile? pickedFile = await _picker.pickImage(
@@ -92,13 +92,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // PROSES CHECKIN / CHECKOUT
     var image = imageFile;
     if (image != null) {
+      _profileBloc.add(InitialProfile());
       if (_status == 'checkin') {
         prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
       } else {
         prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
       }
-      print('inititall');
-      _profileBloc.add(InitialProfile());
     }
   }
 
@@ -109,7 +108,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkin);
     var request = new http.MultipartRequest("POST", uri);
-
     var multiPartFile = new http.MultipartFile.fromBytes(
       "foto",
       imageFile.readAsBytesSync(),
@@ -127,11 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('proses checkin => ' + response.statusCode.toString());
 
     if (response.statusCode == 201) {
-      _profileBloc.add(InitialProfile());
-      getProfil(usrId, date);
-      if (!isShowSuccessCheckin) {
-        showSuccessDialog(context, 'checkin');
-      }
+      showSuccessDialog(context, 'checkin');
     } else {
       print(response.statusCode);
     }
@@ -139,6 +133,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> prosesCheckout(String usrId, String clockOut, File imageFile,
       String idShift, String shift) async {
+    _profileBloc.add(InitialProfile());
+
     var uri = Uri.parse(Endpoint.checkout);
     var request = new http.MultipartRequest("POST", uri);
 
@@ -159,11 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('response.status.checkout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
-      _profileBloc.add(InitialProfile());
-      getProfil(usrId, date);
-      if (!isShowSuccessCheckout) {
-        showSuccessDialog(context, 'checkout');
-      }
+      showSuccessDialog(context, 'checkout');
     } else {
       print(response.statusCode);
     }
@@ -187,9 +179,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('response.status.breakout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
+      // timer = new Timer(new Duration(seconds: 2), () {
       getProfil(usrId, date);
       ToastUtils.show(
           "Selamat istirahat, manfaatkan waktu istirahatmu dengan baik");
+      // });
     } else {
       print(response.statusCode);
     }
@@ -199,7 +193,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> prosesBreakIn(
       String usrId, String breakIn, String idShift, String shift) async {
     _profileBloc.add(InitialProfile());
-
     var uri = Uri.parse(Endpoint.breakin);
     var request = new http.MultipartRequest("POST", uri);
 
@@ -213,8 +206,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('response.status.breakout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
+      // timer = new Timer(new Duration(seconds: 2), () {
       getProfil(usrId, date);
       ToastUtils.show("Selamat bekerja kembali");
+      // });
     } else {
       print(response.statusCode);
     }
@@ -226,7 +221,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-
     _profileBloc.add(InitialProfile());
     getPref();
     _onRefresh();
@@ -390,6 +384,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     print('checkHolidays => ' + response.toString());
     if (response == null) {
+      getProfil(userID, date);
       return null;
     } else {
       statusHariBesar = response['status'];
@@ -409,6 +404,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           hariBesar = false;
         });
+        _profileBloc.add(InitialProfile());
+        getProfil(userID, date);
       }
     }
   }
@@ -452,6 +449,364 @@ class _ProfileScreenState extends State<ProfileScreen> {
             bloc: _profileBloc,
             builder: (context, state) {
               print('status buider => ' + state.status.toString());
+              switch (state.status) {
+                case ProfileStatus.initial:
+                  return Scaffold(
+                    appBar: AppBar(
+                      title: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(
+                              'assets/logo_png_ontime.png',
+                              fit: BoxFit.contain,
+                              width: MediaQuery.of(context).size.width / 4,
+                              height: MediaQuery.of(context).size.height / 14,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.fromLTRB(0, 0, 50, 0),
+                            )
+                          ]),
+                      iconTheme: new IconThemeData(color: Colors.white),
+                      flexibleSpace: Container(
+                        decoration: new BoxDecoration(
+                            gradient: new LinearGradient(
+                                colors: [
+                                  const Color(0xFFFF1744),
+                                  const Color(0xFFF44336)
+                                ],
+                                begin: const FractionalOffset(0.0, 0.0),
+                                end: const FractionalOffset(1.0, 0.0),
+                                stops: [0.0, 1.0],
+                                tileMode: TileMode.clamp)),
+                      ),
+                    ),
+                    drawer: Drawer(
+                      elevation: 1.5,
+                    ),
+                    body: LayoutBuilder(builder: (BuildContext context,
+                        BoxConstraints viewportConstraints) {
+                      String networkImageUrl =
+                          Endpoint.urlFoto + '/' + imageUrl;
+                      return SingleChildScrollView(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                              minHeight: viewportConstraints.maxHeight),
+                          child: Column(
+                            children: <Widget>[
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                height:
+                                    (MediaQuery.of(context).size.height / 1.5),
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                        image:
+                                            AssetImage('assets/background.png'),
+                                        fit: BoxFit.cover)),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: <Widget>[
+                                    SizedBox(height: 20),
+                                    Container(
+                                      width: 300.0,
+                                      height: 300.0,
+                                      decoration: new BoxDecoration(
+                                        color: Colors.lightBlue[50]!
+                                            .withOpacity(0.25),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Column(
+                                        children: <Widget>[
+                                          SizedBox(height: 20),
+                                          Visibility(
+                                            visible: statusPhoto,
+                                            child: Container(
+                                              width: 150.0,
+                                              height: 150.0,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                                shape: BoxShape.circle,
+                                                image: DecorationImage(
+                                                  fit: BoxFit.cover,
+                                                  image: new NetworkImage(
+                                                    networkImageUrl,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Visibility(
+                                            visible: statusIcon,
+                                            child: Container(
+                                              width: 150.0,
+                                              height: 150.0,
+                                              decoration: new BoxDecoration(
+                                                color: Colors.grey[300],
+                                                shape: BoxShape.circle,
+                                              ),
+                                              child: Icon(
+                                                Icons.person_outline,
+                                                color: Colors.white,
+                                                size: 120.0,
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 10),
+                                          Text(state.nama,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(state.jabatan,
+                                              style: TextStyle(
+                                                  color: Colors.white)),
+                                          SizedBox(height: 20),
+                                          Text(_timeString.toString(),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 25,
+                                                  fontWeight: FontWeight.bold)),
+                                          Text(_hariTanggal.toString(),
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12))
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(height: 10),
+                                    Text(
+                                      state.message,
+                                      style: TextStyle(color: Colors.white),
+                                    ),
+                                    Expanded(child: SizedBox()),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 15.0),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        children: [
+                                          Visibility(
+                                            visible: state.statusBreak == '1'
+                                                ? true
+                                                : false,
+                                            child: Visibility(
+                                              visible: state.clockIn == '--:--'
+                                                  ? false
+                                                  : true,
+                                              child: Column(
+                                                children: [
+                                                  Shimmer.fromColors(
+                                                    baseColor: Colors.grey,
+                                                    highlightColor:
+                                                        Colors.white,
+                                                    child: FloatingActionButton(
+                                                      backgroundColor: state
+                                                                  .breakOut !=
+                                                              ''
+                                                          ? Colors.grey
+                                                          : Color(0xff12cad6),
+                                                      heroTag: 'breakOut',
+                                                      onPressed: () {},
+                                                      child: Text('Break\nOut',
+                                                          textAlign:
+                                                              TextAlign.center),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 8.0),
+                                                    child: Shimmer.fromColors(
+                                                      baseColor: Colors.grey,
+                                                      highlightColor:
+                                                          Colors.white,
+                                                      child: SizedBox(
+                                                          height: 5, width: 10),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  3),
+                                          Visibility(
+                                            visible: state.statusBreak == '1'
+                                                ? true
+                                                : false,
+                                            child: Visibility(
+                                              visible: state.clockIn == '--:--'
+                                                  ? false
+                                                  : true,
+                                              child: Column(
+                                                children: [
+                                                  Shimmer.fromColors(
+                                                    baseColor: Colors.grey,
+                                                    highlightColor:
+                                                        Colors.white,
+                                                    child: FloatingActionButton(
+                                                      backgroundColor: (state
+                                                                  .breakOut ==
+                                                              '')
+                                                          ? Colors.grey
+                                                          : (state.breakIn !=
+                                                                  '')
+                                                              ? Colors.grey
+                                                              : Color(
+                                                                  0xff12cad6),
+                                                      heroTag: 'breakIn',
+                                                      onPressed: () {},
+                                                      child: Text('Break\nIn',
+                                                          textAlign:
+                                                              TextAlign.center),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            top: 8.0),
+                                                    child: Shimmer.fromColors(
+                                                      baseColor: Colors.grey,
+                                                      highlightColor:
+                                                          Colors.white,
+                                                      child: SizedBox(
+                                                          height: 5, width: 20),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 20, right: 20, top: 15),
+                                child: Column(
+                                  children: <Widget>[
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: <Widget>[
+                                        Column(children: <Widget>[
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 80,
+                                            ),
+                                          ),
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 50,
+                                            ),
+                                          ),
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 80,
+                                            ),
+                                          ),
+                                        ]),
+                                        Container(
+                                          height: 10,
+                                          width: 10,
+                                        ),
+                                        Column(children: <Widget>[
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 80,
+                                            ),
+                                          ),
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 50,
+                                            ),
+                                          ),
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey,
+                                            highlightColor: Colors.white,
+                                            child: Container(
+                                              color: Colors.grey,
+                                              height: 20,
+                                              width: 80,
+                                            ),
+                                          ),
+                                        ]),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
+                    bottomNavigationBar: BottomAppBar(
+                      shape: const CircularNotchedRectangle(),
+                      child: Container(height: 50.0),
+                    ),
+                    floatingActionButton: Visibility(
+                      visible: _visibleButton,
+                      child: Shimmer.fromColors(
+                        baseColor: Colors.grey,
+                        highlightColor: Colors.white,
+                        child: Container(
+                            height: 80,
+                            width: 80,
+                            child: FloatingActionButton(
+                              onPressed: () => {},
+                              tooltip: _toolTip,
+                              backgroundColor: _colorButton,
+                              child: Icon(Icons.alarm_on,
+                                  color: Colors.white, size: 40),
+                            )),
+                      ),
+                    ),
+                    floatingActionButtonLocation:
+                        FloatingActionButtonLocation.centerDocked,
+                  );
+                default:
+              }
+
               return Scaffold(
                 appBar: AppBar(
                   title: Row(
@@ -1107,6 +1462,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             isShowSuccessCheckout = true;
           });
+          _profileBloc.add(InitialProfile());
+          getProfil(userID, date);
         }
       },
     )..show();
@@ -1127,6 +1484,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconsButton(
           onPressed: () {
             Navigator.of(context).pop();
+            _profileBloc.add(InitialProfile());
+            getProfil(userID, date);
           },
           text: '',
           iconData: Icons.done,
@@ -1182,9 +1541,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   checkStatus(userId) async {
+    showProgressDialog(context);
     // print(userId);
-    _profileBloc.add(InitialProfile());
-
     // setState(() {
     //   _saving = true;
     // });
@@ -1219,8 +1577,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // setState(() {
       //   _saving = false;
       // });
-
-      _profileBloc.add(InitialProfile());
+      Navigator.of(context, rootNavigator: true).pop(context);
 
       if (response.data.aktif == '1') {
         if (response.data.achive == true) {
