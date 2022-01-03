@@ -39,8 +39,8 @@ class _HrSystemState extends State<HrSystem> {
     final args = ModalRoute.of(context)!.settings.arguments as PassParams;
     String username = args.username;
     String password = args.password;
-    String urlAbsen = Endpoint.baseIp +
-        "/hr/bypass/login2?a=" +
+    String urlAbsen = Endpoint.hrSystem +
+        "?a=" +
         username.toString() +
         "&z=" +
         password.toString();
