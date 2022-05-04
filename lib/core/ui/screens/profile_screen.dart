@@ -715,27 +715,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ]),
@@ -748,27 +772,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 50,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                           Shimmer.fromColors(
                                             baseColor: Colors.grey,
                                             highlightColor: Colors.white,
                                             child: Container(
-                                              color: Colors.grey,
-                                              height: 20,
+                                              margin:
+                                                  EdgeInsets.only(bottom: 5),
+                                              height: 15,
                                               width: 80,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey,
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                  15,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ]),
@@ -1019,154 +1067,154 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Expanded(child: SizedBox()),
-                                Padding(
-                                  padding: const EdgeInsets.only(bottom: 15.0),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Visibility(
-                                        visible: state.statusBreak == '1'
-                                            ? true
-                                            : false,
-                                        child: Visibility(
-                                          visible: state.clockIn == '--:--'
-                                              ? false
-                                              : true,
-                                          child: Column(
-                                            children: [
-                                              FloatingActionButton(
-                                                backgroundColor:
-                                                    state.breakOut != ''
-                                                        ? Colors.grey
-                                                        : Color(0xff12cad6),
-                                                heroTag: 'breakOut',
-                                                onPressed: (state.breakOut ==
-                                                        '')
-                                                    ? () {
-                                                        AwesomeDialog(
-                                                          context: context,
-                                                          dialogType: DialogType
-                                                              .QUESTION,
-                                                          animType: AnimType
-                                                              .BOTTOMSLIDE,
-                                                          title: 'Break Out',
-                                                          desc:
-                                                              'Apakah anda yakin sudah masuk jam istirahat?',
-                                                          btnCancelText:
-                                                              "Belum",
-                                                          btnOkText: "Sudah",
-                                                          btnCancelOnPress:
-                                                              () {},
-                                                          btnOkOnPress: () {
-                                                            prosesBreakOut(
-                                                                state.userId,
-                                                                '${DateTime.now()}',
-                                                                state.idShift,
-                                                                state.shiftOut);
-                                                          },
-                                                        )..show();
-                                                      }
-                                                    : () {
-                                                        /*Button break out disabled*/
-                                                      },
-                                                child: Text('Break\nOut',
-                                                    textAlign:
-                                                        TextAlign.center),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 8.0),
-                                                child: Text(
-                                                  state.breakOut,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              3),
-                                      Visibility(
-                                        visible: state.statusBreak == '1'
-                                            ? true
-                                            : false,
-                                        child: Visibility(
-                                          visible: state.clockIn == '--:--'
-                                              ? false
-                                              : true,
-                                          child: Column(
-                                            children: [
-                                              FloatingActionButton(
-                                                backgroundColor:
-                                                    (state.breakOut == '')
-                                                        ? Colors.grey
-                                                        : (state.breakIn != '')
-                                                            ? Colors.grey
-                                                            : Color(0xff12cad6),
-                                                heroTag: 'breakIn',
-                                                onPressed: (state.breakOut ==
-                                                            '' ||
-                                                        state.breakIn != '')
-                                                    ? () {
-                                                        /* Button must disabled */
-                                                      }
-                                                    : () {
-                                                        AwesomeDialog(
-                                                          context: context,
-                                                          dialogType: DialogType
-                                                              .QUESTION,
-                                                          animType: AnimType
-                                                              .BOTTOMSLIDE,
-                                                          title: 'Break In',
-                                                          desc:
-                                                              'Waktu istirahat sudah selesai?',
-                                                          btnCancelText:
-                                                              "Belum",
-                                                          btnOkText: "Sudah",
-                                                          btnCancelOnPress:
-                                                              () {},
-                                                          btnOkOnPress: () {
-                                                            prosesBreakIn(
-                                                                state.userId,
-                                                                '${DateTime.now()}',
-                                                                state.idShift,
-                                                                state.shiftOut);
-                                                          },
-                                                        )..show();
-                                                      },
-                                                child: Text('Break\nIn',
-                                                    textAlign:
-                                                        TextAlign.center),
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                              ),
-                                              Padding(
-                                                padding: const EdgeInsets.only(
-                                                    top: 8.0),
-                                                child: Text(
-                                                  state.breakIn,
-                                                  style: TextStyle(
-                                                      color: Colors.white),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
+                                // Padding(
+                                //   padding: const EdgeInsets.only(bottom: 15.0),
+                                //   child: Row(
+                                //     mainAxisAlignment: MainAxisAlignment.center,
+                                //     children: [
+                                //       Visibility(
+                                //         visible: state.statusBreak == '1'
+                                //             ? true
+                                //             : false,
+                                //         child: Visibility(
+                                //           visible: state.clockIn == '--:--'
+                                //               ? false
+                                //               : true,
+                                //           child: Column(
+                                //             children: [
+                                //               FloatingActionButton(
+                                //                 backgroundColor:
+                                //                     state.breakOut != ''
+                                //                         ? Colors.grey
+                                //                         : Color(0xff12cad6),
+                                //                 heroTag: 'breakOut',
+                                //                 onPressed: (state.breakOut ==
+                                //                         '')
+                                //                     ? () {
+                                //                         AwesomeDialog(
+                                //                           context: context,
+                                //                           dialogType: DialogType
+                                //                               .QUESTION,
+                                //                           animType: AnimType
+                                //                               .BOTTOMSLIDE,
+                                //                           title: 'Break Out',
+                                //                           desc:
+                                //                               'Apakah anda yakin sudah masuk jam istirahat?',
+                                //                           btnCancelText:
+                                //                               "Belum",
+                                //                           btnOkText: "Sudah",
+                                //                           btnCancelOnPress:
+                                //                               () {},
+                                //                           btnOkOnPress: () {
+                                //                             prosesBreakOut(
+                                //                                 state.userId,
+                                //                                 '${DateTime.now()}',
+                                //                                 state.idShift,
+                                //                                 state.shiftOut);
+                                //                           },
+                                //                         )..show();
+                                //                       }
+                                //                     : () {
+                                //                         /*Button break out disabled*/
+                                //                       },
+                                //                 child: Text('Break\nOut',
+                                //                     textAlign:
+                                //                         TextAlign.center),
+                                //                 shape: RoundedRectangleBorder(
+                                //                   borderRadius:
+                                //                       BorderRadius.circular(10),
+                                //                 ),
+                                //               ),
+                                //               Padding(
+                                //                 padding: const EdgeInsets.only(
+                                //                     top: 8.0),
+                                //                 child: Text(
+                                //                   state.breakOut,
+                                //                   style: TextStyle(
+                                //                       color: Colors.white),
+                                //                 ),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //       SizedBox(
+                                //           width: MediaQuery.of(context)
+                                //                   .size
+                                //                   .width /
+                                //               3),
+                                //       Visibility(
+                                //         visible: state.statusBreak == '1'
+                                //             ? true
+                                //             : false,
+                                //         child: Visibility(
+                                //           visible: state.clockIn == '--:--'
+                                //               ? false
+                                //               : true,
+                                //           child: Column(
+                                //             children: [
+                                //               FloatingActionButton(
+                                //                 backgroundColor:
+                                //                     (state.breakOut == '')
+                                //                         ? Colors.grey
+                                //                         : (state.breakIn != '')
+                                //                             ? Colors.grey
+                                //                             : Color(0xff12cad6),
+                                //                 heroTag: 'breakIn',
+                                //                 onPressed: (state.breakOut ==
+                                //                             '' ||
+                                //                         state.breakIn != '')
+                                //                     ? () {
+                                //                         /* Button must disabled */
+                                //                       }
+                                //                     : () {
+                                //                         AwesomeDialog(
+                                //                           context: context,
+                                //                           dialogType: DialogType
+                                //                               .QUESTION,
+                                //                           animType: AnimType
+                                //                               .BOTTOMSLIDE,
+                                //                           title: 'Break In',
+                                //                           desc:
+                                //                               'Waktu istirahat sudah selesai?',
+                                //                           btnCancelText:
+                                //                               "Belum",
+                                //                           btnOkText: "Sudah",
+                                //                           btnCancelOnPress:
+                                //                               () {},
+                                //                           btnOkOnPress: () {
+                                //                             prosesBreakIn(
+                                //                                 state.userId,
+                                //                                 '${DateTime.now()}',
+                                //                                 state.idShift,
+                                //                                 state.shiftOut);
+                                //                           },
+                                //                         )..show();
+                                //                       },
+                                //                 child: Text('Break\nIn',
+                                //                     textAlign:
+                                //                         TextAlign.center),
+                                //                 shape: RoundedRectangleBorder(
+                                //                   borderRadius:
+                                //                       BorderRadius.circular(10),
+                                //                 ),
+                                //               ),
+                                //               Padding(
+                                //                 padding: const EdgeInsets.only(
+                                //                     top: 8.0),
+                                //                 child: Text(
+                                //                   state.breakIn,
+                                //                   style: TextStyle(
+                                //                       color: Colors.white),
+                                //                 ),
+                                //               ),
+                                //             ],
+                                //           ),
+                                //         ),
+                                //       ),
+                                //     ],
+                                //   ),
+                                // ),
                               ],
                             ),
                           ),

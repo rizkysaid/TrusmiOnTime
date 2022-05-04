@@ -39,7 +39,7 @@ dependencies:
   date_format: ^2.0.4
 #  webviewx: ^0.2.1
   equatable: ^2.0.3
-  flutter_bloc: ^8.0.0
+  flutter_bloc: ^8.0.1
   dio: ^4.0.4
   shimmer: ^2.0.0
   awesome_dialog: ^2.1.2

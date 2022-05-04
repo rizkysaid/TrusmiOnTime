@@ -1,5 +1,3 @@
-
-class About{
-  static String version = "V1.2.1";
-
+class About {
+  static String version = "V1.2.2";
 }

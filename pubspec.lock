@@ -35,7 +35,11 @@ packages:
       name: bloc
       url: "https://pub.dartlang.org"
     source: hosted
+<<<<<<< HEAD
     version: "8.0.3"
+=======
+    version: "8.0.2"
+>>>>>>> 1e381f95f594126c439de8696796a344e8bf94e3
   boolean_selector:
     dependency: transitive
     description:
