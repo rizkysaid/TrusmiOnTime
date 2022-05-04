@@ -107,6 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkin);
+    print('Endpoint.checkin => ' + Endpoint.checkin);
     var request = new http.MultipartRequest("POST", uri);
     var multiPartFile = new http.MultipartFile.fromBytes(
       "foto",
@@ -122,12 +123,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    print('proses checkin => ' + response.statusCode.toString());
+    print('proses checkin => ' + response.toString());
 
     if (response.statusCode == 201) {
       showSuccessDialog(context, 'checkin');
     } else {
-      print(response.statusCode);
+      showErrorDialog(context, 'checkin');
     }
   }
 
@@ -157,7 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response.statusCode == 200) {
       showSuccessDialog(context, 'checkout');
     } else {
-      print(response.statusCode);
+      showErrorDialog(context, 'checkout');
     }
   }
 
@@ -323,6 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   getPref() async {
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
+    print(pref.getString('username'));
     if (pref.getString('username') == null) {
       logout();
     } else {
@@ -332,7 +334,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         userID = pref.getString('userID').toString();
         // clockin = pref.getString('clock_in')!;
         // imageUrl = pref.getString('imageUrl')!;
-        _status = pref.getString('status')!;
+        // _status = pref.getString('status')!;
         // _isCheckin = pref.getBool('isCheckin');
         // _isCheckout = pref.getBool('isCheckout');
       });
@@ -1438,9 +1440,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   showSuccessDialog(context, status) {
     String title = '';
     if (status == 'checkin') {
-      title = "Success Check In";
+      title = "Check-In Success ";
     } else {
-      title = "Success Check Out";
+      title = "Check-Out Success ";
     }
 
     return AwesomeDialog(
@@ -1495,6 +1497,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ],
     );
+  }
+
+  showErrorDialog(context, status) {
+    String title = '';
+    if (status == 'checkin') {
+      title = "Check-In Failed";
+    } else {
+      title = "Check-Out Failed";
+    }
+
+    return AwesomeDialog(
+      context: context,
+      dialogType: DialogType.ERROR,
+      animType: AnimType.BOTTOMSLIDE,
+      title: title,
+      // desc: 'Ingin istirahat sekarang?',
+      // btnCancelText: "Nanti",
+      // btnOkText: "Ya",
+      // btnCancelOnPress: () {},
+      btnCancelOnPress: () {
+        _profileBloc.add(InitialProfile());
+        getProfil(userID, date);
+      },
+    )..show();
   }
 
   String _formatDateTime(DateTime dateTime) {

@@ -59,7 +59,7 @@ class _CameraScreenState extends State<CameraScreen> {
     // if (controller != null) {
     //   await controller.dispose();
     // }
-    controller = CameraController(cameraDescription, ResolutionPreset.medium);
+    controller = CameraController(cameraDescription, ResolutionPreset.low);
 
     controller.addListener(() {
       if (mounted) {

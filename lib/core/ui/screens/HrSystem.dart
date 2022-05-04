@@ -3,8 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-import 'package:webviewx/webviewx.dart';
+import 'package:flutter_webview_pro/webview_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,8 +38,8 @@ class _HrSystemState extends State<HrSystem> {
     final args = ModalRoute.of(context)!.settings.arguments as PassParams;
     String username = args.username;
     String password = args.password;
-    String urlAbsen = Endpoint.baseIp +
-        "/hr/bypass/login2?a=" +
+    String urlAbsen = Endpoint.hrSystem +
+        "?a=" +
         username.toString() +
         "&z=" +
         password.toString();
@@ -75,27 +74,60 @@ class _HrSystemState extends State<HrSystem> {
           //       )
           //     : SizedBox.shrink(),
 
-          WebViewX(
-            initialContent: urlAbsen,
-            initialSourceType: SourceType.url,
-            height: MediaQuery.of(context).size.height,
-            width: MediaQuery.of(context).size.width,
+          // WebViewX(
+          //   initialContent: urlAbsen,
+          //   initialSourceType: SourceType.url,
+          //   height: MediaQuery.of(context).size.height,
+          //   width: MediaQuery.of(context).size.width,
+          //   onPageFinished: (String url) {
+          //     setState(() {
+          //       _loading = false;
+          //     });
+          //   },
+          // ),
+          // (_loading)
+          //     ? Container(
+          //         width: MediaQuery.of(context).size.width,
+          //         height: MediaQuery.of(context).size.height,
+          //         color: Colors.grey[100],
+          //         child: Center(
+          //           child: CircularProgressIndicator(),
+          //         ),
+          //       )
+          //     : SizedBox.shrink(),
+
+          // WebViewPlus(
+          //   javascriptMode: JavascriptMode.unrestricted,
+          //   onWebViewCreated: (controller){
+          //     controller.loadUrl(urlAbsen);
+          //   },
+          // ),
+
+          WebView(
+            initialUrl: urlAbsen,
+            javascriptMode: JavascriptMode.unrestricted,
+            gestureNavigationEnabled: true,
+            onPageStarted: (String url) {
+              print('Page started loading: $url');
+            },
             onPageFinished: (String url) {
               setState(() {
                 _loading = false;
               });
+              print('Page finished loading: $url');
             },
           ),
           (_loading)
               ? Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            color: Colors.grey[100],
+            child: Center(
+              child: CircularProgressIndicator(),
+            ),
+          )
               : SizedBox.shrink(),
+
         ],
       ),
     );

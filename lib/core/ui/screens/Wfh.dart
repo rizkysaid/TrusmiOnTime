@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_webview_pro/webview_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,10 +38,9 @@ class _WfhState extends State<Wfh> {
     final args = ModalRoute.of(context)!.settings.arguments as PassParams;
     String username = args.username;
     String password = args.password;
-    String urlAbsen = "https://trusmicorp.com/wfh/login/auth/" +
-        username.toString() +
-        "/" +
-        password.toString();
+    String urlAbsen =
+        Endpoint.wfh + "/" + username.toString() + "/" + password.toString();
+    print("ip=" + urlAbsen);
 //  static String _baseIP = "http://192.168.23.195"; //wfh - local
 //     String urlAbsen = "http://192.168.23.195/wfh/login/auth/"+username.toString()+"/"+password.toString();
 
