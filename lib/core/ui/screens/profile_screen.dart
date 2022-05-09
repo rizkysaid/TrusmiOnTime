@@ -414,6 +414,184 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
+  Future<void> checkBadEmp(context) async {
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    ApiServices services = ApiServices();
+    var response = await services.checkBadEmp(ip, userID);
+
+    print('checkBadEmp status => ' + response['status'].toString());
+    if (response['status'] == true) {
+      print('checkBadEmp data length => ' + response['data'].length.toString());
+    }
+
+    _displayWorstEmployee(context, response);
+  }
+
+  _displayWorstEmployee(BuildContext context, response) {
+    showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        transitionDuration: Duration(milliseconds: 500),
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: animation,
+              child: child,
+            ),
+          );
+        },
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(20),
+              child: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Expanded(
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 50,
+                        padding: EdgeInsets.all(10),
+                        margin: EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          image: DecorationImage(
+                            image: AssetImage('assets/background.png'),
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          children: [
+                            SizedBox(
+                              height: 50,
+                            ),
+                            Column(
+                              children: [
+                                DefaultTextStyle(
+                                  child: Text(
+                                    'Bad Employee',
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 2.0,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                DefaultTextStyle(
+                                  child: Text(
+                                    'Of The Month',
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 2.0,
+                                  ),
+                                ),
+                                SizedBox(height: 5),
+                                DefaultTextStyle(
+                                  child: Text(
+                                    DateFormat('MMMM').format(
+                                          DateTime(
+                                            0,
+                                            int.parse(response['periode']
+                                                .substring(5, 7)),
+                                          ),
+                                        ) +
+                                        ', ' +
+                                        response['periode'].substring(0, 4),
+                                  ),
+                                  style: TextStyle(
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    letterSpacing: 2.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 50),
+                            ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: response['data'].length,
+                                itemBuilder: (context, index) {
+                                  return Card(
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.all(10),
+                                      minVerticalPadding: 10,
+                                      leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          Endpoint.baseIp +
+                                              '/' +
+                                              response['data'][index]
+                                                  ['profile_picture'],
+                                        ),
+                                        radius: 30,
+                                      ),
+                                      title: Text(
+                                          response['data'][index]['employee']),
+                                      subtitle: Text(
+                                          response['data'][index]['jabatan']),
+                                      trailing: Stack(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Chip(
+                                              label: Text(
+                                                response['data'][index]
+                                                    ['score'],
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 0,
+                                            right: 10,
+                                            left: 10,
+                                            child: Text(
+                                              'Score',
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.grey),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }),
+                          ],
+                        ),
+                      ),
+                    ),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text('Dismiss'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     String version = About.version;
@@ -435,6 +613,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               case ProfileStatus.success:
                 Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
+
                 break;
               case ProfileStatus.failure:
                 Navigator.of(context, rootNavigator: true).pop(context);
@@ -1517,6 +1696,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _profileBloc.add(InitialProfile());
           getProfil(userID, date);
         }
+        checkBadEmp(context);
       },
     )..show();
   }

@@ -144,4 +144,16 @@ class ApiServices {
       return null;
     }
   }
+
+  Future<dynamic> checkBadEmp(ip, userId) async {
+    try {
+      var response = await dio.get(ip + '/check_bad_emp/' + userId);
+      print('ip => ' + ip);
+      print("Response checkBadEmp Status : ${response.data['status']}");
+      print("Response checkBadEmp Body : ${response.data}");
+      return response.data;
+    } catch (e) {
+      return null;
+    }
+  }
 }
