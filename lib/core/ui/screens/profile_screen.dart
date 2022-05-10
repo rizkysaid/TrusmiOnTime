@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
     var uri = Uri.parse(Endpoint.checkin);
-    print('Endpoint.checkin => ' + Endpoint.checkin);
+    // print('Endpoint.checkin => ' + Endpoint.checkin);
     var request = new http.MultipartRequest("POST", uri);
     var multiPartFile = new http.MultipartFile.fromBytes(
       "foto",
@@ -125,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    print('proses checkin => ' + response.toString());
+    // print('proses checkin => ' + response.toString());
 
     if (response.statusCode == 201) {
       showSuccessDialog(context, 'checkin');
@@ -136,7 +136,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> prosesCheckout(String usrId, String clockOut, File imageFile,
       String idShift, String shift) async {
-    _profileBloc.add(InitialProfile());
+    showProgressDialog(context);
 
     var uri = Uri.parse(Endpoint.checkout);
     var request = new http.MultipartRequest("POST", uri);
@@ -155,9 +155,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    print('response.status.checkout => ' + response.statusCode.toString());
+    // print('response.status.checkout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
+      // hide pop up
+      Navigator.pop(context);
       showSuccessDialog(context, 'checkout');
     } else {
       showErrorDialog(context, 'checkout');
@@ -179,7 +181,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    print('response.status.breakout => ' + response.statusCode.toString());
+    // print('response.status.breakout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
       // timer = new Timer(new Duration(seconds: 2), () {
@@ -326,7 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   getPref() async {
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
-    print(pref.getString('username'));
+    // print(pref.getString('username'));
     if (pref.getString('username') == null) {
       logout();
     } else {
@@ -388,7 +390,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     print('checkHolidays => ' + response.toString());
     if (response == null) {
-      getProfil(userID, date);
+      checkBadEmp(context);
+      // getProfil(userID, date);
       return null;
     } else {
       statusHariBesar = response['status'];
@@ -408,8 +411,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           hariBesar = false;
         });
-        _profileBloc.add(InitialProfile());
-        getProfil(userID, date);
+        checkBadEmp(context);
+        // _profileBloc.add(InitialProfile());
+        // getProfil(userID, date);
       }
     }
   }
@@ -429,15 +433,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ApiServices services = ApiServices();
     var response = await services.checkBadEmp(ip, userID);
 
-    print('checkBadEmp status => ' + response['status'].toString());
     if (response['status'] == true) {
-      print('checkBadEmp data length => ' + response['data'].length.toString());
+      _displayBadEmployees(context, response);
+    } else {
+      _profileBloc.add(InitialProfile());
+      getProfil(userID, date);
     }
-
-    _displayWorstEmployee(context, response);
   }
 
-  _displayWorstEmployee(BuildContext context, response) {
+  _displayBadEmployees(BuildContext context, response) {
     showGeneralDialog(
         context: context,
         barrierDismissible: false,
@@ -452,139 +456,155 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         pageBuilder: (context, animation, secondaryAnimation) {
-          return SafeArea(
-            child: Container(
-              padding: EdgeInsets.all(20),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 50,
-                        padding: EdgeInsets.all(10),
-                        margin: EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          image: DecorationImage(
-                            image: AssetImage('assets/background.png'),
-                            fit: BoxFit.cover,
+          return WillPopScope(
+            onWillPop: () {
+              Navigator.pop(context);
+              _profileBloc.add(InitialProfile());
+              getProfil(userID, date);
+              return Future.value(true);
+            },
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.all(20),
+                child: Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Expanded(
+                        child: Container(
+                          width: MediaQuery.of(context).size.width - 50,
+                          padding: EdgeInsets.all(10),
+                          margin: EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            image: DecorationImage(
+                              image: AssetImage('assets/background.png'),
+                              fit: BoxFit.cover,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: 50,
-                            ),
-                            Column(
-                              children: [
-                                DefaultTextStyle(
-                                  child: Text(
-                                    'Bad Employee',
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 2.0,
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.topRight,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.close_rounded,
+                                      color: Colors.grey,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                      _profileBloc.add(InitialProfile());
+                                      getProfil(userID, date);
+                                    },
                                   ),
                                 ),
-                                SizedBox(height: 5),
-                                DefaultTextStyle(
-                                  child: Text(
-                                    'Of The Month',
+                              ),
+                              Column(
+                                children: [
+                                  DefaultTextStyle(
+                                    child: Text(
+                                      'Bad Employee',
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 2.0,
+                                    ),
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 2.0,
+                                  SizedBox(height: 5),
+                                  DefaultTextStyle(
+                                    child: Text(
+                                      'Last Month',
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 2.0,
+                                    ),
                                   ),
-                                ),
-                                SizedBox(height: 5),
-                                DefaultTextStyle(
-                                  child: Text(
-                                    DateFormat('MMMM').format(
-                                          DateTime(
-                                            0,
-                                            int.parse(response['periode']
-                                                .substring(5, 7)),
-                                          ),
-                                        ) +
-                                        ', ' +
-                                        response['periode'].substring(0, 4),
+                                  SizedBox(height: 5),
+                                  DefaultTextStyle(
+                                    child: Text(
+                                      DateFormat('MMMM').format(
+                                            DateTime(
+                                              0,
+                                              int.parse(response['periode']
+                                                  .substring(5, 7)),
+                                            ),
+                                          ) +
+                                          ', ' +
+                                          response['periode'].substring(0, 4),
+                                    ),
+                                    style: TextStyle(
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                      letterSpacing: 2.0,
+                                    ),
                                   ),
-                                  style: TextStyle(
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 2.0,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(height: 50),
-                            ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: response['data'].length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.all(10),
-                                      minVerticalPadding: 10,
-                                      leading: CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          Endpoint.baseIp +
-                                              '/' +
-                                              response['data'][index]
-                                                  ['profile_picture'],
-                                        ),
-                                        radius: 30,
-                                      ),
-                                      title: Text(
-                                          response['data'][index]['employee']),
-                                      subtitle: Text(
-                                          response['data'][index]['jabatan']),
-                                      trailing: Stack(
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 5.0),
-                                            child: Chip(
-                                              label: Text(
+                                ],
+                              ),
+                              SizedBox(height: 40),
+                              ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: response['data'].length,
+                                  itemBuilder: (context, index) {
+                                    return Card(
+                                      child: ListTile(
+                                        contentPadding: EdgeInsets.all(10),
+                                        minVerticalPadding: 10,
+                                        leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                            Endpoint.baseIp +
+                                                '/' +
                                                 response['data'][index]
-                                                    ['score'],
+                                                    ['profile_picture'],
+                                          ),
+                                          radius: 30,
+                                        ),
+                                        title: Text(response['data'][index]
+                                            ['employee']),
+                                        subtitle: Text(
+                                            response['data'][index]['jabatan']),
+                                        trailing: Stack(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 5.0),
+                                              child: Chip(
+                                                label: Text(
+                                                  response['data'][index]
+                                                      ['score'],
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          Positioned(
-                                            top: 0,
-                                            right: 10,
-                                            left: 10,
-                                            child: Text(
-                                              'Score',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.grey),
+                                            Positioned(
+                                              top: 0,
+                                              right: 10,
+                                              left: 10,
+                                              child: Text(
+                                                'Score',
+                                                style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.grey),
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                  );
-                                }),
-                          ],
+                                    );
+                                  }),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    ElevatedButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      child: Text('Dismiss'),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -631,7 +651,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: BlocBuilder<ProfileBloc, ProfileState>(
             bloc: _profileBloc,
             builder: (context, state) {
-              print('status buider => ' + state.status.toString());
+              // print('status buider => ' + state.status.toString());
               switch (state.status) {
                 case ProfileStatus.initial:
                   return Scaffold(
@@ -762,123 +782,123 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       style: TextStyle(color: Colors.white),
                                     ),
                                     Expanded(child: SizedBox()),
-                                    Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 15.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Visibility(
-                                            visible: state.statusBreak == '1'
-                                                ? true
-                                                : false,
-                                            child: Visibility(
-                                              visible: state.clockIn == '--:--'
-                                                  ? false
-                                                  : true,
-                                              child: Column(
-                                                children: [
-                                                  Shimmer.fromColors(
-                                                    baseColor: Colors.grey,
-                                                    highlightColor:
-                                                        Colors.white,
-                                                    child: FloatingActionButton(
-                                                      backgroundColor: state
-                                                                  .breakOut !=
-                                                              ''
-                                                          ? Colors.grey
-                                                          : Color(0xff12cad6),
-                                                      heroTag: 'breakOut',
-                                                      onPressed: () {},
-                                                      child: Text('Break\nOut',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 8.0),
-                                                    child: Shimmer.fromColors(
-                                                      baseColor: Colors.grey,
-                                                      highlightColor:
-                                                          Colors.white,
-                                                      child: SizedBox(
-                                                          height: 5, width: 10),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  3),
-                                          Visibility(
-                                            visible: state.statusBreak == '1'
-                                                ? true
-                                                : false,
-                                            child: Visibility(
-                                              visible: state.clockIn == '--:--'
-                                                  ? false
-                                                  : true,
-                                              child: Column(
-                                                children: [
-                                                  Shimmer.fromColors(
-                                                    baseColor: Colors.grey,
-                                                    highlightColor:
-                                                        Colors.white,
-                                                    child: FloatingActionButton(
-                                                      backgroundColor: (state
-                                                                  .breakOut ==
-                                                              '')
-                                                          ? Colors.grey
-                                                          : (state.breakIn !=
-                                                                  '')
-                                                              ? Colors.grey
-                                                              : Color(
-                                                                  0xff12cad6),
-                                                      heroTag: 'breakIn',
-                                                      onPressed: () {},
-                                                      child: Text('Break\nIn',
-                                                          textAlign:
-                                                              TextAlign.center),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Padding(
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            top: 8.0),
-                                                    child: Shimmer.fromColors(
-                                                      baseColor: Colors.grey,
-                                                      highlightColor:
-                                                          Colors.white,
-                                                      child: SizedBox(
-                                                          height: 5, width: 20),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    )
+                                    // Padding(
+                                    //   padding:
+                                    //       const EdgeInsets.only(bottom: 15.0),
+                                    //   child: Row(
+                                    //     mainAxisAlignment:
+                                    //         MainAxisAlignment.center,
+                                    //     children: [
+                                    //       Visibility(
+                                    //         visible: state.statusBreak == '1'
+                                    //             ? true
+                                    //             : false,
+                                    //         child: Visibility(
+                                    //           visible: state.clockIn == '--:--'
+                                    //               ? false
+                                    //               : true,
+                                    //           child: Column(
+                                    //             children: [
+                                    //               Shimmer.fromColors(
+                                    //                 baseColor: Colors.grey,
+                                    //                 highlightColor:
+                                    //                     Colors.white,
+                                    //                 child: FloatingActionButton(
+                                    //                   backgroundColor: state
+                                    //                               .breakOut !=
+                                    //                           ''
+                                    //                       ? Colors.grey
+                                    //                       : Color(0xff12cad6),
+                                    //                   heroTag: 'breakOut',
+                                    //                   onPressed: () {},
+                                    //                   child: Text('Break\nOut',
+                                    //                       textAlign:
+                                    //                           TextAlign.center),
+                                    //                   shape:
+                                    //                       RoundedRectangleBorder(
+                                    //                     borderRadius:
+                                    //                         BorderRadius
+                                    //                             .circular(10),
+                                    //                   ),
+                                    //                 ),
+                                    //               ),
+                                    //               Padding(
+                                    //                 padding:
+                                    //                     const EdgeInsets.only(
+                                    //                         top: 8.0),
+                                    //                 child: Shimmer.fromColors(
+                                    //                   baseColor: Colors.grey,
+                                    //                   highlightColor:
+                                    //                       Colors.white,
+                                    //                   child: SizedBox(
+                                    //                       height: 5, width: 10),
+                                    //                 ),
+                                    //               ),
+                                    //             ],
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //       SizedBox(
+                                    //           width: MediaQuery.of(context)
+                                    //                   .size
+                                    //                   .width /
+                                    //               3),
+                                    //       Visibility(
+                                    //         visible: state.statusBreak == '1'
+                                    //             ? true
+                                    //             : false,
+                                    //         child: Visibility(
+                                    //           visible: state.clockIn == '--:--'
+                                    //               ? false
+                                    //               : true,
+                                    //           child: Column(
+                                    //             children: [
+                                    //               Shimmer.fromColors(
+                                    //                 baseColor: Colors.grey,
+                                    //                 highlightColor:
+                                    //                     Colors.white,
+                                    //                 child: FloatingActionButton(
+                                    //                   backgroundColor: (state
+                                    //                               .breakOut ==
+                                    //                           '')
+                                    //                       ? Colors.grey
+                                    //                       : (state.breakIn !=
+                                    //                               '')
+                                    //                           ? Colors.grey
+                                    //                           : Color(
+                                    //                               0xff12cad6),
+                                    //                   heroTag: 'breakIn',
+                                    //                   onPressed: () {},
+                                    //                   child: Text('Break\nIn',
+                                    //                       textAlign:
+                                    //                           TextAlign.center),
+                                    //                   shape:
+                                    //                       RoundedRectangleBorder(
+                                    //                     borderRadius:
+                                    //                         BorderRadius
+                                    //                             .circular(10),
+                                    //                   ),
+                                    //                 ),
+                                    //               ),
+                                    //               Padding(
+                                    //                 padding:
+                                    //                     const EdgeInsets.only(
+                                    //                         top: 8.0),
+                                    //                 child: Shimmer.fromColors(
+                                    //                   baseColor: Colors.grey,
+                                    //                   highlightColor:
+                                    //                       Colors.white,
+                                    //                   child: SizedBox(
+                                    //                       height: 5, width: 20),
+                                    //                 ),
+                                    //               ),
+                                    //             ],
+                                    //           ),
+                                    //         ),
+                                    //       ),
+                                    //     ],
+                                    //   ),
+                                    // )
                                   ],
                                 ),
                               ),
@@ -1502,10 +1522,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             shift = state.shiftIn;
           });
 
-          print('con. 2 => state.clockIn = ' +
-              state.clockIn +
-              ' dataClockout = ' +
-              state.clockOut);
+          // print('con. 2 => state.clockIn = ' +
+          //     state.clockIn +
+          //     ' dataClockout = ' +
+          //     state.clockOut);
           //kondisi belum checkin
 
         } else if (state.clockOut == "--:--") {
@@ -1527,18 +1547,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
             shift = state.shiftOut;
           });
 
-          print('con. 3 => state.clockIn = ' +
-              state.clockIn +
-              ' dataClockout = ' +
-              state.clockOut);
+          // print('con. 3 => state.clockIn = ' +
+          //     state.clockIn +
+          //     ' dataClockout = ' +
+          //     state.clockOut);
           //kondisi sudah checkin & belum checkout
 
         } else {
           if (state.clockIn != "--:--" && state.clockOut != "--:--") {
-            print('con. 1 => state.clockIn = ' +
-                state.clockIn +
-                ' dataClockout = ' +
-                state.clockOut);
+            // print('con. 1 => state.clockIn = ' +
+            //     state.clockIn +
+            //     ' dataClockout = ' +
+            //     state.clockOut);
             //kondisi sudah checkin & sudah checkout
 
             setState(() {
@@ -1576,10 +1596,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shift = state.shiftIn;
         });
 
-        print('con. 2 => state.clockIn = ' +
-            state.clockIn +
-            ' dataClockout = ' +
-            state.clockOut);
+        // print('con. 2 => state.clockIn = ' +
+        //     state.clockIn +
+        //     ' dataClockout = ' +
+        //     state.clockOut);
         //kondisi belum checkin
 
       } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
@@ -1601,10 +1621,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shift = state.shiftOut;
         });
 
-        print('con. 3 => state.clockIn = ' +
-            state.clockIn +
-            ' dataClockout = ' +
-            state.clockOut);
+        // print('con. 3 => state.clockIn = ' +
+        //     state.clockIn +
+        //     ' dataClockout = ' +
+        //     state.clockOut);
         //kondisi sudah checkin & belum checkout
 
       } else if (dateOut != dateId) {
@@ -1622,10 +1642,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shift = state.shiftIn;
         });
 
-        print('con. 4 => state.clockIn = ' +
-            state.clockIn +
-            ' dataClockout = ' +
-            state.clockOut);
+        // print('con. 4 => state.clockIn = ' +
+        //     state.clockIn +
+        //     ' dataClockout = ' +
+        //     state.clockOut);
         //kondisi tanggal checkout tidak sama dengan tgl hari ini
 
       } else {
@@ -1640,10 +1660,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shift = state.shiftIn;
         });
 
-        print('con. 5 => state.clockIn = ' +
-            state.clockIn +
-            ' dataClockout = ' +
-            state.clockOut);
+        // print('con. 5 => state.clockIn = ' +
+        //     state.clockIn +
+        //     ' dataClockout = ' +
+        //     state.clockOut);
         //kondisi sift malam
       }
     }
@@ -1693,11 +1713,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             isShowSuccessCheckout = true;
           });
-          _profileBloc.add(InitialProfile());
-          getProfil(userID, date);
+          // _profileBloc.add(InitialProfile());
+          // getProfil(userID, date);
+          checkBadEmp(context);
         }
-        checkBadEmp(context);
       },
+      dismissOnBackKeyPress: false,
+      dismissOnTouchOutside: false,
     )..show();
   }
 
@@ -1716,8 +1738,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconsButton(
           onPressed: () {
             Navigator.of(context).pop();
-            _profileBloc.add(InitialProfile());
-            getProfil(userID, date);
+            checkBadEmp(context);
+            // _profileBloc.add(InitialProfile());
+            // getProfil(userID, date);
           },
           text: '',
           iconData: Icons.done,
@@ -1797,17 +1820,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   checkStatus(userId) async {
-    showProgressDialog(context);
-    // print(userId);
-    // setState(() {
-    //   _saving = true;
-    // });
+    // print('checkStatus => userId = ' + userId);
 
-    // if(_isCheckout == true){
-    //   Future.delayed(const Duration(microseconds: 3000),(){
-    //     Navigator.pushNamedAndRemoveUntil(context, "/profile", (Route<dynamic>routes)=>false);
-    //   });
-    // }else{
+    showProgressDialog(context);
+
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
@@ -1819,7 +1835,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     ApiServices services = ApiServices();
-    // var response = await services.checkStatus(ip, userID);
     var response = await services.checkStatus(ip, userID);
 
     if (response.data.aktif.isEmpty) {
@@ -1828,18 +1843,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             context, "/invalid_ip", (Route<dynamic> routes) => false);
       });
     } else {
-      // print('Status aktif = ' + response.data.aktif);
-
-      // setState(() {
-      //   _saving = false;
-      // });
       Navigator.of(context, rootNavigator: true).pop(context);
 
       if (response.data.aktif == '1') {
         if (response.data.achive == true) {
           _getFromCamera();
-          // Navigator.pushNamed(context, "/camera",
-          //     arguments: ScreenArguments(userID, _status, idShift, shift));
         } else {
           AwesomeDialog(
             context: context,
@@ -1853,21 +1861,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     context, "/profile", (Route<dynamic> routes) => false);
               });
             },
-            // buttons: [
-            //   DialogButton(
-            //     child: Text(
-            //       "Kembali",
-            //       style: TextStyle(color: Colors.white, fontSize: 20),
-            //     ),
-            //     onPressed: () => {
-            //       Future.delayed(const Duration(microseconds: 2000), () {
-            //         Navigator.pushNamedAndRemoveUntil(context, "/profile",
-            //             (Route<dynamic> routes) => false);
-            //       })
-            //     },
-            //     width: 120,
-            //   )
-            // ]
           )..show();
         }
       } else {
@@ -1880,19 +1873,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           btnOkOnPress: () {
             logout();
           },
-          // buttons: [
-          //   DialogButton(
-          //     child: Text(
-          //       "Logout",
-          //       style: TextStyle(color: Colors.white, fontSize: 20),
-          //     ),
-          //     onPressed: () => {logout()},
-          //     width: 120,
-          //   )
-          // ]
         )..show();
       }
     }
-    // }
   }
 }
