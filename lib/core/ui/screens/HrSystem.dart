@@ -24,7 +24,7 @@ class _HrSystemState extends State<HrSystem> {
 
   @override
   void initState() {
-    if (Platform.isAndroid) WebView.platform = SurfaceAndroidWebView();
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
     super.initState();
   }
 
@@ -119,15 +119,14 @@ class _HrSystemState extends State<HrSystem> {
           ),
           (_loading)
               ? Container(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            color: Colors.grey[100],
-            child: Center(
-              child: CircularProgressIndicator(),
-            ),
-          )
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  color: Colors.grey[100],
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                )
               : SizedBox.shrink(),
-
         ],
       ),
     );

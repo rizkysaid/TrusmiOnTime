@@ -433,8 +433,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ApiServices services = ApiServices();
     var response = await services.checkBadEmp(ip, userID);
 
-    if (response['status'] == true) {
-      _displayBadEmployees(context, response);
+    if (response != null) {
+      if (response['status'] == true) {
+        _displayBadEmployees(context, response);
+      } else {
+        _profileBloc.add(InitialProfile());
+        getProfil(userID, date);
+      }
     } else {
       _profileBloc.add(InitialProfile());
       getProfil(userID, date);
@@ -518,7 +523,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   SizedBox(height: 5),
                                   DefaultTextStyle(
                                     child: Text(
-                                      'Last Month',
+                                      'Of The Month',
                                     ),
                                     style: TextStyle(
                                       fontSize: 22,
@@ -551,56 +556,71 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               SizedBox(height: 40),
                               ListView.builder(
-                                  shrinkWrap: true,
-                                  itemCount: response['data'].length,
-                                  itemBuilder: (context, index) {
-                                    return Card(
-                                      child: ListTile(
-                                        contentPadding: EdgeInsets.all(10),
-                                        minVerticalPadding: 10,
-                                        leading: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                            Endpoint.baseIp +
-                                                '/' +
-                                                response['data'][index]
-                                                    ['profile_picture'],
-                                          ),
-                                          radius: 30,
+                                shrinkWrap: true,
+                                itemCount: response['data'].length,
+                                itemBuilder: (context, index) {
+                                  return Card(
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.all(10),
+                                      minVerticalPadding: 10,
+                                      leading: CircleAvatar(
+                                        backgroundImage: NetworkImage(
+                                          Endpoint.baseIp +
+                                              '/' +
+                                              response['data'][index]
+                                                  ['profile_picture'],
                                         ),
-                                        title: Text(response['data'][index]
-                                            ['employee']),
-                                        subtitle: Text(
-                                            response['data'][index]['jabatan']),
-                                        trailing: Stack(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 5.0),
-                                              child: Chip(
-                                                label: Text(
-                                                  response['data'][index]
-                                                      ['score'],
-                                                ),
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 0,
-                                              right: 10,
-                                              left: 10,
-                                              child: Text(
-                                                'Score',
-                                                style: TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        radius: 30,
                                       ),
-                                    );
-                                  }),
+                                      title: Text(
+                                          response['data'][index]['employee']),
+                                      subtitle: Text(
+                                          response['data'][index]['jabatan']),
+                                      trailing: Stack(
+                                        children: [
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Chip(
+                                              label: Text(
+                                                response['data'][index]
+                                                    ['score'],
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 0,
+                                            right: 10,
+                                            left: 10,
+                                            child: Text(
+                                              'Score',
+                                              style: TextStyle(
+                                                  fontSize: 10,
+                                                  color: Colors.grey),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                             ],
                           ),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _profileBloc.add(InitialProfile());
+                          getProfil(userID, date);
+                        },
+                        child: Text('Close'),
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.white),
+                          foregroundColor:
+                              MaterialStateProperty.all<Color>(Colors.black87),
                         ),
                       ),
                     ],
@@ -709,7 +729,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: <Widget>[
-                                    SizedBox(height: 20),
+                                    SizedBox(
+                                        height:
+                                            MediaQuery.of(context).size.height *
+                                                0.09),
                                     Container(
                                       width: 300.0,
                                       height: 300.0,
@@ -1195,7 +1218,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.center,
                               mainAxisAlignment: MainAxisAlignment.start,
                               children: <Widget>[
-                                SizedBox(height: 20),
+                                SizedBox(
+                                    height: MediaQuery.of(context).size.height *
+                                        0.09),
                                 Container(
                                   width: 300.0,
                                   height: 300.0,

@@ -150,13 +150,16 @@ class ApiServices {
 
   Future<dynamic> checkBadEmp(ip, userId) async {
     try {
+      var dio = new Dio();
+      // dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
+      dio.options.connectTimeout = 30000; //5s
+      dio.options.receiveTimeout = 25000;
       var response = await dio.get(ip + '/check_bad_emp/' + userId);
-      print('ip => ' + ip);
-      print("Response checkBadEmp Status : ${response.data['status']}");
-      print("Response checkBadEmp Body : ${response.data}");
       return response.data;
     } catch (e) {
       return null;
+    } finally {
+      dio.close();
     }
   }
 }

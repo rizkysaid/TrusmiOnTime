@@ -33,7 +33,20 @@
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data android:name="flutterEmbedding" android:value="2" />
 
+        <!-- Take Image provider -->
+        <provider android:name="androidx.core.content.FileProvider"
+            android:authorities="com.example.login_absen.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
     </application>
+
+    
+
+
 
 
 </manifest>
