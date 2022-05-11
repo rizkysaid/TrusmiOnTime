@@ -47,6 +47,7 @@ class _HrSystemState extends State<HrSystem> {
 
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
           // WebView(
