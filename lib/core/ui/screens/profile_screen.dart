@@ -470,7 +470,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             },
             child: SafeArea(
               child: Container(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(10),
                 child: Center(
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -494,17 +494,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 alignment: Alignment.topRight,
                                 child: Material(
                                   color: Colors.transparent,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.close_rounded,
-                                      color: Colors.grey,
-                                    ),
+                                  child: ElevatedButton(
                                     onPressed: () {
                                       Navigator.pop(context);
                                       _profileBloc.add(InitialProfile());
                                       getProfil(userID, date);
                                     },
+                                    child:
+                                        Icon(Icons.close, color: Colors.grey),
+                                    style: ElevatedButton.styleFrom(
+                                      shape: CircleBorder(),
+                                      padding: EdgeInsets.all(2),
+                                      primary: Colors.red,
+                                      onPrimary: Colors.redAccent,
+                                      elevation: 0,
+                                    ),
                                   ),
+                                  // IconButton(
+                                  //   icon: Icon(
+                                  //     Icons.close_rounded,
+                                  //     color: Colors.grey,
+                                  //   ),
+                                  //   onPressed: () {
+                                  //     Navigator.pop(context);
+                                  //     _profileBloc.add(InitialProfile());
+                                  //     getProfil(userID, date);
+                                  //   },
+                                  // ),
                                 ),
                               ),
                               Column(
@@ -517,7 +533,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       fontSize: 22,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
-                                      letterSpacing: 2.0,
                                     ),
                                   ),
                                   SizedBox(height: 5),
@@ -560,6 +575,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 itemCount: response['data'].length,
                                 itemBuilder: (context, index) {
                                   return Card(
+                                    shadowColor: Colors.grey,
                                     child: ListTile(
                                       contentPadding: EdgeInsets.all(10),
                                       minVerticalPadding: 10,
@@ -576,7 +592,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           response['data'][index]['employee']),
                                       subtitle: Text(
                                           response['data'][index]['jabatan']),
-                                      trailing: Stack(
+                                      trailing:
+                                          // Padding(
+                                          //   padding: EdgeInsets.all(5),
+                                          //   child: Column(
+                                          //     crossAxisAlignment:
+                                          //         CrossAxisAlignment.center,
+                                          //     children: [
+                                          //       Text(
+                                          //         'KPI',
+                                          //         style: TextStyle(
+                                          //             fontSize: 9,
+                                          //             color: Colors.grey),
+                                          //       ),
+                                          //       Chip(
+                                          //         label: Text(
+                                          //           response['data'][index]
+                                          //               ['score'],
+                                          //         ),
+                                          //       ),
+                                          //     ],
+                                          //   ),
+                                          // ),
+
+                                          Stack(
                                         children: [
                                           Padding(
                                             padding:
@@ -590,13 +629,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           ),
                                           Positioned(
                                             top: 0,
-                                            right: 10,
-                                            left: 10,
-                                            child: Text(
-                                              'Score',
-                                              style: TextStyle(
-                                                  fontSize: 10,
-                                                  color: Colors.grey),
+                                            left: 0,
+                                            right: 0,
+                                            child: Align(
+                                              alignment: Alignment.center,
+                                              child: Text(
+                                                'KPI',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    fontSize: 9,
+                                                    color: Colors.grey),
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -616,12 +659,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           getProfil(userID, date);
                         },
                         child: Text('Close'),
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.white),
-                          foregroundColor:
-                              MaterialStateProperty.all<Color>(Colors.black87),
-                        ),
+                        // style: ButtonStyle(
+                        //   backgroundColor:
+                        //       MaterialStateProperty.all<Color>(Colors.white),
+                        //   foregroundColor:
+                        //       MaterialStateProperty.all<Color>(Colors.black87),
+                        // ),
                       ),
                     ],
                   ),
