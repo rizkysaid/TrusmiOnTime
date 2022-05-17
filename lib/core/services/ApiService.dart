@@ -14,8 +14,8 @@ class ApiServices {
     print('getConnect url : ' + url.toString());
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //5s
-      dio.options.receiveTimeout = 25000;
+      dio.options.connectTimeout = 10000; //10s
+      dio.options.receiveTimeout = 5000;
 
       return await dio.post(url, cancelToken: apiToken);
     } on DioError catch (e) {
@@ -46,8 +46,8 @@ class ApiServices {
     print('postData : ' + data.toString());
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //5s
-      dio.options.receiveTimeout = 25000;
+      dio.options.connectTimeout = 10000; //10s
+      dio.options.receiveTimeout = 5000;
 
       return await dio.post(url, data: data, cancelToken: apiToken);
     } on DioError catch (e) {
@@ -96,8 +96,8 @@ class ApiServices {
     String url = ip + '/profil/' + userID + '/' + date;
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //5s
-      dio.options.receiveTimeout = 25000;
+      dio.options.connectTimeout = 10000; //10s
+      dio.options.receiveTimeout = 5000;
       response = await dio.get(url, cancelToken: apiToken);
       if (response.data['status'] == true) {
         return response.data['data'];
@@ -122,8 +122,14 @@ class ApiServices {
     }
   }
 
-  Future<CheckStatusModel> checkStatus(ip, userID) async {
-    var response = await http.get(Uri.parse(ip + '/check_in/' + userID));
+  Future<dynamic> checkStatus(ip, userID) async {
+    var response =
+        await http.get(Uri.parse(ip + '/check_in/' + userID)).timeout(
+      Duration(seconds: 7),
+      onTimeout: () {
+        return http.Response('timeout', 408);
+      },
+    );
     // print("Response CekStatus Status : ${response.statusCode}");
     // print("Response CekStatus Body : ${response.body}");
     if (response.statusCode == 200) {
@@ -131,7 +137,7 @@ class ApiServices {
           CheckStatusModel.fromJson(jsonDecode(response.body));
       return responseRequest;
     } else {
-      throw response.statusCode.toString();
+      return response.statusCode.toString();
     }
   }
 
@@ -152,8 +158,8 @@ class ApiServices {
     try {
       var dio = new Dio();
       // dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //5s
-      dio.options.receiveTimeout = 25000;
+      dio.options.connectTimeout = 10000; //10s
+      dio.options.receiveTimeout = 5000;
       var response = await dio.get(ip + '/check_bad_emp/' + userId);
       return response.data;
     } catch (e) {

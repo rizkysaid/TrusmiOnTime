@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:login_absen/core/bloc/profile/profile_bloc.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/config/about.dart';
@@ -22,6 +24,7 @@ import 'package:http/http.dart' as http;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -29,6 +32,10 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   CancelToken apiToken = CancelToken();
 
   String username = '';
@@ -226,9 +233,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _profileBloc.add(InitialProfile());
-    getPref();
-    _onRefresh();
+    // _profileBloc.add(InitialProfile());
+    // getPref();
+    // _onRefresh();
+
+    initConnectivity();
+
+    _connectivitySubscription =
+        _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
     _timeString = _formatDateTime(DateTime.now());
     _hariTanggal = _formatHariTanggal(DateTime.now());
@@ -248,8 +260,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> initConnectivity() async {
+    late ConnectivityResult result;
+    // Platform messages may fail, so we use a try/catch PlatformException.
+    try {
+      result = await _connectivity.checkConnectivity();
+
+      if (result == ConnectivityResult.none) {
+        Navigator.pushReplacementNamed(context, "/no_connection");
+      } else if (result == ConnectivityResult.mobile) {
+        if (Endpoint.baseIp == 'http://192.168.23.23') {
+          Navigator.pushReplacementNamed(context, "/no_connection");
+        } else {
+          _profileBloc.add(InitialProfile());
+          getPref();
+          _onRefresh();
+        }
+      } else {
+        _profileBloc.add(InitialProfile());
+        getPref();
+        _onRefresh();
+      }
+    } on PlatformException catch (e) {
+      print(e.toString());
+      return;
+    }
+
+    // If the widget was removed from the tree while the asynchronous platform
+    // message was in flight, we want to discard the reply rather than calling
+    // setState to update our non-existent appearance.
+    if (!mounted) {
+      return Future.value(null);
+    }
+
+    return _updateConnectionStatus(result);
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    setState(() {
+      _connectionStatus = result;
+    });
+    if (result == ConnectivityResult.none) {
+      Navigator.pushReplacementNamed(context, "/no_connection");
+    } else if (result == ConnectivityResult.mobile) {
+      if (Endpoint.baseIp == 'http://192.168.23.23') {
+        Navigator.pushReplacementNamed(context, "/no_connection");
+      } else {
+        _profileBloc.add(InitialProfile());
+        getPref();
+        _onRefresh();
+      }
+    } else {
+      _profileBloc.add(InitialProfile());
+      getPref();
+      _onRefresh();
+    }
+    print(_connectionStatus);
+  }
+
   @override
   void dispose() {
+    _connectivitySubscription.cancel();
     super.dispose();
 //    timer.cancel();
   }
@@ -279,7 +350,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   //       ToastUtils.show("Error Connecting To Server");
   //       Future.delayed(const Duration(microseconds: 2000), () {
   //         Navigator.pushNamedAndRemoveUntil(
-  //             context, "/invalid_ip", (Route<dynamic> routes) => false);
+  //             context, "/no_connection", (Route<dynamic> routes) => false);
   //       });
   //     }
   //   }
@@ -1887,7 +1958,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  checkStatus(userId) async {
+  Future<void> checkStatus(userId) async {
     // print('checkStatus => userId = ' + userId);
 
     showProgressDialog(context);
@@ -1903,46 +1974,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     ApiServices services = ApiServices();
-    var response = await services.checkStatus(ip, userID);
 
-    if (response.data.aktif.isEmpty) {
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/invalid_ip", (Route<dynamic> routes) => false);
-      });
-    } else {
-      Navigator.of(context, rootNavigator: true).pop(context);
+    try {
+      var response = await services.checkStatus(ip, userID);
 
-      if (response.data.aktif == '1') {
-        if (response.data.achive == true) {
-          _getFromCamera();
+      if (response.data.aktif.isEmpty) {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/no_connection", (Route<dynamic> routes) => false);
+        });
+      } else {
+        Navigator.of(context, rootNavigator: true).pop(context);
+
+        if (response.data.aktif == '1') {
+          if (response.data.achive == true) {
+            _getFromCamera();
+          } else {
+            AwesomeDialog(
+              context: context,
+              dialogType: DialogType.ERROR,
+              title: "Anda tidak bisa melakukan absen!",
+              desc: response.data.message,
+              btnOkText: "Kembali",
+              btnOkOnPress: () {
+                Future.delayed(const Duration(microseconds: 2000), () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/profile", (Route<dynamic> routes) => false);
+                });
+              },
+            )..show();
+          }
         } else {
           AwesomeDialog(
             context: context,
             dialogType: DialogType.ERROR,
             title: "Anda tidak bisa melakukan absen!",
-            desc: response.data.message,
-            btnOkText: "Kembali",
+            desc: "Akun anda telah dinonaktifkan.",
+            btnOkText: "Logout",
             btnOkOnPress: () {
-              Future.delayed(const Duration(microseconds: 2000), () {
-                Navigator.pushNamedAndRemoveUntil(
-                    context, "/profile", (Route<dynamic> routes) => false);
-              });
+              logout();
             },
           )..show();
         }
-      } else {
-        AwesomeDialog(
-          context: context,
-          dialogType: DialogType.ERROR,
-          title: "Anda tidak bisa melakukan absen!",
-          desc: "Akun anda telah dinonaktifkan.",
-          btnOkText: "Logout",
-          btnOkOnPress: () {
-            logout();
-          },
-        )..show();
       }
+    } catch (_) {
+      // ToastUtils.show('Request Time Out. Please try again!');
+      Fluttertoast.showToast(
+        msg: 'Request Time Out. Please try again!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        // fontSize: 16.0,
+      );
+      Navigator.pop(context);
     }
   }
 }

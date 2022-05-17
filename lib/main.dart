@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+// import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
@@ -15,7 +16,7 @@ import 'dart:async';
 
 import 'core/ui/screens/invalid_ip.dart';
 import 'core/ui/screens/login_config.dart';
-//import 'core/utils/toast_util.dart';
+// import 'package:connectivity_plus/connectivity_plus.dart';
 
 void main() {
   runApp(MyApp());
@@ -54,6 +55,10 @@ class CekLogin extends StatefulWidget {
 }
 
 class _CekLoginState extends State<CekLogin> {
+  // ConnectivityResult _connectionStatus = ConnectivityResult.none;
+  // final Connectivity _connectivity = Connectivity();
+  // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+
   String? ip;
   String? userID;
   String? username;
@@ -67,13 +72,58 @@ class _CekLoginState extends State<CekLogin> {
   void initState() {
     super.initState();
     _deleteConfig();
+
+    // initConnectivity();
+
+    // _connectivitySubscription =
+    //     _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
     getPref();
   }
 
   @override
   void dispose() {
+    // _connectivitySubscription.cancel();
     super.dispose();
   }
+
+  // Future<void> initConnectivity() async {
+  //   late ConnectivityResult result;
+  //   // Platform messages may fail, so we use a try/catch PlatformException.
+  //   try {
+  //     result = await _connectivity.checkConnectivity();
+
+  //     if (result == ConnectivityResult.none) {
+  //       Navigator.pushReplacementNamed(context, "/no_connection");
+  //     } else if (result == ConnectivityResult.mobile) {
+  //       if (Endpoint.baseIp == 'http://192.168.23.23') {
+  //         Navigator.pushReplacementNamed(context, "/no_connection");
+  //       } else {
+  //         getPref();
+  //       }
+  //     } else {
+  //       getPref();
+  //     }
+  //   } on PlatformException catch (e) {
+  //     print(e.toString());
+  //     return;
+  //   }
+
+  //   // If the widget was removed from the tree while the asynchronous platform
+  //   // message was in flight, we want to discard the reply rather than calling
+  //   // setState to update our non-existent appearance.
+  //   if (!mounted) {
+  //     return Future.value(null);
+  //   }
+
+  //   return _updateConnectionStatus(result);
+  // }
+
+  // Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+  //   setState(() {
+  //     _connectionStatus = result;
+  //   });
+  //   print(_connectionStatus);
+  // }
 
   getPref() async {
     final dbHelper = DatabaseHelper.instance;
