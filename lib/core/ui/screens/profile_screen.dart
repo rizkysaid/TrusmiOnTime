@@ -325,38 +325,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 //    timer.cancel();
   }
 
-  // Future<void> checkConnection() async {
-
-  //   String ip;
-  //   final dbHelper = DatabaseHelper.instance;
-  //   final allRows = await dbHelper.queryAllRows();
-
-  //   if (allRows.length != 0) {
-  //     ip = allRows[0]['ip_address'];
-  //   } else {
-  //     ip = Endpoint.baseUrl;
-  //   }
-
-  //   ApiServices services = ApiServices();
-  //   var response = await services.profil(ip, userID, date);
-
-  //   if (userID == null) {
-  //     Future.delayed(const Duration(microseconds: 2000), () {
-  //       Navigator.pushNamedAndRemoveUntil(
-  //           context, "/login", (Route<dynamic> routes) => false);
-  //     });
-  //   } else {
-  //     if (response == null) {
-  //       ToastUtils.show("Error Connecting To Server");
-  //       Future.delayed(const Duration(microseconds: 2000), () {
-  //         Navigator.pushNamedAndRemoveUntil(
-  //             context, "/no_connection", (Route<dynamic> routes) => false);
-  //       });
-  //     }
-  //   }
-
-  // }
-
   RefreshController _refreshController =
       RefreshController(initialRefresh: false);
 
@@ -396,7 +364,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  getPref() async {
+  Future<void> getPref() async {
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
     // print(pref.getString('username'));
@@ -542,208 +510,690 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: SafeArea(
               child: Container(
                 padding: EdgeInsets.all(10),
-                child: Center(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Expanded(
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            response.length == 1
+                                ? _singleBestEmployee(response)
+                                : _prodevBestEmployee(response),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5),
+                      child: GestureDetector(
                         child: Container(
-                          width: MediaQuery.of(context).size.width - 50,
                           padding: EdgeInsets.all(10),
-                          margin: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            image: DecorationImage(
-                              image: AssetImage('assets/background.png'),
-                              fit: BoxFit.cover,
-                            ),
+                            color: Colors.transparent,
+                            // image: DecorationImage(
+                            //   image: AssetImage('assets/background.png'),
+                            //   fit: BoxFit.cover,
+                            // ),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: Column(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Align(
-                                alignment: Alignment.topRight,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                      _profileBloc.add(InitialProfile());
-                                      getProfil(userID, date);
-                                    },
-                                    child:
-                                        Icon(Icons.close, color: Colors.grey),
-                                    style: ElevatedButton.styleFrom(
-                                      shape: CircleBorder(),
-                                      padding: EdgeInsets.all(2),
-                                      primary: Colors.red,
-                                      onPrimary: Colors.redAccent,
-                                      elevation: 0,
-                                    ),
-                                  ),
-                                  // IconButton(
-                                  //   icon: Icon(
-                                  //     Icons.close_rounded,
-                                  //     color: Colors.grey,
-                                  //   ),
-                                  //   onPressed: () {
-                                  //     Navigator.pop(context);
-                                  //     _profileBloc.add(InitialProfile());
-                                  //     getProfil(userID, date);
-                                  //   },
-                                  // ),
+                              DefaultTextStyle(
+                                child: Text('Close (x)'),
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 17,
                                 ),
-                              ),
-                              Column(
-                                children: [
-                                  DefaultTextStyle(
-                                    child: Text(
-                                      'Bad Employee',
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  DefaultTextStyle(
-                                    child: Text(
-                                      'Of The Month',
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 2.0,
-                                    ),
-                                  ),
-                                  SizedBox(height: 5),
-                                  DefaultTextStyle(
-                                    child: Text(
-                                      DateFormat('MMMM').format(
-                                            DateTime(
-                                              0,
-                                              int.parse(response['periode']
-                                                  .substring(5, 7)),
-                                            ),
-                                          ) +
-                                          ', ' +
-                                          response['periode'].substring(0, 4),
-                                    ),
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 2.0,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 40),
-                              ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: response['data'].length,
-                                itemBuilder: (context, index) {
-                                  return Card(
-                                    shadowColor: Colors.grey,
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.all(10),
-                                      minVerticalPadding: 10,
-                                      leading: CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          Endpoint.baseIp +
-                                              '/' +
-                                              response['data'][index]
-                                                  ['profile_picture'],
-                                        ),
-                                        radius: 30,
-                                      ),
-                                      title: Text(
-                                          response['data'][index]['employee']),
-                                      subtitle: Text(
-                                          response['data'][index]['jabatan']),
-                                      trailing:
-                                          // Padding(
-                                          //   padding: EdgeInsets.all(5),
-                                          //   child: Column(
-                                          //     crossAxisAlignment:
-                                          //         CrossAxisAlignment.center,
-                                          //     children: [
-                                          //       Text(
-                                          //         'KPI',
-                                          //         style: TextStyle(
-                                          //             fontSize: 9,
-                                          //             color: Colors.grey),
-                                          //       ),
-                                          //       Chip(
-                                          //         label: Text(
-                                          //           response['data'][index]
-                                          //               ['score'],
-                                          //         ),
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-
-                                          Stack(
-                                        children: [
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 5.0),
-                                            child: Chip(
-                                              label: Text(
-                                                response['data'][index]
-                                                    ['score'],
-                                              ),
-                                            ),
-                                          ),
-                                          Positioned(
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            child: Align(
-                                              alignment: Alignment.center,
-                                              child: Text(
-                                                'KPI',
-                                                textAlign: TextAlign.center,
-                                                style: TextStyle(
-                                                    fontSize: 9,
-                                                    color: Colors.grey),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                },
                               ),
                             ],
                           ),
                         ),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
+                        onTap: () {
                           Navigator.pop(context);
                           _profileBloc.add(InitialProfile());
                           getProfil(userID, date);
                         },
-                        child: Text('Close'),
-                        // style: ButtonStyle(
-                        //   backgroundColor:
-                        //       MaterialStateProperty.all<Color>(Colors.white),
-                        //   foregroundColor:
-                        //       MaterialStateProperty.all<Color>(Colors.black87),
-                        // ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ),
             ),
           );
         });
+  }
+
+  Widget _singleBestEmployee(response) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                  image: AssetImage('assets/background.png'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(30),
+                  bottomLeft: Radius.circular(30),
+                ),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.3,
+                child: Column(
+                  children: [
+                    Container(
+                      margin: EdgeInsets.only(top: 15),
+                      width: double.infinity,
+                      child: Center(
+                        child: DefaultTextStyle(
+                          child: Text('Best Employee Of The Month'),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(top: 15, bottom: 10),
+                      alignment: Alignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: Padding(
+                                padding: const EdgeInsets.only(top: 5),
+                                child: Column(
+                                  children: [
+                                    DefaultTextStyle(
+                                      child: Text("Periode"),
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Container(
+                                      child: Column(
+                                        children: [
+                                          DefaultTextStyle(
+                                            child:
+                                                Text(DateFormat('MMMM').format(
+                                              DateTime(
+                                                0,
+                                                int.parse(
+                                                  response['periode']
+                                                      .substring(5, 7),
+                                                ),
+                                              ),
+                                            )),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          DefaultTextStyle(
+                                            child: Text(response['periode']
+                                                .substring(0, 4)),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(
+                              20,
+                              5,
+                              20,
+                              0,
+                            ),
+                            padding: EdgeInsets.all(2.5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                            ),
+                            child: CircleAvatar(
+                              backgroundColor: Colors.white,
+                              backgroundImage: NetworkImage(
+                                Endpoint.baseIp +
+                                    '/' +
+                                    response['data']['best'][0]
+                                        ['profile_picture'],
+                              ),
+                              radius: 45.0,
+                            ),
+                          ),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 5),
+                              child: Center(
+                                child: Column(
+                                  children: [],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    DefaultTextStyle(
+                      child: Text(response['data']['best'][0]['employee']),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    DefaultTextStyle(
+                      child: Text(response['data']['best'][0]['jabatan']),
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 5,
+              right: 5,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    _profileBloc.add(InitialProfile());
+                    getProfil(userID, date);
+                  },
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue[50]!.withOpacity(0.25),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.grey,
+                      size: 17,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              top: 70,
+              right: 15,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Column(
+                    children: [
+                      DefaultTextStyle(
+                        child: Text("KPI"),
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      Image(
+                        image: AssetImage('assets/gold-medal.png'),
+                        width: 80,
+                        height: 80,
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    top: 32,
+                    // left: 25,
+                    child: Center(
+                      child: DefaultTextStyle(
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                        child: Text(
+                          response['data']['best'][0]['score'],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 20,
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(bottom: 5),
+                width: double.infinity,
+                child: Center(
+                  child: Column(
+                    children: [
+                      DefaultTextStyle(
+                        child: Text('Bad Employee Of The Month'),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: response['data']['bad'].length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    // elevation: 5,
+                    // shape: RoundedRectangleBorder(
+                    //   borderRadius: BorderRadius.circular(20),
+                    // ),
+                    child: ListTile(
+                      // contentPadding: EdgeInsets.all(10),
+                      // minVerticalPadding: 5,
+                      leading: Container(
+                        padding: EdgeInsets.all(2.5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            Endpoint.baseIp +
+                                '/' +
+                                response['data']['bad'][index]
+                                    ['profile_picture'],
+                          ),
+                          radius: 30,
+                        ),
+                      ),
+                      title: Text(response['data']['bad'][index]['employee']),
+                      subtitle: Text(response['data']['bad'][index]['jabatan']),
+                      trailing: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: Chip(
+                              label: Text(
+                                response['data']['bad'][index]['score'],
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'KPI',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 9, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _prodevBestEmployee(response) {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                image: DecorationImage(
+                  image: AssetImage('assets/background.png'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(10),
+                  topRight: Radius.circular(10),
+                  bottomRight: Radius.circular(30),
+                  bottomLeft: Radius.circular(30),
+                ),
+              ),
+              child: Container(
+                width: double.infinity,
+                height: MediaQuery.of(context).size.height * 0.4,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child: Container()),
+                    Container(
+                      width: double.infinity,
+                      child: Center(
+                        child: Column(
+                          children: [
+                            DefaultTextStyle(
+                              child: Text('Best Employee Of The Month'),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            DefaultTextStyle(
+                              child: Text(
+                                DateFormat('MMMM').format(
+                                      DateTime(
+                                        0,
+                                        int.parse(
+                                          response['periode'].substring(5, 7),
+                                        ),
+                                      ),
+                                    ) +
+                                    ' ' +
+                                    response['periode'].substring(0, 4),
+                              ),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Container()),
+                    Container(
+                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
+                      child: GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.vertical,
+                        childAspectRatio: 1.5,
+                        children: List.generate(
+                          response['data']['best'].length,
+                          (index) {
+                            return Card(
+                              elevation: 0,
+                              color: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  Container(
+                                    width:
+                                        MediaQuery.of(context).size.width / 2.5,
+                                    padding: EdgeInsets.all(5),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          padding: EdgeInsets.only(right: 30),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            padding: EdgeInsets.all(2.5),
+                                            child: CircleAvatar(
+                                              backgroundImage: NetworkImage(
+                                                Endpoint.baseIp +
+                                                    '/' +
+                                                    response['data']['best']
+                                                            [index]
+                                                        ['profile_picture'],
+                                              ),
+                                              radius: 30,
+                                            ),
+                                          ),
+                                        ),
+                                        DefaultTextStyle(
+                                          child: Text(
+                                            response['data']['best'][index]
+                                                ['employee'],
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        Flexible(
+                                          child: DefaultTextStyle(
+                                            child: Text(
+                                              response['data']['best'][index]
+                                                  ['jabatan'],
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Positioned(
+                                    top: 10,
+                                    right: 15,
+                                    child: Stack(
+                                      alignment: Alignment.center,
+                                      children: [
+                                        Container(
+                                          child: Image(
+                                            image: AssetImage(
+                                                'assets/gold-medal.png'),
+                                            width: 70,
+                                            height: 70,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 10,
+                                          child: DefaultTextStyle(
+                                            child: Text('KPI'),
+                                            style: TextStyle(
+                                              color: Colors.black54,
+                                              fontSize: 8,
+                                            ),
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 18,
+                                          child: DefaultTextStyle(
+                                            child: Text(response['data']['best']
+                                                [index]['score']),
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 17,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Expanded(child: Container()),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              top: 5,
+              right: 5,
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(context);
+                    _profileBloc.add(InitialProfile());
+                    getProfil(userID, date);
+                  },
+                  child: Container(
+                    width: 20,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: Colors.lightBlue[50]!.withOpacity(0.25),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Icons.close,
+                      color: Colors.grey,
+                      size: 17,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 5),
+          child: Column(
+            children: [
+              Container(
+                // margin: EdgeInsets.only(bottom: 5),
+                width: double.infinity,
+                child: Center(
+                  child: Column(
+                    children: [
+                      DefaultTextStyle(
+                        child: Text('Bad Employee Of The Month'),
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              ListView.builder(
+                shrinkWrap: true,
+                itemCount: response['data']['bad'].length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    // elevation: 3,
+                    // shape: RoundedRectangleBorder(
+                    //   borderRadius: BorderRadius.circular(20),
+                    // ),
+                    child: ListTile(
+                      leading: Container(
+                        padding: EdgeInsets.all(1.5),
+                        decoration: BoxDecoration(
+                          color: Colors.grey,
+                          shape: BoxShape.circle,
+                        ),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(
+                            Endpoint.baseIp +
+                                '/' +
+                                response['data']['bad'][index]
+                                    ['profile_picture'],
+                          ),
+                          radius: 20,
+                        ),
+                      ),
+                      title: Text(response['data']['bad'][index]['employee']),
+                      subtitle: Text(response['data']['bad'][index]['jabatan']),
+                      trailing: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 5.0),
+                            child: Chip(
+                              label: Text(
+                                response['data']['bad'][index]['score'],
+                                style: TextStyle(
+                                  color: Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'KPI',
+                                textAlign: TextAlign.center,
+                                style:
+                                    TextStyle(fontSize: 9, color: Colors.grey),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -767,6 +1217,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               case ProfileStatus.success:
                 Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
+
+                checkBadEmp(context);
 
                 break;
               case ProfileStatus.failure:
@@ -1248,25 +1700,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: Colors.transparent,
                             ),
                             SizedBox(width: 10),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Text(
-                                  state.nama,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                ),
-                                Text(
-                                  state.jabatan,
-                                  textAlign: TextAlign.left,
-                                  style: TextStyle(
-                                      fontSize: 14, color: Colors.white),
-                                ),
-                              ],
+                            Flexible(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    state.nama,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    state.jabatan,
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
                             ),
                           ],
                         ),

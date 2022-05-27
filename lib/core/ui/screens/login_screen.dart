@@ -8,6 +8,7 @@ import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:login_absen/core/config/about.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 // bool _saving = false;
 
@@ -213,9 +214,18 @@ class _LoginScreenState extends State<LoginScreen> {
       listener: (context, state) {
         switch (state.status) {
           case LoginStatus.success:
-            ToastUtils.show(state.message);
-            print('listener_success');
-            print(state.message);
+            // ToastUtils.show(state.message);
+            Fluttertoast.showToast(
+              msg: state.message,
+              toastLength: Toast.LENGTH_SHORT,
+              gravity: ToastGravity.TOP,
+              timeInSecForIosWeb: 1,
+              backgroundColor: Colors.blue,
+              textColor: Colors.white,
+              // fontSize: 16.0,
+            );
+            // print('listener_success');
+            // print(state.message);
             Navigator.pop(context);
             savePref(usernameController.text.toString(), state.userId,
                 passwordController.text);
@@ -226,13 +236,13 @@ class _LoginScreenState extends State<LoginScreen> {
             break;
           case LoginStatus.failure:
             ToastUtils.show(state.message);
-            print('listener_filure');
-            print(state.message);
+            // print('listener_filure');
+            // print(state.message);
             Navigator.pop(context);
             break;
           case LoginStatus.loading:
-            print('listener_loading');
-            print(state.message);
+            // print('listener_loading');
+            // print(state.message);
             showProgressDialog(context);
             break;
           default:

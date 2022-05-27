@@ -73,6 +73,7 @@ flutter:
     - assets/background_login.png
     - assets/logo_png_ontime.png
     - assets/no_connection.png
+    - assets/gold-medal.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
