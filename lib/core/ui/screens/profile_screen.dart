@@ -1218,7 +1218,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
 
-                checkBadEmp(context);
+                // checkBadEmp(context);
 
                 break;
               case ProfileStatus.failure:
