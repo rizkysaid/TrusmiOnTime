@@ -72,6 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _timeString = '';
   String _hariTanggal = '';
 
+  int responseTime = 15;
+
   String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
 
   File? imageFile;
@@ -320,7 +322,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void dispose() {
-    _connectivitySubscription.cancel();
+    if (!mounted) {
+      _connectivitySubscription.cancel();
+    }
     super.dispose();
 //    timer.cancel();
   }
@@ -429,7 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     print('checkHolidays => ' + response.toString());
     if (response == null) {
-      checkBadEmp(context);
+      checkBestBadEmployee(context);
       // getProfil(userID, date);
       return null;
     } else {
@@ -450,14 +454,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           hariBesar = false;
         });
-        checkBadEmp(context);
+        checkBestBadEmployee(context);
         // _profileBloc.add(InitialProfile());
         // getProfil(userID, date);
       }
     }
   }
 
-  Future<void> checkBadEmp(context) async {
+  Future<void> checkBestBadEmployee(context) async {
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
@@ -470,11 +474,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
 
     ApiServices services = ApiServices();
-    var response = await services.checkBadEmp(ip, userID);
+    var response = await services.checkBestBadEmployee(ip, userID);
 
     if (response != null) {
       if (response['status'] == true) {
-        _displayBadEmployees(context, response);
+        _displayBestBadEmployees(context, response);
       } else {
         _profileBloc.add(InitialProfile());
         getProfil(userID, date);
@@ -485,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  _displayBadEmployees(BuildContext context, response) {
+  void _displayBestBadEmployees(BuildContext context, response) {
     showGeneralDialog(
         context: context,
         barrierDismissible: false,
@@ -521,7 +525,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            response.length == 1
+                            response['data']['best'].length == 1
                                 ? _singleBestEmployee(response)
                                 : _prodevBestEmployee(response),
                           ],
@@ -1218,7 +1222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
 
-                // checkBadEmp(context);
+                // checkBestBadEmployee(context);
 
                 break;
               case ProfileStatus.failure:
@@ -2095,6 +2099,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       userID = state.userId;
       idShift = state.idShift;
+      responseTime = state.responseTime;
     });
     if (state.idShift != '3') {
       if (state.clockIn != dateId) {
@@ -2307,9 +2312,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             isShowSuccessCheckout = true;
           });
-          // _profileBloc.add(InitialProfile());
-          // getProfil(userID, date);
-          checkBadEmp(context);
+          checkBestBadEmployee(context);
         }
       },
       dismissOnBackKeyPress: false,
@@ -2332,7 +2335,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconsButton(
           onPressed: () {
             Navigator.of(context).pop();
-            checkBadEmp(context);
+            checkBestBadEmployee(context);
             // _profileBloc.add(InitialProfile());
             // getProfil(userID, date);
           },
@@ -2431,7 +2434,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ApiServices services = ApiServices();
 
     try {
-      var response = await services.checkStatus(ip, userID);
+      var response = await services.checkStatus(ip, userID, responseTime);
+
+      print('responseTime = ' + responseTime.toString());
 
       if (response.data.aktif.isEmpty) {
         Future.delayed(const Duration(microseconds: 2000), () {

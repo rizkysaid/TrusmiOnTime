@@ -22,6 +22,7 @@ class ProfileState extends Equatable {
   final String breakOut;
   final String breakIn;
   final String message;
+  final int responseTime;
 
   const ProfileState({
     this.status = ProfileStatus.initial,
@@ -43,6 +44,7 @@ class ProfileState extends Equatable {
     this.breakOut = '',
     this.breakIn = '',
     this.message = '',
+    this.responseTime = 1,
   });
 
   ProfileState copyWith({
@@ -65,6 +67,7 @@ class ProfileState extends Equatable {
     String? breakOut,
     String? breakIn,
     String? message,
+    int? responseTime,
   }) {
     return ProfileState(
       status: status ?? this.status,
@@ -86,6 +89,7 @@ class ProfileState extends Equatable {
       breakOut: breakOut ?? this.breakOut,
       breakIn: breakIn ?? this.breakIn,
       message: message ?? this.message,
+      responseTime: responseTime ?? this.responseTime,
     );
   }
 
@@ -109,6 +113,7 @@ class ProfileState extends Equatable {
         this.statusBreak,
         this.breakOut,
         this.breakIn,
-        this.message
+        this.message,
+        this.responseTime
       ];
 }

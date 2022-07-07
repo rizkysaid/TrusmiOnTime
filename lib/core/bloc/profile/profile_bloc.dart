@@ -38,6 +38,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         breakOut: profile['break_out'],
         breakIn: profile['break_in'],
         message: profile['message'],
+        responseTime: profile['response_time'],
       ));
     } catch (e) {
       if (e != 'cancel') {

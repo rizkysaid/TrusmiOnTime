@@ -159,13 +159,11 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _username(BuildContext context) {
-    var isValidateUsername = false;
     return Padding(
       padding: EdgeInsets.all(8.0),
       child: TextFormField(
         controller: usernameController,
-        validator: (value) =>
-            isValidateUsername ? "Username harus diisi" : null,
+        validator: (value) => "Username harus diisi",
         onSaved: (value) {
           username = value!;
         },

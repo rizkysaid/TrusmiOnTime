@@ -122,10 +122,11 @@ class ApiServices {
     }
   }
 
-  Future<dynamic> checkStatus(ip, userID) async {
+  Future<dynamic> checkStatus(ip, userID, responseTime) async {
     var response =
         await http.get(Uri.parse(ip + '/check_in/' + userID)).timeout(
-      Duration(seconds: 7),
+      // set response time here
+      Duration(seconds: responseTime),
       onTimeout: () {
         return http.Response('timeout', 408);
       },
@@ -154,7 +155,7 @@ class ApiServices {
     }
   }
 
-  Future<dynamic> checkBadEmp(ip, userId) async {
+  Future<dynamic> checkBestBadEmployee(ip, userId) async {
     try {
       var dio = new Dio();
       // dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';

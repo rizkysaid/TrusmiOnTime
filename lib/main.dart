@@ -13,10 +13,7 @@ import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
-
-import 'core/ui/screens/invalid_ip.dart';
 import 'core/ui/screens/login_config.dart';
-// import 'package:connectivity_plus/connectivity_plus.dart';
 
 void main() {
   runApp(MyApp());
