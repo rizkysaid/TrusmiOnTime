@@ -26,6 +26,7 @@ class Endpoint {
   static String breakin = "$_baseURL/break_in";
   static String hrSystem = "$_baseIP/hr/bypass/login2";
   static String wfh = "$_trusmiCorp/wfh/login/auth";
+  static String bestMktRsp = "$_baseURL/best_mkt_rsp";
 
   getIP() async {
     SharedPreferences pref = await SharedPreferences.getInstance();

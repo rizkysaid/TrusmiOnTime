@@ -169,4 +169,16 @@ class ApiServices {
       dio.close();
     }
   }
+
+  Future<dynamic> getBestMktRsp(ip) async {
+    try {
+      var url = '$ip/best_mkt_rsp';
+      dio.options.connectTimeout = 10000; //10s
+      dio.options.receiveTimeout = 10000;
+      var response = await dio.get(url);
+      return response.data;
+    } catch (e) {
+      throw e;
+    }
+  }
 }

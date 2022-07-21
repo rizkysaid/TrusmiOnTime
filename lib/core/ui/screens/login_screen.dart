@@ -53,12 +53,14 @@ class _LoginScreenState extends State<LoginScreen> {
   String username = '';
   String password = '';
 
-  savePref(String username, String userID, String pass) async {
+  savePref(
+      String username, String userID, String pass, String departmentId) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString('username', username);
       pref.setString('userID', userID);
       pref.setString('password', pass);
+      pref.setString('departmentId', departmentId);
       pref.setString('id_shift', '1');
     });
   }
@@ -226,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // print(state.message);
             Navigator.pop(context);
             savePref(usernameController.text.toString(), state.userId,
-                passwordController.text);
+                passwordController.text, state.departmentId);
             Future.delayed(const Duration(microseconds: 2000), () {
               Navigator.pushNamedAndRemoveUntil(
                   context, "/profile", (Route<dynamic> routes) => false);

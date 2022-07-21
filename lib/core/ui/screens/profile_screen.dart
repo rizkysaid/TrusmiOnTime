@@ -71,6 +71,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   String _timeString = '';
   String _hariTanggal = '';
+  String departmentId = '';
 
   int responseTime = 15;
 
@@ -379,6 +380,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         username = pref.getString('username')!;
         password = pref.getString('password')!;
         userID = pref.getString('userID').toString();
+        departmentId = pref.getString('departmentId').toString();
         // clockin = pref.getString('clock_in')!;
         // imageUrl = pref.getString('imageUrl')!;
         // _status = pref.getString('status')!;
@@ -431,14 +433,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ApiServices services = ApiServices();
     var response = await services.checkHolidays(ip, userID);
 
-    print('checkHolidays => ' + response.toString());
+    // print('checkHolidays => ' + response.toString());
     if (response == null) {
-      checkBestBadEmployee(context);
+      // 24 = Departement Marketing RSP
+      if (departmentId == '24') {
+        print('departmentId == ${departmentId.toString()}');
+        getBestMktRsp(context);
+      } else {
+        checkBestBadEmployee(context);
+        print('checkBestBadEmployee');
+      }
+
       // getProfil(userID, date);
       return null;
     } else {
       statusHariBesar = response['status'];
-      print(response['data']);
+      // print(response['data']);
       if (statusHariBesar == true) {
         setState(() {
           hariBesar = true;
@@ -454,7 +464,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           hariBesar = false;
         });
-        checkBestBadEmployee(context);
+        // 24 = Departement Marketing RSP
+        if (departmentId == '24') {
+          print('departmentId == ${departmentId.toString()}');
+          getBestMktRsp(context);
+        } else {
+          checkBestBadEmployee(context);
+          print('checkBestBadEmployee');
+        }
         // _profileBloc.add(InitialProfile());
         // getProfil(userID, date);
       }
@@ -1200,6 +1217,261 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Future<void> getBestMktRsp(context) async {
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    ApiServices services = ApiServices();
+    var response = await services.getBestMktRsp(ip);
+
+    // if (response != null) {
+    //   if (response['status'] == true) {
+    //     _displayBestBadEmployees(context, response);
+    //   } else {
+    //     _profileBloc.add(InitialProfile());
+    //     getProfil(userID, date);
+    //   }
+    // } else {
+    //   _profileBloc.add(InitialProfile());
+    //   getProfil(userID, date);
+    // }
+
+    print(response.toString());
+    _displayBestMktRsp(context, response);
+  }
+
+  void _displayBestMktRsp(BuildContext context, response) {
+    showGeneralDialog(
+        context: context,
+        barrierDismissible: false,
+        transitionDuration: Duration(milliseconds: 500),
+        transitionBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(
+              scale: animation,
+              child: child,
+            ),
+          );
+        },
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return WillPopScope(
+            onWillPop: () {
+              Navigator.pop(context);
+              _profileBloc.add(InitialProfile());
+              getProfil(userID, date);
+              return Future.value(true);
+            },
+            child: SafeArea(
+              child: Container(
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              image: DecorationImage(
+                                image: AssetImage('assets/background.png'),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(10),
+                                topRight: Radius.circular(10),
+                                bottomRight: Radius.circular(30),
+                                bottomLeft: Radius.circular(30),
+                              ),
+                            ),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 15,
+                                ),
+                                Center(
+                                  child: DefaultTextStyle(
+                                    child: Text(
+                                      "Sales Of The Month",
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(
+                                  height: 10,
+                                ),
+                                Row(
+                                  children: [
+                                    Card(
+                                      elevation: 0,
+                                      color: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2.5,
+                                            padding: EdgeInsets.all(5),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(2.5),
+                                                    child: CircleAvatar(
+                                                      child: Icon(Icons.person),
+                                                      // backgroundImage:
+                                                      //     NetworkImage(
+                                                      //   Endpoint.baseIp +
+                                                      //       '/' +
+                                                      //       response['data']
+                                                      //           ['b_12_photo'],
+                                                      // ),
+                                                      radius: 30,
+                                                    ),
+                                                  ),
+                                                ),
+                                                DefaultTextStyle(
+                                                  child: Text(
+                                                    response['data']
+                                                        ['b_12_photo'],
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                // Flexible(
+                                                //   child: DefaultTextStyle(
+                                                //     child: Text(
+                                                //       'Jabatan',
+                                                //       overflow:
+                                                //           TextOverflow.ellipsis,
+                                                //     ),
+                                                //     style: TextStyle(
+                                                //       color: Colors.white,
+                                                //       fontSize: 12,
+                                                //     ),
+                                                //   ),
+                                                // ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            right: 15,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                        'assets/gold-medal.png'),
+                                                    width: 70,
+                                                    height: 70,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 10,
+                                                  child: DefaultTextStyle(
+                                                    child: Text('KPI'),
+                                                    style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 18,
+                                                  child: DefaultTextStyle(
+                                                    child: Text('98'),
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  _profileBloc.add(InitialProfile());
+                                  getProfil(userID, date);
+                                },
+                                child: Container(
+                                  width: 20,
+                                  height: 20,
+                                  decoration: BoxDecoration(
+                                    color:
+                                        Colors.lightBlue[50]!.withOpacity(0.25),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.grey,
+                                    size: 17,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     String version = About.version;
@@ -1223,6 +1495,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 setKondisi(state);
 
                 // checkBestBadEmployee(context);
+                getBestMktRsp(context);
 
                 break;
               case ProfileStatus.failure:
