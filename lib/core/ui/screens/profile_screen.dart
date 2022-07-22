@@ -73,6 +73,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _hariTanggal = '';
   String departmentId = '';
 
+  String prevMonthName = '';
+
   int responseTime = 15;
 
   String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
@@ -1249,6 +1251,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _displayBestMktRsp(BuildContext context, response) {
+    setState(() {
+      prevMonthName = DateFormat('MMMM yyyy')
+          .format(DateTime.now().subtract(Duration(days: 30)));
+    });
+
     showGeneralDialog(
         context: context,
         barrierDismissible: false,
@@ -1280,7 +1287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         children: [
                           Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              // color: Color(0xff015a80),
                               image: DecorationImage(
                                 image: AssetImage('assets/background.png'),
                                 fit: BoxFit.cover,
@@ -1292,7 +1299,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 bottomLeft: Radius.circular(30),
                               ),
                             ),
-                            child: Column(
+                            child: ListView(
                               children: [
                                 SizedBox(
                                   height: 15,
@@ -1310,126 +1317,971 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     ),
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 10,
+                                Center(
+                                  child: DefaultTextStyle(
+                                    child: Text(
+                                      prevMonthName,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                 ),
-                                Row(
+                                SizedBox(
+                                  height: 20,
+                                ),
+                                // Akad
+                                Center(
+                                  child: DefaultTextStyle(
+                                    child: Text(
+                                      "Akad",
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 16, right: 16),
+                                  child: Divider(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
                                   children: [
-                                    Card(
-                                      elevation: 0,
-                                      color: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(15),
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['ak_12_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['ak_12_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja > 12 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 20,
+                                      child: DefaultTextStyle(
+                                        child: Text('Akad'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
                                       child: Stack(
                                         alignment: Alignment.center,
                                         children: [
                                           Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width /
-                                                2.5,
-                                            padding: EdgeInsets.all(5),
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Container(
-                                                  padding: EdgeInsets.only(
-                                                      right: 30),
-                                                  child: Container(
-                                                    decoration: BoxDecoration(
-                                                      color: Colors.white,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                    padding:
-                                                        EdgeInsets.all(2.5),
-                                                    child: CircleAvatar(
-                                                      child: Icon(Icons.person),
-                                                      // backgroundImage:
-                                                      //     NetworkImage(
-                                                      //   Endpoint.baseIp +
-                                                      //       '/' +
-                                                      //       response['data']
-                                                      //           ['b_12_photo'],
-                                                      // ),
-                                                      radius: 30,
-                                                    ),
-                                                  ),
-                                                ),
-                                                DefaultTextStyle(
-                                                  child: Text(
-                                                    response['data']
-                                                        ['b_12_photo'],
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                  ),
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                // Flexible(
-                                                //   child: DefaultTextStyle(
-                                                //     child: Text(
-                                                //       'Jabatan',
-                                                //       overflow:
-                                                //           TextOverflow.ellipsis,
-                                                //     ),
-                                                //     style: TextStyle(
-                                                //       color: Colors.white,
-                                                //       fontSize: 12,
-                                                //     ),
-                                                //   ),
-                                                // ),
-                                              ],
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
                                             ),
                                           ),
                                           Positioned(
-                                            top: 10,
-                                            right: 15,
-                                            child: Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                Container(
-                                                  child: Image(
-                                                    image: AssetImage(
-                                                        'assets/gold-medal.png'),
-                                                    width: 70,
-                                                    height: 70,
-                                                  ),
-                                                ),
-                                                Positioned(
-                                                  top: 10,
-                                                  child: DefaultTextStyle(
-                                                    child: Text('KPI'),
-                                                    style: TextStyle(
-                                                      color: Colors.black54,
-                                                      fontSize: 8,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Positioned(
-                                                  top: 18,
-                                                  child: DefaultTextStyle(
-                                                    child: Text('98'),
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      fontSize: 17,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['ak_12_akad']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
                                   ],
-                                )
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['ak_612_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['ak_612_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 6-12 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 20,
+                                      child: DefaultTextStyle(
+                                        child: Text('Akad'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['ak_612_akad']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['ak_35_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['ak_35_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 3-5 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 20,
+                                      child: DefaultTextStyle(
+                                        child: Text('Akad'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['ak_35_akad']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['ak_02_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['ak_02_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 0-2 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 20,
+                                      child: DefaultTextStyle(
+                                        child: Text('Akad'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['ak_02_akad']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+
+                                SizedBox(
+                                  height: 30,
+                                ),
+
+                                // Booking
+                                Center(
+                                  child: DefaultTextStyle(
+                                    child: Text(
+                                      "Booking",
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                Container(
+                                  margin: EdgeInsets.only(left: 16, right: 16),
+                                  child: Divider(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['b_12_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['b_12_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja > 12 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 14,
+                                      child: DefaultTextStyle(
+                                        child: Text('Booking'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['b_12_booking']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['b_612_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['b_612_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 6-12 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 14,
+                                      child: DefaultTextStyle(
+                                        child: Text('Booking'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['b_612_booking']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['b_35_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['b_35_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 3-5 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 14,
+                                      child: DefaultTextStyle(
+                                        child: Text('Booking'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['b_35_booking']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    Column(
+                                      children: [
+                                        Container(
+                                          height: 40,
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Row(
+                                            children: [
+                                              CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                  Endpoint.baseIp +
+                                                      '/' +
+                                                      response['data']
+                                                          ['b_02_photo'],
+                                                ),
+                                                radius: 18,
+                                              ),
+                                              Container(
+                                                width: (MediaQuery.of(context)
+                                                        .size
+                                                        .width) /
+                                                    1.75,
+                                                padding: const EdgeInsets.only(
+                                                    left: 20),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          response['data']
+                                                              ['b_02_nama']),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 17,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                    DefaultTextStyle(
+                                                      child: Text(
+                                                          'Masa kerja 0-2 Bulan'),
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              Expanded(child: Container()),
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin: EdgeInsets.only(
+                                              left: 16, right: 16),
+                                          child: Divider(
+                                            color: Colors.white,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                    Positioned(
+                                      top: 0,
+                                      right: 14,
+                                      child: DefaultTextStyle(
+                                        child: Text('Booking'),
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 8,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                    Positioned(
+                                      top: 10,
+                                      right: 10,
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            child: Image(
+                                              image: AssetImage(
+                                                  'assets/gold-medal.png'),
+                                              width: 40,
+                                              height: 40,
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 5,
+                                            child: DefaultTextStyle(
+                                              child: Text(response['data']
+                                                  ['b_02_booking']),
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ],
                             ),
                           ),
