@@ -3,11 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class Endpoint {
   late String ip;
 
-  static String _baseIP = "http://103.39.50.142"; //public
-  // static String _baseIP = "http://192.168.23.23"; //local
+  // static String _baseIP = "http://103.39.50.142"; //public
+  static String _baseIP = "http://192.168.23.23"; //local
   // static String _baseIP = "http://10.10.11.66"; //bali
-  static String _trusmiCorp = "http://103.39.50.138"; //trusmicorppublic
-  // static String _trusmiCorp = "http://192.168.23.195"; //trusmicorplocal
+  // static String _trusmiCorp = "http://103.39.50.138"; //trusmicorppublic
+  static String _trusmiCorp = "http://192.168.23.195"; //trusmicorplocal
 
   static String _baseURL = "$_baseIP/absensi2/api";
   // static String _baseURL = "$_baseIP/trusmiontime/api";

@@ -439,14 +439,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response == null) {
       // 24 = Departement Marketing RSP
       if (departmentId == '24') {
-        // print('departmentId == ${departmentId.toString()}');
         getBestMktRsp(context);
       } else {
         checkBestBadEmployee(context);
-        // print('checkBestBadEmployee');
       }
 
-      // getProfil(userID, date);
       return null;
     } else {
       statusHariBesar = response['status'];
@@ -468,14 +465,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
         // 24 = Departement Marketing RSP
         if (departmentId == '24') {
-          print('departmentId == ${departmentId.toString()}');
           getBestMktRsp(context);
         } else {
           checkBestBadEmployee(context);
-          print('checkBestBadEmployee');
         }
-        // _profileBloc.add(InitialProfile());
-        // getProfil(userID, date);
       }
     }
   }
@@ -1220,6 +1213,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> getBestMktRsp(context) async {
+    showProgressDialog(context);
     String ip;
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
@@ -1234,23 +1228,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ApiServices services = ApiServices();
     var response = await services.getBestMktRsp(ip);
 
-    // if (response != null) {
-    //   if (response['status'] == true) {
-    //     _displayBestBadEmployees(context, response);
-    //   } else {
-    //     _profileBloc.add(InitialProfile());
-    //     getProfil(userID, date);
-    //   }
-    // } else {
-    //   _profileBloc.add(InitialProfile());
-    //   getProfil(userID, date);
-    // }
-
-    print(response.toString());
     _displayBestMktRsp(context, response);
   }
 
   void _displayBestMktRsp(BuildContext context, response) {
+    Navigator.pop(context);
     setState(() {
       prevMonthName = DateFormat('MMMM yyyy')
           .format(DateTime.now().subtract(Duration(days: 30)));
@@ -4271,7 +4253,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           setState(() {
             isShowSuccessCheckout = true;
           });
-          checkBestBadEmployee(context);
+
+          // 24 = Departement Marketing RSP
+          if (departmentId == '24') {
+            getBestMktRsp(context);
+          } else {
+            checkBestBadEmployee(context);
+          }
         }
       },
       dismissOnBackKeyPress: false,
@@ -4294,9 +4282,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         IconsButton(
           onPressed: () {
             Navigator.of(context).pop();
-            checkBestBadEmployee(context);
-            // _profileBloc.add(InitialProfile());
-            // getProfil(userID, date);
+
+            // 24 = Departement Marketing RSP
+            if (departmentId == '24') {
+              getBestMktRsp(context);
+            } else {
+              checkBestBadEmployee(context);
+            }
           },
           text: '',
           iconData: Icons.done,
