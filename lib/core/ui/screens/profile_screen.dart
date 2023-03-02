@@ -109,6 +109,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _profileBloc.add(InitialProfile());
       if (_status == 'checkin') {
         prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
+        print('usrId => ' + userID);
+        print('clockIn => ' + '${DateTime.now()}');
+        print('idShift => ' + idShift);
+        print('shift => ' + shift);
       } else {
         prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
       }
@@ -137,7 +141,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    // print('proses checkin => ' + response.toString());
+    print('usrId => ' + usrId);
+    print('clockIn => ' + clockIn);
+    print('idShift => ' + idShift);
+    print('shift => ' + shift);
+
+    print('proses checkin => ' + response.statusCode.toString());
+    print('proses checkin => ' + response.toString());
 
     if (response.statusCode == 201) {
       showSuccessDialog(context, 'checkin');
@@ -4067,7 +4077,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           //     ' dataClockout = ' +
           //     state.clockOut);
           //kondisi belum checkin
-
         } else if (state.clockOut == "--:--") {
           if (_isCheckin == true) {
             setState(() {
@@ -4092,7 +4101,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           //     ' dataClockout = ' +
           //     state.clockOut);
           //kondisi sudah checkin & belum checkout
-
         } else {
           if (state.clockIn != "--:--" && state.clockOut != "--:--") {
             // print('con. 1 => state.clockIn = ' +
@@ -4141,7 +4149,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //     ' dataClockout = ' +
         //     state.clockOut);
         //kondisi belum checkin
-
       } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
         if (_isCheckin == true) {
           setState(() {
@@ -4166,7 +4173,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //     ' dataClockout = ' +
         //     state.clockOut);
         //kondisi sudah checkin & belum checkout
-
       } else if (dateOut != dateId) {
         setState(() {
           clockin = state.clockIn;
@@ -4187,7 +4193,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         //     ' dataClockout = ' +
         //     state.clockOut);
         //kondisi tanggal checkout tidak sama dengan tgl hari ini
-
       } else {
         setState(() {
           statusPhoto = true;
@@ -4229,9 +4234,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   showSuccessDialog(context, status) {
     String title = '';
     if (status == 'checkin') {
-      title = "Check-In Success ";
+      title = "Check In Success ";
     } else {
-      title = "Check-Out Success ";
+      title = "Check Out Success ";
     }
 
     return AwesomeDialog(

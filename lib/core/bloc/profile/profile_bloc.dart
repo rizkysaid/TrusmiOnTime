@@ -18,6 +18,26 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
     try {
       final profile = await apiServices.profil(
           event.ip, event.userID, event.date, event.apiToken);
+      // print('user_id: ' + profile['user_id'].toString());
+      // print('nama: ' + profile['nama'].toString());
+      // print('id_shift: ' + profile['id_shift'].toString());
+      // print('foto_profil: ' + profile['foto_profil'].toString());
+      // print('jabatan: ' + profile['jabatan'].toString());
+      // print('photo_in: ' + profile['photo_in'].toString());
+      // print('date_in: ' + profile['date_in'].toString());
+      // print('clock_in: ' + profile['clock_in'].toString());
+      // print('shift_in: ' + profile['shift_in'].toString());
+      // print('photo_out: ' + profile['photo_out'].toString());
+      // print('date_out: ' + profile['date_out'].toString());
+      // print('clock_out: ' + profile['clock_out'].toString());
+      // print('shift_out: ' + profile['shift_out'].toString());
+      // print('total_work: ' + profile['total_work'].toString());
+      // print('status_break: ' + profile['status_break'].toString());
+      // print('break_out: ' + profile['break_out'].toString());
+      // print('break_in: ' + profile['break_in'].toString());
+      // print('department_id: ' + profile['department_id'].toString());
+      // print('message: ' + profile['message'].toString());
+      // print('response_time: ' + profile['response_time'].toString());
       return emit(state.copyWith(
         status: ProfileStatus.success,
         userId: profile['user_id'],
