@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 // import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
@@ -10,6 +11,7 @@ import 'package:login_absen/core/ui/screens/ip_config.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
+import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
@@ -22,13 +24,17 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: "Login",
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          primaryColor: Colors.red[700],
-          colorScheme:
-              ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent)),
+        primaryColor: Colors.red[700],
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent),
+        // radioTheme: RadioThemeData(
+        //   fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
+        // ),
+      ),
       home: CekLogin(),
       routes: {
         "/login": (context) => LoginScreen(),
@@ -41,6 +47,7 @@ class MyApp extends StatelessWidget {
         "/login_config": (context) => LoginConfig(),
         "/hrsystem": (context) => HrSystem(),
         "/wfh": (context) => Wfh(),
+        "/quiz": (context) => QuizScreen(),
       },
     );
   }
@@ -157,6 +164,8 @@ class _CekLoginState extends State<CekLogin> {
             context, "/profile", (Route<dynamic> routes) => false);
       });
     }
+
+    // Navigator.pushNamed(context, "/quiz");
   }
 
   @override

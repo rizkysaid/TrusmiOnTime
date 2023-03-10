@@ -96,7 +96,7 @@ class ApiServices {
     String url = ip + '/profil/' + userID + '/' + date;
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 10000; //10s
+      dio.options.connectTimeout = 30000; //10s
       dio.options.receiveTimeout = 5000;
       response = await dio.get(url, cancelToken: apiToken);
       if (response.data['status'] == true) {
@@ -105,7 +105,8 @@ class ApiServices {
         throw response.data['message'];
       }
     } catch (e) {
-      throw e.toString();
+      // return e.toString();
+      throw "Terjadi kesalahan";
     }
   }
 
@@ -181,4 +182,28 @@ class ApiServices {
       throw e;
     }
   }
+
+  // QUESTION
+  Future<dynamic> fetchQuestion(url, userId, departmentId) async {
+    url = '$url/quiz';
+    return http
+        .post(
+      Uri.parse(url),
+      body: jsonEncode(<String, String>{
+        'user_id': userId,
+        'department_id': departmentId,
+      }),
+    )
+        .then((response) {
+      var data = json.decode(response.body);
+      // var question = QuestionModel(
+      //   id: data['id'],
+      //   question: data['question'],
+      //   options: Map.fromEntries(data['options']),
+      // );
+
+      return data;
+    });
+  }
+  // QUESTION
 }

@@ -12,6 +12,7 @@ import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -81,7 +82,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   File? imageFile;
 
-  void _getFromCamera() async {
+  void _openCamera() async {
     // Capture a photo
     final ImagePicker _picker = ImagePicker();
     final XFile? pickedFile = await _picker.pickImage(
@@ -109,10 +110,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _profileBloc.add(InitialProfile());
       if (_status == 'checkin') {
         prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
-        print('usrId => ' + userID);
-        print('clockIn => ' + '${DateTime.now()}');
-        print('idShift => ' + idShift);
-        print('shift => ' + shift);
       } else {
         prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
       }
@@ -121,6 +118,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   bool isShowSuccessCheckin = false;
   bool isShowSuccessCheckout = false;
+
+  late bool isQuizPasses;
 
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
@@ -141,13 +140,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    print('usrId => ' + usrId);
-    print('clockIn => ' + clockIn);
-    print('idShift => ' + idShift);
-    print('shift => ' + shift);
+    // print('usrId => ' + usrId);
+    // print('clockIn => ' + clockIn);
+    // print('idShift => ' + idShift);
+    // print('shift => ' + shift);
 
-    print('proses checkin => ' + response.statusCode.toString());
-    print('proses checkin => ' + response.toString());
+    // print('proses checkin => ' + response.statusCode.toString());
+    // print('proses checkin => ' + response.toString());
 
     if (response.statusCode == 201) {
       showSuccessDialog(context, 'checkin');
@@ -337,9 +336,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void dispose() {
     if (!mounted) {
       _connectivitySubscription.cancel();
+      timer.cancel();
     }
     super.dispose();
-//    timer.cancel();
   }
 
   RefreshController _refreshController =
@@ -384,7 +383,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> getPref() async {
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
-    // print(pref.getString('username'));
     if (pref.getString('username') == null) {
       logout();
     } else {
@@ -393,17 +391,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         password = pref.getString('password')!;
         userID = pref.getString('userID').toString();
         departmentId = pref.getString('departmentId').toString();
-        // clockin = pref.getString('clock_in')!;
-        // imageUrl = pref.getString('imageUrl')!;
-        // _status = pref.getString('status')!;
-        // _isCheckin = pref.getBool('isCheckin');
-        // _isCheckout = pref.getBool('isCheckout');
       });
 
-      // timer = new Timer(new Duration(seconds: 1), () {
-      // debugPrint("Print after 1 seconds");
       getProfil(userID, date);
-      // });
     }
 
     if (clockin.isEmpty) {
@@ -562,7 +552,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           decoration: BoxDecoration(
                             color: Colors.transparent,
                             // image: DecorationImage(
-                            //   image: AssetImage('assets/background.png'),
+                            //   image: AssetImage('assets/background_new.png'),
                             //   fit: BoxFit.cover,
                             // ),
                             borderRadius: BorderRadius.circular(10),
@@ -605,7 +595,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 image: DecorationImage(
-                  image: AssetImage('assets/background.png'),
+                  image: AssetImage('assets/background_new.png'),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.only(
@@ -919,7 +909,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 image: DecorationImage(
-                  image: AssetImage('assets/background.png'),
+                  image: AssetImage('assets/background_new.png'),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.only(
@@ -1281,7 +1271,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             decoration: BoxDecoration(
                               // color: Color(0xff015a80),
                               image: DecorationImage(
-                                image: AssetImage('assets/background.png'),
+                                image: AssetImage('assets/background_new.png'),
                                 fit: BoxFit.cover,
                               ),
                               borderRadius: BorderRadius.only(
@@ -3172,9 +3162,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
 
-                // checkBestBadEmployee(context);
-                // getBestMktRsp(context);
-
                 break;
               case ProfileStatus.failure:
                 Navigator.of(context, rootNavigator: true).pop(context);
@@ -3213,15 +3200,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       iconTheme: new IconThemeData(color: Colors.white),
                       flexibleSpace: Container(
                         decoration: new BoxDecoration(
-                            gradient: new LinearGradient(
-                                colors: [
-                                  const Color(0xFFFF1744),
-                                  const Color(0xFFF44336)
-                                ],
-                                begin: const FractionalOffset(0.0, 0.0),
-                                end: const FractionalOffset(1.0, 0.0),
-                                stops: [0.0, 1.0],
-                                tileMode: TileMode.clamp)),
+                          gradient: new LinearGradient(
+                            colors: [
+                              const Color(0xFFFF1744),
+                              const Color(0xFFF44336)
+                            ],
+                            begin: const FractionalOffset(0.0, 0.0),
+                            end: const FractionalOffset(1.0, 0.0),
+                            stops: [0.0, 1.0],
+                            tileMode: TileMode.clamp,
+                          ),
+                        ),
                       ),
                     ),
                     drawer: Drawer(
@@ -3243,8 +3232,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     (MediaQuery.of(context).size.height / 1.5),
                                 decoration: BoxDecoration(
                                     image: DecorationImage(
-                                        image:
-                                            AssetImage('assets/background.png'),
+                                        image: AssetImage(
+                                            'assets/background_new.png'),
                                         fit: BoxFit.cover)),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -3736,7 +3725,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             height: (MediaQuery.of(context).size.height / 1.5),
                             decoration: BoxDecoration(
                                 image: DecorationImage(
-                                    image: AssetImage('assets/background.png'),
+                                    image:
+                                        AssetImage('assets/background_new.png'),
                                     fit: BoxFit.cover)),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -4029,7 +4019,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 80,
                       width: 80,
                       child: FloatingActionButton(
-                        onPressed: () => {checkStatus(userID)},
+                        onPressed: () => {
+                          checkStatus(userID),
+                        },
                         tooltip: _toolTip,
                         backgroundColor: _colorButton,
                         child:
@@ -4046,18 +4038,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  setKondisi(state) {
+  setKondisi(state) async {
     setState(() {
       userID = state.userId;
       idShift = state.idShift;
       responseTime = state.responseTime;
     });
     if (state.idShift != '3') {
+      // Selain Security
       if (state.clockIn != dateId) {
         if (state.clockIn == "--:--") {
           setState(() {
             _isCheckin = false;
-            // _isCheckout = false;
           });
 
           setState(() {
@@ -4072,10 +4064,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             shift = state.shiftIn;
           });
 
-          // print('con. 2 => state.clockIn = ' +
-          //     state.clockIn +
-          //     ' dataClockout = ' +
-          //     state.clockOut);
           //kondisi belum checkin
         } else if (state.clockOut == "--:--") {
           if (_isCheckin == true) {
@@ -4095,20 +4083,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
             _status = "checkout";
             shift = state.shiftOut;
           });
-
-          // print('con. 3 => state.clockIn = ' +
-          //     state.clockIn +
-          //     ' dataClockout = ' +
-          //     state.clockOut);
-          //kondisi sudah checkin & belum checkout
         } else {
+          //kondisi sudah checkin & belum checkout
           if (state.clockIn != "--:--" && state.clockOut != "--:--") {
-            // print('con. 1 => state.clockIn = ' +
-            //     state.clockIn +
-            //     ' dataClockout = ' +
-            //     state.clockOut);
             //kondisi sudah checkin & sudah checkout
-
             setState(() {
               clockin = state.clockIn;
               clockout = state.clockOut;
@@ -4144,10 +4122,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           shift = state.shiftIn;
         });
 
-        // print('con. 2 => state.clockIn = ' +
-        //     state.clockIn +
-        //     ' dataClockout = ' +
-        //     state.clockOut);
         //kondisi belum checkin
       } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
         if (_isCheckin == true) {
@@ -4167,13 +4141,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _status = "checkout";
           shift = state.shiftOut;
         });
-
-        // print('con. 3 => state.clockIn = ' +
-        //     state.clockIn +
-        //     ' dataClockout = ' +
-        //     state.clockOut);
-        //kondisi sudah checkin & belum checkout
       } else if (dateOut != dateId) {
+        //kondisi sudah checkin & belum checkout
         setState(() {
           clockin = state.clockIn;
           clockout = state.clockOut;
@@ -4187,13 +4156,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _status = "checkin";
           shift = state.shiftIn;
         });
-
-        // print('con. 4 => state.clockIn = ' +
-        //     state.clockIn +
-        //     ' dataClockout = ' +
-        //     state.clockOut);
-        //kondisi tanggal checkout tidak sama dengan tgl hari ini
       } else {
+        //kondisi tanggal checkout tidak sama dengan tgl hari ini
         setState(() {
           statusPhoto = true;
           statusIcon = false;
@@ -4204,14 +4168,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _status = "checkin";
           shift = state.shiftIn;
         });
-
-        // print('con. 5 => state.clockIn = ' +
-        //     state.clockIn +
-        //     ' dataClockout = ' +
-        //     state.clockOut);
-        //kondisi sift malam
       }
     }
+
+    // QUIZ
+    setState(() {
+      state.quizStatus == '1' ? isQuizPasses = true : isQuizPasses = false;
+    });
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('isQuizPasses', isQuizPasses);
+
+    print('state.quizStatus : ${state.quizStatus.toString()}');
+    print('isQuizPasses : ${isQuizPasses.toString()}');
   }
 
   Future showProgressDialog(BuildContext loadContext) {
@@ -4308,9 +4277,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   showErrorDialog(context, status) {
     String title = '';
     if (status == 'checkin') {
-      title = "Check-In Failed";
+      title = "Check In Failed";
     } else {
-      title = "Check-Out Failed";
+      title = "Check Out Failed";
     }
 
     return AwesomeDialog(
@@ -4369,12 +4338,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       pref.remove('username');
       pref.remove('password');
       pref.remove('clock_in');
+      pref.remove('isQuizPasses');
     });
   }
 
   Future<void> checkStatus(userId) async {
-    // print('checkStatus => userId = ' + userId);
-
     showProgressDialog(context);
 
     String ip;
@@ -4392,7 +4360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       var response = await services.checkStatus(ip, userID, responseTime);
 
-      print('responseTime = ' + responseTime.toString());
+      // print('responseTime = ' + responseTime.toString());
 
       if (response.data.aktif.isEmpty) {
         Future.delayed(const Duration(microseconds: 2000), () {
@@ -4404,7 +4372,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         if (response.data.aktif == '1') {
           if (response.data.achive == true) {
-            _getFromCamera();
+            if (clockin != '--:--') {
+              if (isQuizPasses) {
+                _openCamera();
+              } else {
+                _showQuiz();
+              }
+            } else {
+              _openCamera();
+            }
           } else {
             AwesomeDialog(
               context: context,
@@ -4446,5 +4422,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       );
       Navigator.pop(context);
     }
+  }
+
+  void _showQuiz() {
+    Future<void> future = showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => QuizScreen(),
+    );
+
+    future.then((value) => _closeQuiz(value));
+  }
+
+  void _closeQuiz(void value) async {
+    var pref = await SharedPreferences.getInstance();
+    if (pref.containsKey('isQuizPasses')) {
+      setState(() {
+        isQuizPasses = pref.getBool('isQuizPasses')!;
+      });
+    } else {
+      setState(() {
+        isQuizPasses = false;
+      });
+    }
+    if (isQuizPasses) {
+      _openCamera();
+    } else {
+      print('not open camera');
+    }
+
+    print('isQuizPasses => ${isQuizPasses.toString()}');
   }
 }

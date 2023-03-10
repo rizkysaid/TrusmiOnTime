@@ -23,6 +23,7 @@ class ProfileState extends Equatable {
   final String breakIn;
   final String departmentId;
   final String message;
+  final String quizStatus;
   final int responseTime;
 
   const ProfileState({
@@ -46,6 +47,7 @@ class ProfileState extends Equatable {
     this.breakIn = '',
     this.departmentId = '',
     this.message = '',
+    this.quizStatus = '',
     this.responseTime = 10,
   });
 
@@ -70,6 +72,7 @@ class ProfileState extends Equatable {
     String? breakIn,
     String? departmentId,
     String? message,
+    String? quizStatus,
     int? responseTime,
   }) {
     return ProfileState(
@@ -93,6 +96,7 @@ class ProfileState extends Equatable {
       breakIn: breakIn ?? this.breakIn,
       departmentId: departmentId ?? this.departmentId,
       message: message ?? this.message,
+      quizStatus: quizStatus ?? this.quizStatus,
       responseTime: responseTime ?? this.responseTime,
     );
   }
@@ -119,6 +123,7 @@ class ProfileState extends Equatable {
         this.breakIn,
         this.departmentId,
         this.message,
+        this.quizStatus,
         this.responseTime
       ];
 }
