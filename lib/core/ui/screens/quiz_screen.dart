@@ -221,19 +221,23 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Icon(
-                Icons.arrow_back_outlined,
-              ),
-            ),
-          ),
+          // leading: GestureDetector(
+          //   onTap: () {
+          //     if (Platform.isAndroid) {
+          //       SystemNavigator.pop();
+          //     } else if (Platform.isIOS) {
+          //       exit(0);
+          //     }
+          //   },
+          //   child: Padding(
+          //     padding: EdgeInsets.only(top: 20.0),
+          //     child: Icon(
+          //       Icons.close,
+          //     ),
+          //   ),
+          // ),
           title: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
+            padding: const EdgeInsets.only(left: 20.0),
             child: Row(
               children: [
                 Text("Quiz"),
@@ -290,7 +294,7 @@ class _QuizScreenState extends State<QuizScreen> {
               bottom: Radius.circular(30),
             ),
           ),
-          toolbarHeight: 120,
+          toolbarHeight: 100,
         ),
         body: Container(
           padding: const EdgeInsets.all(14.0),

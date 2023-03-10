@@ -146,10 +146,10 @@ class ApiServices {
   Future<dynamic> checkHolidays(ip, userID) async {
     try {
       var response = await dio.get(ip + '/check_holidays/' + userID);
-      print('ip => ' + ip);
-      print('userId => ' + userID);
-      print("Response CekHolidays Status : ${response.data['status']}");
-      print("Response CekHolidays Body : ${response.data}");
+      // print('ip => ' + ip);
+      // print('userId => ' + userID);
+      // print("Response CekHolidays Status : ${response.data['status']}");
+      // print("Response CekHolidays Body : ${response.data}");
       return response.data;
     } catch (e) {
       return null;
@@ -185,24 +185,23 @@ class ApiServices {
 
   // QUESTION
   Future<dynamic> fetchQuestion(url, userId, departmentId) async {
-    url = '$url/quiz';
-    return http
-        .post(
-      Uri.parse(url),
-      body: jsonEncode(<String, String>{
-        'user_id': userId,
-        'department_id': departmentId,
-      }),
-    )
-        .then((response) {
-      var data = json.decode(response.body);
-      // var question = QuestionModel(
-      //   id: data['id'],
-      //   question: data['question'],
-      //   options: Map.fromEntries(data['options']),
-      // );
+    final uri = Uri.parse('$url/quiz');
+    var map = new Map<String, dynamic>();
+    map['user_id'] = userId;
+    map['department_id'] = departmentId;
+    return http.post(uri, body: map).then((response) {
+      try {
+        var data = json.decode(response.body);
+        // var question = QuestionModel(
+        //   id: data['id'],
+        //   question: data['question'],
+        //   options: Map.fromEntries(data['options']),
+        // );
 
-      return data;
+        return data;
+      } catch (e) {
+        throw e.toString();
+      }
     });
   }
   // QUESTION

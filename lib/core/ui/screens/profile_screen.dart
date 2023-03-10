@@ -26,6 +26,7 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -436,7 +437,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     var response = await services.checkHolidays(ip, userID);
 
     // print('checkHolidays => ' + response.toString());
-    if (response == null) {
+    if (response['status'] == false) {
       // 24 = Departement Marketing RSP
       if (departmentId == '24') {
         getBestMktRsp(context);
@@ -4376,7 +4377,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (isQuizPasses) {
                 _openCamera();
               } else {
-                _showQuiz();
+                // _showQuiz();
+                Get.offAll(() => QuizScreen());
               }
             } else {
               _openCamera();
@@ -4424,33 +4426,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  void _showQuiz() {
-    Future<void> future = showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      builder: (context) => QuizScreen(),
-    );
+  // void _showQuiz() {
+  //   Future<void> future = showModalBottomSheet(
+  //     isScrollControlled: true,
+  //     context: context,
+  //     builder: (context) => QuizScreen(),
+  //   );
 
-    future.then((value) => _closeQuiz(value));
-  }
+  //   future.then((value) => _closeQuiz(value));
+  // }
 
-  void _closeQuiz(void value) async {
-    var pref = await SharedPreferences.getInstance();
-    if (pref.containsKey('isQuizPasses')) {
-      setState(() {
-        isQuizPasses = pref.getBool('isQuizPasses')!;
-      });
-    } else {
-      setState(() {
-        isQuizPasses = false;
-      });
-    }
-    if (isQuizPasses) {
-      _openCamera();
-    } else {
-      print('not open camera');
-    }
-
-    print('isQuizPasses => ${isQuizPasses.toString()}');
-  }
+  // void _closeQuiz(void value) async {
+  //   var pref = await SharedPreferences.getInstance();
+  //   if (pref.containsKey('isQuizPasses')) {
+  //     setState(() {
+  //       isQuizPasses = pref.getBool('isQuizPasses')!;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       isQuizPasses = false;
+  //     });
+  //   }
+  //   if (isQuizPasses) {
+  //     _openCamera();
+  //   }
+  // }
 }
