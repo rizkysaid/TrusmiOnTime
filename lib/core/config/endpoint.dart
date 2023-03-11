@@ -28,6 +28,7 @@ class Endpoint {
   static String wfh = "$_trusmiCorp/wfh/login/auth";
   static String bestMktRsp = "$_baseURL/best_mkt_rsp";
   static String insertQuiz = "$_baseURL/insert_quiz";
+  static String insertQuizTemp = "$_baseURL/insert_quiz_temp";
 
   getIP() async {
     SharedPreferences pref = await SharedPreferences.getInstance();

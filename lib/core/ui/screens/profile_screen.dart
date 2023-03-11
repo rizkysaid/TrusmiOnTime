@@ -26,7 +26,6 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -287,14 +286,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (Endpoint.baseIp == 'http://192.168.23.23') {
           Navigator.pushReplacementNamed(context, "/no_connection");
         } else {
-          _profileBloc.add(InitialProfile());
+          // _profileBloc.add(InitialProfile());
           getPref();
-          _onRefresh();
+          // _onRefresh();
         }
       } else {
-        _profileBloc.add(InitialProfile());
+        // _profileBloc.add(InitialProfile());
         getPref();
-        _onRefresh();
+        // _onRefresh();
       }
     } on PlatformException catch (e) {
       print(e.toString());
@@ -412,6 +411,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (_status.isEmpty) {
       _status = "checkin";
     }
+    precacheImage(AssetImage('assets/background_new.png'), context);
+    precacheImage(AssetImage('assets/gold-medal.png'), context);
+    precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
   }
 
   bool isShowHariBesar = false;
@@ -702,6 +704,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         ['profile_picture'],
                               ),
                               radius: 45.0,
+                              // child: CachedNetworkImage(
+                              //     imageUrl:
+                              //         '${Endpoint.baseIp}/${response['data']['best'][0]['profile_picture']}'),
                             ),
                           ),
                           Expanded(
@@ -4377,8 +4382,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               if (isQuizPasses) {
                 _openCamera();
               } else {
-                // _showQuiz();
-                Get.offAll(() => QuizScreen());
+                _showQuiz();
+                // Get.offAll(() => QuizScreen());
               }
             } else {
               _openCamera();
@@ -4426,29 +4431,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // void _showQuiz() {
-  //   Future<void> future = showModalBottomSheet(
-  //     isScrollControlled: true,
-  //     context: context,
-  //     builder: (context) => QuizScreen(),
-  //   );
+  void _showQuiz() {
+    Future<void> future = showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      builder: (context) => QuizScreen(),
+    );
 
-  //   future.then((value) => _closeQuiz(value));
-  // }
+    future.then((value) => _closeQuiz(value));
+  }
 
-  // void _closeQuiz(void value) async {
-  //   var pref = await SharedPreferences.getInstance();
-  //   if (pref.containsKey('isQuizPasses')) {
-  //     setState(() {
-  //       isQuizPasses = pref.getBool('isQuizPasses')!;
-  //     });
-  //   } else {
-  //     setState(() {
-  //       isQuizPasses = false;
-  //     });
-  //   }
-  //   if (isQuizPasses) {
-  //     _openCamera();
-  //   }
-  // }
+  void _closeQuiz(void value) async {
+    var pref = await SharedPreferences.getInstance();
+    if (pref.containsKey('isQuizPasses')) {
+      setState(() {
+        isQuizPasses = pref.getBool('isQuizPasses')!;
+      });
+    } else {
+      setState(() {
+        isQuizPasses = false;
+      });
+    }
+    if (isQuizPasses) {
+      _openCamera();
+    }
+  }
 }

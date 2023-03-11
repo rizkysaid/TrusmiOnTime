@@ -29,8 +29,12 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primaryColor: Colors.red[700],
-        colorScheme:
-            ColorScheme.fromSwatch().copyWith(secondary: Colors.redAccent),
+        colorScheme: ColorScheme.fromSwatch().copyWith(
+          secondary: Colors.redAccent,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.red[700],
+        ),
         // radioTheme: RadioThemeData(
         //   fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
         // ),
@@ -38,7 +42,6 @@ class MyApp extends StatelessWidget {
       home: CekLogin(),
       routes: {
         "/login": (context) => LoginScreen(),
-        // "/register": (context) => LoginScreen(),
         "/profile": (context) => ProfileScreen(),
         "/camera": (context) => CameraScreen(),
         "/no_connection": (context) => NoConnection(),
@@ -76,7 +79,6 @@ class _CekLoginState extends State<CekLogin> {
   void initState() {
     super.initState();
     _deleteConfig();
-
     // initConnectivity();
 
     // _connectivitySubscription =
@@ -129,7 +131,7 @@ class _CekLoginState extends State<CekLogin> {
   //   print(_connectionStatus);
   // }
 
-  getPref() async {
+  void getPref() async {
     final dbHelper = DatabaseHelper.instance;
     final allRows = await dbHelper.queryAllRows();
     // print('query all rows getPref Profil:' + allRows.toList().toString());
@@ -144,7 +146,7 @@ class _CekLoginState extends State<CekLogin> {
         userID = pref.getString('userID')!;
       });
 
-      Future.delayed(const Duration(seconds: 3), () {
+      Future.delayed(const Duration(seconds: 2), () {
         if (username != null) {
           Future.delayed(const Duration(microseconds: 2000), () {
             Navigator.pushNamedAndRemoveUntil(
@@ -156,6 +158,8 @@ class _CekLoginState extends State<CekLogin> {
                 context, "/profile", (Route<dynamic> routes) => false);
           });
         }
+        precacheImage(AssetImage('assets/background.png'), context);
+        precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
       });
     } else {
       ip = Endpoint.baseUrl;

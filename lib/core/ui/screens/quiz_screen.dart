@@ -70,6 +70,8 @@ class _QuizScreenState extends State<QuizScreen> {
       jawaban = null;
     });
 
+    _insertQuizTemp(idQuestion);
+
     // print(response['options'].toString());
   }
 
@@ -138,11 +140,51 @@ class _QuizScreenState extends State<QuizScreen> {
 
       if (response.data['status'] == true) {
         showSuccessDialog(context, benar);
+        _deleteQuizTemp(userId);
       } else {
         print(response.data['status']);
         print(response.data['message']);
         print('jawaban $benar');
       }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void _insertQuizTemp(idQuestion) async {
+    var formData = FormData.fromMap({
+      'employee_id': userId,
+      'id_question': idQuestion,
+    });
+
+    Dio dio = new Dio();
+    try {
+      var response = await dio.post(Endpoint.insertQuizTemp, data: formData);
+
+      // if (response.data['status'] == true) {
+      //   showSuccessDialog(context, benar);
+      // } else {
+      //   print(response.data['status']);
+      //   print(response.data['message']);
+      print('insert quiz temp ${response.data['status'].toString()}');
+      // }
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  void _deleteQuizTemp(usedId) async {
+    Dio dio = new Dio();
+    try {
+      var response = await dio.delete('${Endpoint.insertQuizTemp}/$usedId');
+
+      // if (response.data['status'] == true) {
+      //   showSuccessDialog(context, benar);
+      // } else {
+      //   print(response.data['status']);
+      //   print(response.data['message']);
+      print('delete quiz temp ${response.data['status'].toString()}');
+      // }
     } catch (e) {
       print(e.toString());
     }
@@ -221,23 +263,19 @@ class _QuizScreenState extends State<QuizScreen> {
               ),
             ),
           ),
-          // leading: GestureDetector(
-          //   onTap: () {
-          //     if (Platform.isAndroid) {
-          //       SystemNavigator.pop();
-          //     } else if (Platform.isIOS) {
-          //       exit(0);
-          //     }
-          //   },
-          //   child: Padding(
-          //     padding: EdgeInsets.only(top: 20.0),
-          //     child: Icon(
-          //       Icons.close,
-          //     ),
-          //   ),
-          // ),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: EdgeInsets.only(top: 20.0),
+              child: Icon(
+                Icons.arrow_back_outlined,
+              ),
+            ),
+          ),
           title: Padding(
-            padding: const EdgeInsets.only(left: 20.0),
+            padding: const EdgeInsets.only(top: 20.0),
             child: Row(
               children: [
                 Text("Quiz"),
@@ -294,7 +332,7 @@ class _QuizScreenState extends State<QuizScreen> {
               bottom: Radius.circular(30),
             ),
           ),
-          toolbarHeight: 100,
+          toolbarHeight: 120,
         ),
         body: Container(
           padding: const EdgeInsets.all(14.0),
