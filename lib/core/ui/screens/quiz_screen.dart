@@ -39,9 +39,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
   Future<void> getPref() async {
     var pref = await SharedPreferences.getInstance();
-
     final allRows = await dbHelper.queryAllRows();
-
     if (allRows.length != 0) {
       setState(() {
         url = allRows[0]['ip_address'];
@@ -60,6 +58,7 @@ class _QuizScreenState extends State<QuizScreen> {
   }
 
   Future<dynamic> getQuestion(url, userId, departmentId) async {
+    showProgressDialog(context);
     ApiServices services = ApiServices();
     var response = await services.fetchQuestion(url, userId, departmentId);
 
@@ -82,7 +81,6 @@ class _QuizScreenState extends State<QuizScreen> {
   bool _isShowTooltip = false;
 
   void _cekJawaban() {
-    print('jawaban: $jawaban');
     // jika belum memilih jawaban
     if (jawaban == null || jawaban == "") {
       // jika keterangan belum memilih jawaban tidak muncul
@@ -113,19 +111,12 @@ class _QuizScreenState extends State<QuizScreen> {
         });
       }
     } else {
-      // Sudah memilih jawaban
-      // jika jawaban salah
-      // if (benar == '0') {
-
-      // } else {
-      //   // jika jawaban benar
-
-      // }
       _insertQuiz(idQuestion, question, jawaban, benar);
     }
   }
 
   void _insertQuiz(idQuestion, question, jawaban, benar) async {
+    showProgressDialog(context);
     var formData = FormData.fromMap({
       'employee_id': userId,
       'id_question': idQuestion,
@@ -139,12 +130,13 @@ class _QuizScreenState extends State<QuizScreen> {
       var response = await dio.post(Endpoint.insertQuiz, data: formData);
 
       if (response.data['status'] == true) {
+        Navigator.pop(context);
         showSuccessDialog(context, benar);
         _deleteQuizTemp(userId);
       } else {
-        print(response.data['status']);
-        print(response.data['message']);
-        print('jawaban $benar');
+        // print(response.data['status']);
+        // print(response.data['message']);
+        // print('jawaban $benar');
       }
     } catch (e) {
       print(e.toString());
@@ -160,14 +152,8 @@ class _QuizScreenState extends State<QuizScreen> {
     Dio dio = new Dio();
     try {
       var response = await dio.post(Endpoint.insertQuizTemp, data: formData);
-
-      // if (response.data['status'] == true) {
-      //   showSuccessDialog(context, benar);
-      // } else {
-      //   print(response.data['status']);
-      //   print(response.data['message']);
+      Navigator.pop(context);
       print('insert quiz temp ${response.data['status'].toString()}');
-      // }
     } catch (e) {
       print(e.toString());
     }
@@ -177,14 +163,7 @@ class _QuizScreenState extends State<QuizScreen> {
     Dio dio = new Dio();
     try {
       var response = await dio.delete('${Endpoint.insertQuizTemp}/$usedId');
-
-      // if (response.data['status'] == true) {
-      //   showSuccessDialog(context, benar);
-      // } else {
-      //   print(response.data['status']);
-      //   print(response.data['message']);
       print('delete quiz temp ${response.data['status'].toString()}');
-      // }
     } catch (e) {
       print(e.toString());
     }
@@ -236,6 +215,23 @@ class _QuizScreenState extends State<QuizScreen> {
       dismissOnBackKeyPress: false,
       dismissOnTouchOutside: false,
     )..show();
+  }
+
+  Future showProgressDialog(BuildContext loadContext) {
+    return showDialog(
+      context: loadContext,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () {
+            return Future.value(false);
+          },
+          child: Center(
+            child: CircularProgressIndicator(),
+          ),
+        );
+      },
+    );
   }
 
   @override
