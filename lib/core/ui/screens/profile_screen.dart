@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +15,7 @@ import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
+import 'package:login_absen/core/ui/screens/trusmiverse.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -26,6 +29,8 @@ import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:crypto/crypto.dart';
+import 'package:get/get.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -37,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
 
+  ApiServices services = ApiServices();
   CancelToken apiToken = CancelToken();
 
   String username = '';
@@ -346,7 +352,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 2000));
-
     _refreshController.refreshCompleted();
     _profileBloc.add(InitialProfile());
     getProfil(userID, date);
@@ -435,13 +440,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ip = Endpoint.baseUrl;
     }
 
-    ApiServices services = ApiServices();
     var response = await services.checkHolidays(ip, userID);
 
-    // print('checkHolidays => ' + response.toString());
-    if (response['status'] == false) {
-      // 24 = Departement Marketing RSP
-      if (departmentId == '24') {
+    print('checkHolidays => ' + response.toString());
+    if (response == null || response['status'] == false) {
+      // 120 = Departement Marketing RSP
+      if (departmentId == '120') {
         getBestMktRsp(context);
       } else {
         checkBestBadEmployee(context);
@@ -466,8 +470,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         setState(() {
           hariBesar = false;
         });
-        // 24 = Departement Marketing RSP
-        if (departmentId == '24') {
+        // 120 = Departement Marketing RSP
+        if (departmentId == '120') {
           getBestMktRsp(context);
         } else {
           checkBestBadEmployee(context);
@@ -488,7 +492,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ip = Endpoint.baseUrl;
     }
 
-    ApiServices services = ApiServices();
     var response = await services.checkBestBadEmployee(ip, userID);
 
     if (response != null) {
@@ -1231,10 +1234,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ip = Endpoint.baseUrl;
     }
 
-    ApiServices services = ApiServices();
-    var response = await services.getBestMktRsp(ip);
-
-    _displayBestMktRsp(context, response);
+    var response = await services.getBestMktRsp(ip, apiToken);
+    if (response == null) {
+      Navigator.pop(context);
+      _profileBloc.add(InitialProfile());
+      getProfil(userID, date);
+    } else {
+      _displayBestMktRsp(context, response);
+    }
   }
 
   void _displayBestMktRsp(BuildContext context, response) {
@@ -3262,17 +3269,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           SizedBox(height: 20),
                                           Visibility(
                                             visible: statusPhoto,
-                                            child: Container(
-                                              width: 150.0,
-                                              height: 150.0,
-                                              decoration: BoxDecoration(
-                                                color: Colors.grey[300],
-                                                shape: BoxShape.circle,
-                                                image: DecorationImage(
-                                                  fit: BoxFit.cover,
-                                                  image: new NetworkImage(
-                                                    networkImageUrl,
+                                            child: CachedNetworkImage(
+                                              imageUrl: networkImageUrl,
+                                              imageBuilder:
+                                                  (context, imageProvider) =>
+                                                      Container(
+                                                width: 150.0,
+                                                height: 150.0,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  image: DecorationImage(
+                                                    image: imageProvider,
+                                                    fit: BoxFit.cover,
+                                                    colorFilter:
+                                                        ColorFilter.mode(
+                                                            Colors.grey,
+                                                            BlendMode.dst),
                                                   ),
+                                                  color: Colors.grey[300],
+                                                ),
+                                              ),
+                                              placeholder: (context, url) =>
+                                                  Container(
+                                                width: 150.0,
+                                                height: 150.0,
+                                                decoration: new BoxDecoration(
+                                                  color: Colors.grey[300],
+                                                  shape: BoxShape.circle,
+                                                ),
+                                                child: Icon(
+                                                  Icons.person_outline,
+                                                  color: Colors.white,
+                                                  size: 120.0,
                                                 ),
                                               ),
                                             ),
@@ -3639,13 +3667,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             new CircleAvatar(
                               radius: 30.0,
                               child: ClipOval(
+                                // child: CachedNetworkImage(
+                                //   imageUrl:
+                                //       '${Endpoint.urlProfile}/${state.fotoProfil}',
+                                //   imageBuilder: (context, imageProvider) =>
+                                //       Container(
+                                //     width: 60.0,
+                                //     height: 60.0,
+                                //     decoration: BoxDecoration(
+                                //       shape: BoxShape.circle,
+                                //       image: DecorationImage(
+                                //         image: imageProvider,
+                                //         fit: BoxFit.cover,
+                                //         colorFilter: ColorFilter.mode(
+                                //             Colors.grey, BlendMode.dst),
+                                //       ),
+                                //       color: Colors.grey[300],
+                                //     ),
+                                //   ),
+                                //   placeholder: (context, url) =>
+                                //       Shimmer.fromColors(
+                                //     baseColor: Colors.grey,
+                                //     highlightColor: Colors.white,
+                                //     child: Container(
+                                //       width: 60.0,
+                                //       height: 60.0,
+                                //       decoration: BoxDecoration(
+                                //         shape: BoxShape.circle,
+                                //         color: Colors.grey[300],
+                                //       ),
+                                //       child: Icon(Icons.person_outline_rounded),
+                                //     ),
+                                //   ),
+                                //   errorWidget:
+                                //(context, url, error) =>
+                                //       Container(
+                                //     width: 60.0,
+                                //     height: 60.0,
+                                //     decoration: BoxDecoration(
+                                //       shape: BoxShape.circle,
+                                //       color: Colors.grey[300],
+                                //     ),
+                                //     child: Icon(
+                                //       Icons.person_outline_rounded,
+                                //       size: 40,
+                                //     ),
+                                //   ),
+                                // ),
                                 child: Image.network(
-                                    Endpoint.urlProfile +
-                                        "/" +
-                                        state.fotoProfil,
-                                    width: 125,
-                                    height: 125,
-                                    fit: BoxFit.cover),
+                                  Endpoint.urlProfile + "/" + state.fotoProfil,
+                                  width: 125,
+                                  height: 125,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                    width: 60.0,
+                                    height: 60.0,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.grey[300],
+                                    ),
+                                    child: Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Colors.white,
+                                      size: 40,
+                                    ),
+                                  ),
+                                ),
                               ),
                               backgroundColor: Colors.transparent,
                             ),
@@ -3688,6 +3776,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 leading: Icon(Icons.add_to_home_screen),
                                 title: Text('HR System'),
                                 onTap: () => goToHR(context)),
+                            ListTile(
+                                leading: Icon(Icons.group_work_outlined),
+                                title: Text('Trusmiverse'),
+                                onTap: () => goToTrusmiverse(context)),
                             ListTile(
                                 leading: Icon(Icons.account_balance),
                                 title: Text('WFH'),
@@ -3757,6 +3849,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         child: Container(
                                           width: 150.0,
                                           height: 150.0,
+                                          padding: EdgeInsets.all(2.5),
                                           decoration: BoxDecoration(
                                             color: Colors.grey[300],
                                             shape: BoxShape.circle,
@@ -3767,6 +3860,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               ),
                                             ),
                                           ),
+                                          // child: CachedNetworkImage(
+                                          //   imageUrl: networkImageUrl,
+                                          //   errorWidget:
+                                          //       (context, url, error) => Icon(
+                                          //     Icons.person_outline,
+                                          //     size: 100,
+                                          //     color: Colors.grey,
+                                          //   ),
+                                          //   placeholder: (context, url) =>
+                                          //       Shimmer.fromColors(
+                                          //     child: Icon(
+                                          //       Icons.person_outline,
+                                          //       size: 100,
+                                          //       color: Colors.grey,
+                                          //     ),
+                                          //     baseColor: Colors.grey,
+                                          //     highlightColor: Colors.white,
+                                          //   ),
+                                          // ),
                                         ),
                                       ),
                                       Visibility(
@@ -4179,12 +4291,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // QUIZ
     setState(() {
-      state.quizStatus == '1' ? isQuizPasses = true : isQuizPasses = false;
+      state.quizRequired == "1"
+          ? state.quizStatus == '1'
+              ? isQuizPasses = true
+              : isQuizPasses = false
+          : isQuizPasses = true;
     });
 
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool('isQuizPasses', isQuizPasses);
 
+    print('state.quizRequired : ${state.quizRequired.toString()}');
     print('state.quizStatus : ${state.quizStatus.toString()}');
     print('isQuizPasses : ${isQuizPasses.toString()}');
   }
@@ -4234,8 +4351,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             isShowSuccessCheckout = true;
           });
 
-          // 24 = Departement Marketing RSP
-          if (departmentId == '24') {
+          // 120 = Departement Marketing RSP
+          if (departmentId == '120') {
             getBestMktRsp(context);
           } else {
             checkBestBadEmployee(context);
@@ -4263,8 +4380,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onPressed: () {
             Navigator.of(context).pop();
 
-            // 24 = Departement Marketing RSP
-            if (departmentId == '24') {
+            // 120 = Departement Marketing RSP
+            if (departmentId == '120') {
               getBestMktRsp(context);
             } else {
               checkBestBadEmployee(context);
@@ -4333,6 +4450,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
         arguments: PassParams(username, password));
   }
 
+  goToTrusmiverse(context) async {
+    String pwd = md5.convert(utf8.encode(password)).toString();
+    try {
+      final response = await services.trusmiverseLogin(username, pwd, apiToken);
+      print(jsonDecode(response.data)['link'].toString());
+      String url = jsonDecode(response.data)['link'].toString();
+      Get.to(Trusmiverse(url: url));
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   wfh(context) async {
     Navigator.pushNamed(context, "/wfh",
         arguments: PassParams(username, password));
@@ -4360,8 +4489,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     } else {
       ip = Endpoint.baseUrl;
     }
-
-    ApiServices services = ApiServices();
 
     try {
       var response = await services.checkStatus(ip, userID, responseTime);

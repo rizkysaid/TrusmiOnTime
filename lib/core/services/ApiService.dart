@@ -105,8 +105,8 @@ class ApiServices {
         throw response.data['message'];
       }
     } catch (e) {
-      // return e.toString();
-      throw "Terjadi kesalahan";
+      return e.toString();
+      // throw "Terjadi kesalahan";
     }
   }
 
@@ -166,20 +166,22 @@ class ApiServices {
       return response.data;
     } catch (e) {
       return null;
-    } finally {
-      dio.close();
     }
+    // finally {
+    //   dio.close();
+    // }
   }
 
-  Future<dynamic> getBestMktRsp(ip) async {
+  Future<dynamic> getBestMktRsp(ip, apiToken) async {
     try {
       var url = '$ip/best_mkt_rsp';
       dio.options.connectTimeout = 10000; //10s
       dio.options.receiveTimeout = 10000;
-      var response = await dio.get(url);
+      // var response = await dio.get(url);
+      var response = await dio.get(url, cancelToken: apiToken);
       return response.data;
     } catch (e) {
-      throw e;
+      return null;
     }
   }
 
@@ -205,4 +207,25 @@ class ApiServices {
     });
   }
   // QUESTION
+
+  // TRUSMIVERSE
+  Future<dynamic> trusmiverseLogin(username, password, apiToken) async {
+    try {
+      var url = "http://trusmiverse.com/apps/login/auth_api";
+      var formData = FormData.fromMap({
+        'username': username,
+        'password': password,
+      });
+      var response = await dio.post(url, data: formData, cancelToken: apiToken);
+      return response;
+      // if (response.data['result']) {
+      //   return response.data['link'];
+      // } else {
+      //   throw "Username or password is not valid";
+      // }
+    } catch (e) {
+      return null;
+    }
+  }
+  // TRUSMIVERSE
 }

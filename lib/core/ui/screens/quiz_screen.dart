@@ -234,223 +234,238 @@ class _QuizScreenState extends State<QuizScreen> {
     );
   }
 
+  Future<bool> _onWillPop() async {
+    if (!_isSnackbarActive) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _isShowTooltip = false;
-        });
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          iconTheme: new IconThemeData(
-            color: Color.fromARGB(255, 240, 245, 249),
-          ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/background_login.png'),
-                fit: BoxFit.cover,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(30.0),
-                bottomRight: Radius.circular(30.0),
+    return WillPopScope(
+      onWillPop: () => _onWillPop(),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _isShowTooltip = false;
+          });
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            iconTheme: new IconThemeData(
+              color: Color.fromARGB(255, 240, 245, 249),
+            ),
+            flexibleSpace: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/background_login.png'),
+                  fit: BoxFit.cover,
+                ),
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(30.0),
+                  bottomRight: Radius.circular(30.0),
+                ),
               ),
             ),
-          ),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: EdgeInsets.only(top: 20.0),
-              child: Icon(
-                Icons.arrow_back_outlined,
+            leading: GestureDetector(
+              onTap: () {
+                if (!_isSnackbarActive) {
+                  Navigator.pop(context);
+                }
+              },
+              child: Padding(
+                padding: EdgeInsets.only(top: 20.0),
+                child: Icon(
+                  Icons.arrow_back_outlined,
+                ),
               ),
             ),
-          ),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: Row(
-              children: [
-                Text("Quiz"),
-                SizedBox(width: 10),
-                GestureDetector(
-                  onTap: () {
-                    if (!_isShowTooltip) {
-                      setState(() {
-                        _isShowTooltip = true;
-                      });
-                    } else {
-                      setState(() {
-                        _isShowTooltip = false;
-                      });
-                    }
-                  },
-                  child: SimpleTooltip(
-                    tooltipTap: () {
-                      setState(() {
-                        _isShowTooltip = false;
-                      });
+            title: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Row(
+                children: [
+                  Text("Quiz"),
+                  SizedBox(width: 10),
+                  GestureDetector(
+                    onTap: () {
+                      if (!_isShowTooltip) {
+                        setState(() {
+                          _isShowTooltip = true;
+                        });
+                      } else {
+                        setState(() {
+                          _isShowTooltip = false;
+                        });
+                      }
                     },
-                    animationDuration: Duration(seconds: 1),
-                    hideOnTooltipTap: true,
-                    show: _isShowTooltip,
-                    tooltipDirection: TooltipDirection.right,
-                    child: Icon(
-                      Icons.info,
-                      color: Colors.white.withOpacity(0.8),
-                      size: 18.0,
-                    ),
-                    backgroundColor: Colors.grey.shade900.withOpacity(0.3),
-                    borderColor: Colors.grey.shade900.withOpacity(0.1),
-                    arrowTipDistance: 3,
-                    ballonPadding: EdgeInsets.symmetric(
-                      horizontal: 6,
-                      vertical: 4,
-                    ),
-                    content: Text(
-                      "Jawablah pertanyaan dengan benar untuk dapat melakukan absen pulang!",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 244, 240, 240),
-                        fontSize: 12,
-                        decoration: TextDecoration.none,
+                    child: SimpleTooltip(
+                      tooltipTap: () {
+                        setState(() {
+                          _isShowTooltip = false;
+                        });
+                      },
+                      animationDuration: Duration(seconds: 1),
+                      hideOnTooltipTap: true,
+                      show: _isShowTooltip,
+                      tooltipDirection: TooltipDirection.right,
+                      child: Icon(
+                        Icons.info,
+                        color: Colors.white.withOpacity(0.8),
+                        size: 18.0,
+                      ),
+                      backgroundColor: Colors.grey.shade900.withOpacity(0.3),
+                      borderColor: Colors.grey.shade900.withOpacity(0.1),
+                      arrowTipDistance: 3,
+                      ballonPadding: EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 4,
+                      ),
+                      content: Text(
+                        "Jawablah pertanyaan dengan benar untuk dapat melakukan absen pulang!",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 244, 240, 240),
+                          fontSize: 12,
+                          decoration: TextDecoration.none,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(30),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                bottom: Radius.circular(30),
+              ),
             ),
+            toolbarHeight: 120,
           ),
-          toolbarHeight: 120,
-        ),
-        body: Container(
-          padding: const EdgeInsets.all(14.0),
-          height: double.infinity,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Text(
-                    question,
-                    style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                for (var n in _options)
+          body: Container(
+            padding: const EdgeInsets.all(14.0),
+            height: double.infinity,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                    child: Column(
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20.0),
-                            border: Border.all(
-                              color: jawaban == n['option']
-                                  ? Color(0XFFFF0000)
-                                  : Color(0XFF121212),
-                              width: 1.0,
-                            ),
-                          ),
-                          child: RadioListTile<String>(
-                            activeColor: Color(0XFFFF0000),
-                            value: n['option'],
-                            groupValue: jawaban,
-                            onChanged: (val) {
-                              setState(() {
-                                jawaban = val;
-                              });
-                              if (val != null) {
-                                benar = n['status'];
-                              } else {
-                                benar = val;
-                              }
-                            },
-                            title: Text(
-                              n['option'],
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                            toggleable: true,
-                            selected: jawaban == n['option'],
-                          ),
-                        ),
-                        SizedBox(
-                          height: 20.0,
-                        )
-                      ],
+                    padding: const EdgeInsets.all(20.0),
+                    child: Text(
+                      question,
+                      style: TextStyle(
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                SizedBox(height: 70.0),
-              ],
+                  for (var n in _options)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Column(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(
+                                color: jawaban == n['option']
+                                    ? Color(0XFFFF0000)
+                                    : Color(0XFF121212),
+                                width: 1.0,
+                              ),
+                            ),
+                            child: RadioListTile<String>(
+                              activeColor: Color(0XFFFF0000),
+                              value: n['option'],
+                              groupValue: jawaban,
+                              onChanged: (val) {
+                                setState(() {
+                                  jawaban = val;
+                                });
+                                if (val != null) {
+                                  benar = n['status'];
+                                } else {
+                                  benar = val;
+                                }
+                              },
+                              title: Text(
+                                n['option'],
+                                style: TextStyle(fontSize: 14.0),
+                              ),
+                              toggleable: true,
+                              selected: jawaban == n['option'],
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20.0,
+                          )
+                        ],
+                      ),
+                    ),
+                  SizedBox(height: 70.0),
+                ],
+              ),
             ),
           ),
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        floatingActionButton: Padding(
-          padding: const EdgeInsets.only(bottom: 30.0, left: 50, right: 50),
-          child: ElevatedButton(
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20.0),
+          floatingActionButtonLocation:
+              FloatingActionButtonLocation.centerDocked,
+          floatingActionButton: Padding(
+            padding: const EdgeInsets.only(bottom: 30.0, left: 50, right: 50),
+            child: ElevatedButton(
+              style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20.0),
+                  ),
                 ),
+                minimumSize:
+                    MaterialStateProperty.all(Size(double.infinity, 50)),
+                backgroundColor:
+                    MaterialStateProperty.all(Color.fromARGB(255, 212, 0, 0)),
+                // elevation: MaterialStateProperty.all(3),
+                shadowColor: MaterialStateProperty.all(Colors.redAccent),
               ),
-              minimumSize: MaterialStateProperty.all(Size(double.infinity, 50)),
-              backgroundColor:
-                  MaterialStateProperty.all(Color.fromARGB(255, 212, 0, 0)),
-              // elevation: MaterialStateProperty.all(3),
-              shadowColor: MaterialStateProperty.all(Colors.redAccent),
-            ),
-            onPressed: () {
-              _cekJawaban();
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(
-                top: 10,
-                bottom: 10,
-              ),
-              child: Text(
-                "Submit",
-                style: TextStyle(
-                  fontSize: 18,
+              onPressed: () {
+                _cekJawaban();
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(
+                  top: 10,
+                  bottom: 10,
+                ),
+                child: Text(
+                  "Submit",
+                  style: TextStyle(
+                    fontSize: 18,
+                  ),
                 ),
               ),
             ),
           ),
+          // bottomNavigationBar: BottomAppBar(
+          //   shape: CircularNotchedRectangle(),
+          //   notchMargin: 8.0,
+          //   child: Row(
+          //     mainAxisSize: MainAxisSize.max,
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: <Widget>[
+          //       IconButton(
+          //         icon: Icon(Icons.menu),
+          //         onPressed: () {
+          //           // Do something when the menu button is pressed
+          //         },
+          //       ),
+          //       IconButton(
+          //         icon: Icon(Icons.search),
+          //         onPressed: () {
+          //           // Do something when the search button is pressed
+          //         },
+          //       ),
+          //     ],
+          //   ),
+          // ),
         ),
-        // bottomNavigationBar: BottomAppBar(
-        //   shape: CircularNotchedRectangle(),
-        //   notchMargin: 8.0,
-        //   child: Row(
-        //     mainAxisSize: MainAxisSize.max,
-        //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //     children: <Widget>[
-        //       IconButton(
-        //         icon: Icon(Icons.menu),
-        //         onPressed: () {
-        //           // Do something when the menu button is pressed
-        //         },
-        //       ),
-        //       IconButton(
-        //         icon: Icon(Icons.search),
-        //         onPressed: () {
-        //           // Do something when the search button is pressed
-        //         },
-        //       ),
-        //     ],
-        //   ),
-        // ),
       ),
     );
   }
