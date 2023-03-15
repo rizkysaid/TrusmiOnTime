@@ -4129,7 +4129,89 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 }),
                 bottomNavigationBar: BottomAppBar(
                   shape: const CircularNotchedRectangle(),
-                  child: Container(height: 50.0),
+                  child: Container(height: 60.0),
+                  // child: Padding(
+                  //   padding: const EdgeInsets.all(8.0),
+                  //   child: Row(
+                  //     mainAxisSize: MainAxisSize.max,
+                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  //     children: [
+                  //       Wrap(
+                  //         crossAxisAlignment: WrapCrossAlignment.center,
+                  //         direction: Axis.vertical,
+                  //         children: [
+                  //           IconButton(
+                  //             onPressed: () {},
+                  //             icon: Icon(
+                  //               Icons.add_to_home_screen_outlined,
+                  //               size: 30,
+                  //             ),
+                  //             color: Colors.grey,
+                  //           ),
+                  //           Text(
+                  //             "HR System",
+                  //             style: TextStyle(fontSize: 10),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       Wrap(
+                  //         crossAxisAlignment: WrapCrossAlignment.center,
+                  //         direction: Axis.vertical,
+                  //         children: [
+                  //           IconButton(
+                  //             onPressed: () {},
+                  //             icon: Icon(
+                  //               Icons.group_work_outlined,
+                  //               size: 30,
+                  //             ),
+                  //             color: Colors.grey,
+                  //           ),
+                  //           Text(
+                  //             "Trusmiverse",
+                  //             style: TextStyle(fontSize: 10),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       Padding(padding: EdgeInsets.symmetric(horizontal: 25)),
+                  //       Wrap(
+                  //         crossAxisAlignment: WrapCrossAlignment.center,
+                  //         direction: Axis.vertical,
+                  //         children: [
+                  //           IconButton(
+                  //             onPressed: () {},
+                  //             icon: Icon(
+                  //               Icons.account_balance,
+                  //               size: 30,
+                  //             ),
+                  //             color: Colors.grey,
+                  //           ),
+                  //           Text(
+                  //             "WFH",
+                  //             style: TextStyle(fontSize: 10),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //       Wrap(
+                  //         crossAxisAlignment: WrapCrossAlignment.center,
+                  //         direction: Axis.vertical,
+                  //         children: [
+                  //           IconButton(
+                  //             onPressed: () {},
+                  //             icon: Icon(
+                  //               Icons.exit_to_app,
+                  //               size: 30,
+                  //             ),
+                  //             color: Colors.grey,
+                  //           ),
+                  //           Text(
+                  //             "Logout",
+                  //             style: TextStyle(fontSize: 10),
+                  //           ),
+                  //         ],
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
                 ),
                 floatingActionButton: Visibility(
                   visible: _visibleButton,
@@ -4456,7 +4538,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final response = await services.trusmiverseLogin(username, pwd, apiToken);
       print(jsonDecode(response.data)['link'].toString());
       String url = jsonDecode(response.data)['link'].toString();
-      Get.to(Trusmiverse(url: url));
+      Get.to(() => Trusmiverse(url: url));
     } catch (e) {
       print(e.toString());
     }

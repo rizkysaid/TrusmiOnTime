@@ -10,41 +10,60 @@ class Trusmiverse extends StatefulWidget {
 }
 
 class _TrusmiverseState extends State<Trusmiverse> {
+  int loadingPrecentage = 0;
   @override
   Widget build(BuildContext context) {
     String url = widget.url;
-    // double progress = 0;
-    bool _loading = true;
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          WebView(
-            initialUrl: url,
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureNavigationEnabled: true,
-            onPageStarted: (String url) {
-              print('Page started loading: $url');
-            },
-            onPageFinished: (String url) {
-              setState(() {
-                _loading = false;
-              });
-              print('Page finished loading: $url');
-            },
-          ),
-          (_loading)
-              ? Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : SizedBox.shrink(),
-        ],
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        resizeToAvoidBottomInset: false,
+        body: Stack(
+          children: [
+            WebView(
+              initialUrl: url,
+              javascriptMode: JavascriptMode.unrestricted,
+              gestureNavigationEnabled: true,
+              onPageStarted: (String url) {
+                print('Page started loading: $url');
+                setState(() {
+                  loadingPrecentage = 0;
+                });
+              },
+              onProgress: (int progress) {
+                print('Page progress: $progress');
+                setState(() {
+                  loadingPrecentage = progress;
+                });
+              },
+              onPageFinished: (String url) {
+                setState(() {
+                  loadingPrecentage = 100;
+                });
+                print('Page finished loading: $url');
+              },
+            ),
+            loadingPrecentage < 100
+                ? Container(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
+                    color: Colors.grey[100],
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 15),
+                          Text('${loadingPrecentage.toString()}%'),
+                          SizedBox(height: 10),
+                          Text('Loading, please wait...'),
+                        ],
+                      ),
+                    ),
+                  )
+                : SizedBox.shrink(),
+          ],
+        ),
       ),
     );
   }

@@ -18,9 +18,7 @@ class HrSystem extends StatefulWidget {
 class _HrSystemState extends State<HrSystem> {
   // InAppWebViewController webView;
   String url = "";
-  double progress = 0;
-
-  bool _loading = true;
+  int loadingPrecentage = 0;
 
   @override
   void initState() {
@@ -50,81 +48,45 @@ class _HrSystemState extends State<HrSystem> {
       resizeToAvoidBottomInset: false,
       body: Stack(
         children: [
-          // WebView(
-          //   initialUrl: urlAbsen,
-          //   javascriptMode: JavascriptMode.unrestricted,
-          //   gestureNavigationEnabled: true,
-          //   onPageStarted: (String url) {
-          //     print('Page started loading: $url');
-          //   },
-          //   onPageFinished: (String url) {
-          //     setState(() {
-          //       _loading = false;
-          //     });
-          //     print('Page finished loading: $url');
-          //   },
-          // ),
-          // (_loading)
-          //     ? Container(
-          //         width: MediaQuery.of(context).size.width,
-          //         height: MediaQuery.of(context).size.height,
-          //         color: Colors.grey[100],
-          //         child: Center(
-          //           child: CircularProgressIndicator(),
-          //         ),
-          //       )
-          //     : SizedBox.shrink(),
-
-          // WebViewX(
-          //   initialContent: urlAbsen,
-          //   initialSourceType: SourceType.url,
-          //   height: MediaQuery.of(context).size.height,
-          //   width: MediaQuery.of(context).size.width,
-          //   onPageFinished: (String url) {
-          //     setState(() {
-          //       _loading = false;
-          //     });
-          //   },
-          // ),
-          // (_loading)
-          //     ? Container(
-          //         width: MediaQuery.of(context).size.width,
-          //         height: MediaQuery.of(context).size.height,
-          //         color: Colors.grey[100],
-          //         child: Center(
-          //           child: CircularProgressIndicator(),
-          //         ),
-          //       )
-          //     : SizedBox.shrink(),
-
-          // WebViewPlus(
-          //   javascriptMode: JavascriptMode.unrestricted,
-          //   onWebViewCreated: (controller){
-          //     controller.loadUrl(urlAbsen);
-          //   },
-          // ),
-
           WebView(
             initialUrl: urlAbsen,
             javascriptMode: JavascriptMode.unrestricted,
             gestureNavigationEnabled: true,
             onPageStarted: (String url) {
               print('Page started loading: $url');
+              setState(() {
+                loadingPrecentage = 0;
+              });
+            },
+            onProgress: (int progress) {
+              print('Page progress: $progress');
+              setState(() {
+                loadingPrecentage = progress;
+              });
             },
             onPageFinished: (String url) {
               setState(() {
-                _loading = false;
+                loadingPrecentage = 100;
               });
               print('Page finished loading: $url');
             },
           ),
-          (_loading)
+          loadingPrecentage < 100
               ? Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   color: Colors.grey[100],
                   child: Center(
-                    child: CircularProgressIndicator(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CircularProgressIndicator(),
+                        SizedBox(height: 15),
+                        Text('${loadingPrecentage.toString()}%'),
+                        SizedBox(height: 10),
+                        Text('Loading, please wait...'),
+                      ],
+                    ),
                   ),
                 )
               : SizedBox.shrink(),
