@@ -4538,7 +4538,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       final response = await services.trusmiverseLogin(username, pwd, apiToken);
       print(jsonDecode(response.data)['link'].toString());
       String url = jsonDecode(response.data)['link'].toString();
-      Get.to(() => Trusmiverse(url: url));
+      String token = jsonDecode(response.data)['token'].toString();
+      Get.to(() => Trusmiverse(url: url, token: token));
     } catch (e) {
       print(e.toString());
     }
@@ -4644,6 +4645,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     Future<void> future = showModalBottomSheet(
       isScrollControlled: true,
       context: context,
+      enableDrag: true,
       builder: (context) => QuizScreen(),
     );
 

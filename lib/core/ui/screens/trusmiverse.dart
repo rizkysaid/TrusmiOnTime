@@ -3,7 +3,9 @@ import 'package:flutter_webview_pro/webview_flutter.dart';
 
 class Trusmiverse extends StatefulWidget {
   final String url;
-  const Trusmiverse({Key? key, required this.url}) : super(key: key);
+  final String token;
+  const Trusmiverse({Key? key, required this.url, required this.token})
+      : super(key: key);
 
   @override
   State<Trusmiverse> createState() => _TrusmiverseState();
@@ -14,6 +16,7 @@ class _TrusmiverseState extends State<Trusmiverse> {
   @override
   Widget build(BuildContext context) {
     String url = widget.url;
+    String token = widget.token;
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -21,9 +24,15 @@ class _TrusmiverseState extends State<Trusmiverse> {
         body: Stack(
           children: [
             WebView(
-              initialUrl: url,
+              // initialUrl: url,
               javascriptMode: JavascriptMode.unrestricted,
               gestureNavigationEnabled: true,
+              onWebViewCreated: (controller) {
+                Map<String, String> headers = {
+                  "Authorization": "Bearer $token"
+                };
+                controller.loadUrl(url, headers: headers);
+              },
               onPageStarted: (String url) {
                 print('Page started loading: $url');
                 setState(() {
