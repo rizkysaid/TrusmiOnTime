@@ -4416,8 +4416,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return AwesomeDialog(
       context: context,
-      dialogType: DialogType.SUCCES,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
       title: title,
       // desc: 'Ingin istirahat sekarang?',
       // btnCancelText: "Nanti",
@@ -4490,8 +4490,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return AwesomeDialog(
       context: context,
-      dialogType: DialogType.ERROR,
-      animType: AnimType.BOTTOMSLIDE,
+      dialogType: DialogType.error,
+      animType: AnimType.bottomSlide,
       title: title,
       // desc: 'Ingin istirahat sekarang?',
       // btnCancelText: "Nanti",
@@ -4602,7 +4602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           } else {
             AwesomeDialog(
               context: context,
-              dialogType: DialogType.ERROR,
+              dialogType: DialogType.error,
               title: "Anda tidak bisa melakukan absen!",
               desc: response.data.message,
               btnOkText: "Kembali",
@@ -4617,7 +4617,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         } else {
           AwesomeDialog(
             context: context,
-            dialogType: DialogType.ERROR,
+            dialogType: DialogType.error,
             title: "Anda tidak bisa melakukan absen!",
             desc: "Akun anda telah dinonaktifkan.",
             btnOkText: "Logout",
