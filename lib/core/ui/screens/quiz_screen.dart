@@ -176,13 +176,13 @@ class _QuizScreenState extends State<QuizScreen> {
     late String btnOkText;
     late Color btnColor;
     if (status == '0') {
-      dialogType = DialogType.ERROR;
+      dialogType = DialogType.error;
       title = "Upss..";
       desc = "Jawaban kamu salah!";
       btnOkText = "Ulangi";
       btnColor = Color(0XFFFF0000);
     } else {
-      dialogType = DialogType.SUCCES;
+      dialogType = DialogType.success;
       title = "Selamat";
       desc = "Jawaban kamu benar";
       btnOkText = "Lanjutkan absen";
@@ -192,7 +192,7 @@ class _QuizScreenState extends State<QuizScreen> {
     return AwesomeDialog(
       context: context,
       dialogType: dialogType,
-      animType: AnimType.BOTTOMSLIDE,
+      animType: AnimType.bottomSlide,
       title: title,
       desc: desc,
       btnOkColor: btnColor,

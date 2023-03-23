@@ -14,23 +14,23 @@ class ApiServices {
     print('getConnect url : ' + url.toString());
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 10000; //10s
-      dio.options.receiveTimeout = 5000;
+      dio.options.connectTimeout = 10000 as Duration?; //10s
+      dio.options.receiveTimeout = 5000 as Duration?;
 
       return await dio.post(url, cancelToken: apiToken);
     } on DioError catch (e) {
       // print(e.toString() + ' | ' + url.toString());
 
-      if (e.type == DioErrorType.response) {
+      if (e.type == DioErrorType.badResponse) {
         int? statusCode = e.response!.statusCode;
         if (statusCode == 404) {
           throw "Api not found";
         } else if (statusCode == 500) {
           throw "Internal Server Error";
         } else {
-          throw e.error.message.toString();
+          throw e.error.toString();
         }
-      } else if (e.type == DioErrorType.connectTimeout) {
+      } else if (e.type == DioErrorType.connectionTimeout) {
         throw e.message.toString();
       } else if (e.type == DioErrorType.cancel) {
         throw 'cancel';
@@ -46,22 +46,22 @@ class ApiServices {
     print('postData : ' + data.toString());
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 10000; //10s
-      dio.options.receiveTimeout = 5000;
+      dio.options.connectTimeout = 10000 as Duration?; //10s
+      dio.options.receiveTimeout = 5000 as Duration?;
 
       return await dio.post(url, data: data, cancelToken: apiToken);
     } on DioError catch (e) {
       //print(e.toString()+' | '+url.toString());
-      if (e.type == DioErrorType.response) {
+      if (e.type == DioErrorType.badResponse) {
         int? statusCode = e.response!.statusCode;
         if (statusCode == 404) {
           throw "Api not found";
         } else if (statusCode == 500) {
           throw "Internal Server Error";
         } else {
-          throw e.error.message.toString();
+          throw e.error.toString();
         }
-      } else if (e.type == DioErrorType.connectTimeout) {
+      } else if (e.type == DioErrorType.connectionTimeout) {
         throw e.message.toString();
       } else if (e.type == DioErrorType.cancel) {
         throw 'cancel';
@@ -96,8 +96,8 @@ class ApiServices {
     String url = ip + '/profil/' + userID + '/' + date;
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000; //10s
-      dio.options.receiveTimeout = 5000;
+      dio.options.connectTimeout = 30000 as Duration?; //10s
+      dio.options.receiveTimeout = 5000 as Duration?;
       response = await dio.get(url, cancelToken: apiToken);
       if (response.data['status'] == true) {
         return response.data['data'];
@@ -160,8 +160,8 @@ class ApiServices {
     try {
       var dio = new Dio();
       // dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 10000; //10s
-      dio.options.receiveTimeout = 5000;
+      dio.options.connectTimeout = 10000 as Duration?; //10s
+      dio.options.receiveTimeout = 5000 as Duration?;
       var response = await dio.get(ip + '/check_bad_emp/' + userId);
       return response.data;
     } catch (e) {
@@ -175,8 +175,8 @@ class ApiServices {
   Future<dynamic> getBestMktRsp(ip, apiToken) async {
     try {
       var url = '$ip/best_mkt_rsp';
-      dio.options.connectTimeout = 10000; //10s
-      dio.options.receiveTimeout = 10000;
+      dio.options.connectTimeout = 10000 as Duration?; //10s
+      dio.options.receiveTimeout = 10000 as Duration?;
       // var response = await dio.get(url);
       var response = await dio.get(url, cancelToken: apiToken);
       return response.data;

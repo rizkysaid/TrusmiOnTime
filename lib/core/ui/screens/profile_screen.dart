@@ -31,6 +31,7 @@ import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
