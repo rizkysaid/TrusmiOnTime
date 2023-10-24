@@ -5,6 +5,7 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <application android:label="Trusmi OnTime" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
         <activity 
         android:name=".MainActivity" 

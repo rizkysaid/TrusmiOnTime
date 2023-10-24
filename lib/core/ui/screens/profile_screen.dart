@@ -3186,7 +3186,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 });
                 break;
               default:
-                showProgressDialog(context);
+                // showProgressDialog(context);
                 getPref();
             }
           },

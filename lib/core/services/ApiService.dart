@@ -96,8 +96,8 @@ class ApiServices {
     String url = ip + '/profil/' + userID + '/' + date;
     try {
       dio.options.headers['content-Type'] = 'application/x-www-form-urlencoded';
-      dio.options.connectTimeout = 30000 as Duration?; //10s
-      dio.options.receiveTimeout = 5000 as Duration?;
+      // dio.options.connectTimeout = 30000; //10s
+      // dio.options.receiveTimeout = 5000;
       response = await dio.get(url, cancelToken: apiToken);
       if (response.data['status'] == true) {
         return response.data['data'];
