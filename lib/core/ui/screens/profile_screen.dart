@@ -55,14 +55,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String clockout = '--:--';
   String imageUrl = '';
   String message = '';
-  // static String totalWork = '';
   String _status = '';
   bool _isCheckin = false;
-  // bool _isCheckout = false;
   bool statusPhoto = false;
   bool statusIcon = true;
   bool _visibleButton = true;
-  // bool statusTotalWork = false;
   Color _colorButton = Colors.red;
   late Timer timer;
 
@@ -147,14 +144,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    // print('usrId => ' + usrId);
-    // print('clockIn => ' + clockIn);
-    // print('idShift => ' + idShift);
-    // print('shift => ' + shift);
-
-    // print('proses checkin => ' + response.statusCode.toString());
-    // print('proses checkin => ' + response.toString());
-
     if (response.statusCode == 201) {
       showSuccessDialog(context, 'checkin');
     } else {
@@ -183,8 +172,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     var response = await request.send();
 
-    // print('response.status.checkout => ' + response.statusCode.toString());
-
     if (response.statusCode == 200) {
       // hide pop up
       Navigator.pop(context);
@@ -208,8 +195,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     request.fields['shift'] = shift;
 
     var response = await request.send();
-
-    // print('response.status.breakout => ' + response.statusCode.toString());
 
     if (response.statusCode == 200) {
       // timer = new Timer(new Duration(seconds: 2), () {
@@ -254,9 +239,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // _profileBloc.add(InitialProfile());
-    // getPref();
-    // _onRefresh();
 
     initConnectivity();
 
@@ -293,14 +275,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (Endpoint.baseIp == 'http://192.168.23.23') {
           Navigator.pushReplacementNamed(context, "/no_connection");
         } else {
-          // _profileBloc.add(InitialProfile());
           getPref();
-          // _onRefresh();
         }
       } else {
-        // _profileBloc.add(InitialProfile());
         getPref();
-        // _onRefresh();
       }
     } on PlatformException catch (e) {
       print(e.toString());
@@ -523,11 +501,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         pageBuilder: (context, animation, secondaryAnimation) {
-          return WillPopScope(
-            onWillPop: () {
+          return PopScope(
+            onPopInvoked: (bool didPop) async  {
               Navigator.pop(context);
               _profileBloc.add(InitialProfile());
               getProfil(userID, date);
+              if (didPop) {
+                return;
+              }
               return Future.value(true);
             },
             child: SafeArea(
@@ -1266,11 +1247,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         pageBuilder: (context, animation, secondaryAnimation) {
-          return WillPopScope(
-            onWillPop: () {
+          return PopScope(
+            onPopInvoked: (bool didPop) async {
               Navigator.pop(context);
               _profileBloc.add(InitialProfile());
               getProfil(userID, date);
+              if (didPop) {
+                return;
+              }
               return Future.value(true);
             },
             child: SafeArea(
@@ -3170,16 +3154,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: _profileBloc,
           listener: (context, state) {
-            print('listener status =>' + state.status.toString());
+            // print('listener status =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
-                Navigator.of(context, rootNavigator: true).pop(context);
+                // Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
 
                 break;
               case ProfileStatus.failure:
-                Navigator.of(context, rootNavigator: true).pop(context);
-                print('listener failure ');
+                // Navigator.of(context, rootNavigator: true).pop(context);
+                // print('listener failure ');
                 Future.delayed(const Duration(microseconds: 2000), () {
                   Navigator.pushNamedAndRemoveUntil(context, "/no_connection",
                       (Route<dynamic> routes) => false);
@@ -3193,7 +3177,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: BlocBuilder<ProfileBloc, ProfileState>(
             bloc: _profileBloc,
             builder: (context, state) {
-              // print('status buider => ' + state.status.toString());
               switch (state.status) {
                 case ProfileStatus.initial:
                   return Scaffold(
@@ -3926,154 +3909,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   style: TextStyle(color: Colors.white),
                                 ),
                                 Expanded(child: SizedBox()),
-                                // Padding(
-                                //   padding: const EdgeInsets.only(bottom: 15.0),
-                                //   child: Row(
-                                //     mainAxisAlignment: MainAxisAlignment.center,
-                                //     children: [
-                                //       Visibility(
-                                //         visible: state.statusBreak == '1'
-                                //             ? true
-                                //             : false,
-                                //         child: Visibility(
-                                //           visible: state.clockIn == '--:--'
-                                //               ? false
-                                //               : true,
-                                //           child: Column(
-                                //             children: [
-                                //               FloatingActionButton(
-                                //                 backgroundColor:
-                                //                     state.breakOut != ''
-                                //                         ? Colors.grey
-                                //                         : Color(0xff12cad6),
-                                //                 heroTag: 'breakOut',
-                                //                 onPressed: (state.breakOut ==
-                                //                         '')
-                                //                     ? () {
-                                //                         AwesomeDialog(
-                                //                           context: context,
-                                //                           dialogType: DialogType
-                                //                               .QUESTION,
-                                //                           animType: AnimType
-                                //                               .BOTTOMSLIDE,
-                                //                           title: 'Break Out',
-                                //                           desc:
-                                //                               'Apakah anda yakin sudah masuk jam istirahat?',
-                                //                           btnCancelText:
-                                //                               "Belum",
-                                //                           btnOkText: "Sudah",
-                                //                           btnCancelOnPress:
-                                //                               () {},
-                                //                           btnOkOnPress: () {
-                                //                             prosesBreakOut(
-                                //                                 state.userId,
-                                //                                 '${DateTime.now()}',
-                                //                                 state.idShift,
-                                //                                 state.shiftOut);
-                                //                           },
-                                //                         )..show();
-                                //                       }
-                                //                     : () {
-                                //                         /*Button break out disabled*/
-                                //                       },
-                                //                 child: Text('Break\nOut',
-                                //                     textAlign:
-                                //                         TextAlign.center),
-                                //                 shape: RoundedRectangleBorder(
-                                //                   borderRadius:
-                                //                       BorderRadius.circular(10),
-                                //                 ),
-                                //               ),
-                                //               Padding(
-                                //                 padding: const EdgeInsets.only(
-                                //                     top: 8.0),
-                                //                 child: Text(
-                                //                   state.breakOut,
-                                //                   style: TextStyle(
-                                //                       color: Colors.white),
-                                //                 ),
-                                //               ),
-                                //             ],
-                                //           ),
-                                //         ),
-                                //       ),
-                                //       SizedBox(
-                                //           width: MediaQuery.of(context)
-                                //                   .size
-                                //                   .width /
-                                //               3),
-                                //       Visibility(
-                                //         visible: state.statusBreak == '1'
-                                //             ? true
-                                //             : false,
-                                //         child: Visibility(
-                                //           visible: state.clockIn == '--:--'
-                                //               ? false
-                                //               : true,
-                                //           child: Column(
-                                //             children: [
-                                //               FloatingActionButton(
-                                //                 backgroundColor:
-                                //                     (state.breakOut == '')
-                                //                         ? Colors.grey
-                                //                         : (state.breakIn != '')
-                                //                             ? Colors.grey
-                                //                             : Color(0xff12cad6),
-                                //                 heroTag: 'breakIn',
-                                //                 onPressed: (state.breakOut ==
-                                //                             '' ||
-                                //                         state.breakIn != '')
-                                //                     ? () {
-                                //                         /* Button must disabled */
-                                //                       }
-                                //                     : () {
-                                //                         AwesomeDialog(
-                                //                           context: context,
-                                //                           dialogType: DialogType
-                                //                               .QUESTION,
-                                //                           animType: AnimType
-                                //                               .BOTTOMSLIDE,
-                                //                           title: 'Break In',
-                                //                           desc:
-                                //                               'Waktu istirahat sudah selesai?',
-                                //                           btnCancelText:
-                                //                               "Belum",
-                                //                           btnOkText: "Sudah",
-                                //                           btnCancelOnPress:
-                                //                               () {},
-                                //                           btnOkOnPress: () {
-                                //                             prosesBreakIn(
-                                //                                 state.userId,
-                                //                                 '${DateTime.now()}',
-                                //                                 state.idShift,
-                                //                                 state.shiftOut);
-                                //                           },
-                                //                         )..show();
-                                //                       },
-                                //                 child: Text('Break\nIn',
-                                //                     textAlign:
-                                //                         TextAlign.center),
-                                //                 shape: RoundedRectangleBorder(
-                                //                   borderRadius:
-                                //                       BorderRadius.circular(10),
-                                //                 ),
-                                //               ),
-                                //               Padding(
-                                //                 padding: const EdgeInsets.only(
-                                //                     top: 8.0),
-                                //                 child: Text(
-                                //                   state.breakIn,
-                                //                   style: TextStyle(
-                                //                       color: Colors.white),
-                                //                 ),
-                                //               ),
-                                //             ],
-                                //           ),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
+
                               ],
                             ),
                           ),
@@ -4394,8 +4230,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: loadContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () {
+        return PopScope(
+          onPopInvoked: (bool didPop) async {
+            if (didPop) {
+              return;
+            }
             return Future.value(false);
           },
           child: Center(
