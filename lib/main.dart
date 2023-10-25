@@ -25,20 +25,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: "Login",
+      title: "Trusmi Ontime",
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primaryColor: Colors.red[700],
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          secondary: Colors.redAccent,
-        ),
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.red[700],
-        ),
-        // radioTheme: RadioThemeData(
-        //   fillColor: MaterialStateColor.resolveWith((states) => Colors.white),
-        // ),
-      ),
       home: CekLogin(),
       routes: {
         "/login": (context) => LoginScreen(),
@@ -78,7 +66,7 @@ class _CekLoginState extends State<CekLogin> {
   @override
   void initState() {
     super.initState();
-    // _deleteConfig();
+    _deleteConfig();
     getPref();
   }
 
