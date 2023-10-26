@@ -280,7 +280,7 @@ class NotificationController extends ChangeNotifier {
   /// Use this method to detect when a new fcm token is received
   @pragma("vm:entry-point")
   static Future<void> myFcmTokenHandle(String token) async {
-    debugPrint('Firebase Token:"$token"');
+    print('Firebase Token:"$token"');
 
     _instance._firebaseToken = token;
     _instance.notifyListeners();
@@ -289,7 +289,7 @@ class NotificationController extends ChangeNotifier {
   /// Use this method to detect when a new native token is received
   @pragma("vm:entry-point")
   static Future<void> myNativeTokenHandle(String token) async {
-    debugPrint('Native Token:"$token"');
+    print('Native Token:"$token"');
 
     _instance._nativeToken = token;
     _instance.notifyListeners();
@@ -305,10 +305,10 @@ class NotificationController extends ChangeNotifier {
       try {
         return await AwesomeNotificationsFcm().requestFirebaseAppToken();
       } catch (exception) {
-        debugPrint('$exception');
+        print('$exception');
       }
     } else {
-      debugPrint('Firebase is not available on this project');
+      print('Firebase is not available on this project');
     }
     return '';
   }
