@@ -18,10 +18,10 @@ class ApiServices {
       dio.options.receiveTimeout = 5000 as Duration?;
 
       return await dio.post(url, cancelToken: apiToken);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       // print(e.toString() + ' | ' + url.toString());
 
-      if (e.type == DioErrorType.badResponse) {
+      if (e.type == DioExceptionType.badResponse) {
         int? statusCode = e.response!.statusCode;
         if (statusCode == 404) {
           throw "Api not found";
@@ -30,9 +30,9 @@ class ApiServices {
         } else {
           throw e.error.toString();
         }
-      } else if (e.type == DioErrorType.connectionTimeout) {
+      } else if (e.type == DioExceptionType.connectionTimeout) {
         throw e.message.toString();
-      } else if (e.type == DioErrorType.cancel) {
+      } else if (e.type == DioExceptionType.cancel) {
         throw 'cancel';
       }
       throw connErr;
@@ -50,9 +50,9 @@ class ApiServices {
       dio.options.receiveTimeout = 5000 as Duration?;
 
       return await dio.post(url, data: data, cancelToken: apiToken);
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       //print(e.toString()+' | '+url.toString());
-      if (e.type == DioErrorType.badResponse) {
+      if (e.type == DioExceptionType.badResponse) {
         int? statusCode = e.response!.statusCode;
         if (statusCode == 404) {
           throw "Api not found";
@@ -61,9 +61,9 @@ class ApiServices {
         } else {
           throw e.error.toString();
         }
-      } else if (e.type == DioErrorType.connectionTimeout) {
+      } else if (e.type == DioExceptionType.connectionTimeout) {
         throw e.message.toString();
-      } else if (e.type == DioErrorType.cancel) {
+      } else if (e.type == DioExceptionType.cancel) {
         throw 'cancel';
       }
       throw connErr;

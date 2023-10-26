@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-// import 'package:flutter/services.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
+import 'package:login_absen/core/services/notification_controller.dart';
 import 'package:login_absen/core/ui/screens/HrSystem.dart';
 import 'package:login_absen/core/ui/screens/Wfh.dart';
 import 'package:login_absen/core/ui/screens/invalid_ip.dart';
@@ -17,11 +17,27 @@ import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 import 'core/ui/screens/login_config.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationController.initializeLocalNotifications();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    NotificationController.startListeningNotificationEvents();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
