@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
-import 'package:login_absen/main.dart';
 
 class NotificationController extends ChangeNotifier {
 
@@ -185,9 +184,9 @@ class NotificationController extends ChangeNotifier {
   ///     REQUESTING NOTIFICATION PERMISSIONS
   ///  *********************************************
   ///
-  static Future<bool> displayNotificationRationale() async {
+  static Future<bool> displayNotificationRationale(context) async {
     bool userAuthorized = false;
-    BuildContext context = MyApp.navigatorKey.currentContext!;
+    // BuildContext? context = MyApp.navigatorKey.currentContext!;
     await showDialog(
         context: context,
         builder: (BuildContext ctx) {
@@ -321,9 +320,9 @@ class NotificationController extends ChangeNotifier {
   ///     NOTIFICATION CREATION METHODS
   ///  *********************************************
   ///
-  static Future<void> createNewNotification() async {
+  static Future<void> createNewNotification(context) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) isAllowed = await displayNotificationRationale();
+    if (!isAllowed) isAllowed = await displayNotificationRationale(context);
     if (!isAllowed) return;
 
     await AwesomeNotifications().createNotification(
@@ -353,9 +352,9 @@ class NotificationController extends ChangeNotifier {
         ]);
   }
 
-  static Future<void> scheduleNewNotification() async {
+  static Future<void> scheduleNewNotification(context) async {
     bool isAllowed = await AwesomeNotifications().isNotificationAllowed();
-    if (!isAllowed) isAllowed = await displayNotificationRationale();
+    if (!isAllowed) isAllowed = await displayNotificationRationale(context);
     if (!isAllowed) return;
 
     await myNotifyScheduleInHours(

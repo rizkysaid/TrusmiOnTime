@@ -21,12 +21,13 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationController.initializeLocalNotifications();
   await NotificationController.initializeRemoteNotifications(debug: true);
-  await NotificationController.initializeIsolateReceivePort();
+  // await NotificationController.initializeIsolateReceivePort();
   await NotificationController.getInitialNotificationAction();
   runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
+  MyApp({super.key});
   static final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override

@@ -4038,8 +4038,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 80,
                       child: FloatingActionButton(
                         onPressed: () => {
-                          checkStatus(userID),
-                          // NotificationController.createNewNotification()
+                          // checkStatus(userID),
+                          NotificationController.createNewNotification(context)
                         },
                         tooltip: _toolTip,
                         backgroundColor: _colorButton,
