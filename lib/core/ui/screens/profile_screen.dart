@@ -502,72 +502,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         pageBuilder: (context, animation, secondaryAnimation) {
-          return PopScope(
-            onPopInvoked: (bool didPop) async  {
-              Navigator.pop(context);
-              _profileBloc.add(InitialProfile());
-              getProfil(userID, date);
-              if (didPop) {
-                return;
-              }
-              return Future.value(true);
-            },
-            child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Expanded(
+          return SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          response['data']['best'].length == 1
+                              ? _singleBestEmployee(response)
+                              : _prodevBestEmployee(response),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 5),
+                    child: GestureDetector(
                       child: Container(
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.transparent,
+                          // image: DecorationImage(
+                          //   image: AssetImage('assets/background_new.png'),
+                          //   fit: BoxFit.cover,
+                          // ),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            response['data']['best'].length == 1
-                                ? _singleBestEmployee(response)
-                                : _prodevBestEmployee(response),
+                            DefaultTextStyle(
+                              child: Text('Close (x)'),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 17,
+                              ),
+                            ),
                           ],
                         ),
                       ),
+                      onTap: () {
+                        Navigator.pop(context);
+                        _profileBloc.add(InitialProfile());
+                        getProfil(userID, date);
+                      },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 5),
-                      child: GestureDetector(
-                        child: Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            // image: DecorationImage(
-                            //   image: AssetImage('assets/background_new.png'),
-                            //   fit: BoxFit.cover,
-                            // ),
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              DefaultTextStyle(
-                                child: Text('Close (x)'),
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _profileBloc.add(InitialProfile());
-                          getProfil(userID, date);
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -1248,1891 +1237,1880 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         pageBuilder: (context, animation, secondaryAnimation) {
-          return PopScope(
-            onPopInvoked: (bool didPop) async {
-              Navigator.pop(context);
-              _profileBloc.add(InitialProfile());
-              getProfil(userID, date);
-              if (didPop) {
-                return;
-              }
-              return Future.value(true);
-            },
-            child: SafeArea(
-              child: Container(
-                padding: EdgeInsets.all(10),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              // color: Color(0xff015a80),
-                              image: DecorationImage(
-                                image: AssetImage('assets/background_new.png'),
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(10),
-                                topRight: Radius.circular(10),
-                                bottomRight: Radius.circular(30),
-                                bottomLeft: Radius.circular(30),
-                              ),
+          return SafeArea(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Stack(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            // color: Color(0xff015a80),
+                            image: DecorationImage(
+                              image: AssetImage('assets/background_new.png'),
+                              fit: BoxFit.cover,
                             ),
-                            child: ListView(
-                              children: [
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                Center(
-                                  child: DefaultTextStyle(
-                                    child: Text(
-                                      "Sales Of The Month",
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(10),
+                              topRight: Radius.circular(10),
+                              bottomRight: Radius.circular(30),
+                              bottomLeft: Radius.circular(30),
+                            ),
+                          ),
+                          child: ListView(
+                            children: [
+                              SizedBox(
+                                height: 15,
+                              ),
+                              Center(
+                                child: DefaultTextStyle(
+                                  child: Text(
+                                    "Sales Of The Month",
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                Center(
-                                  child: DefaultTextStyle(
-                                    child: Text(
-                                      prevMonthName,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 20,
-                                ),
-                                // Akad
-                                Center(
-                                  child: DefaultTextStyle(
-                                    child: Text(
-                                      "Akad",
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 16, right: 16),
-                                  child: Divider(
+                                  style: TextStyle(
                                     color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                (response['data']['ak_02_nama'] != '')
-                                    ? Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_12_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_12_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja > 12 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_12_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_612_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_612_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja 6-12 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_612_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_35_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_35_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja 3-5 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_35_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_02_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_02_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja 0-2 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_02_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      )
-                                    : Column(
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_12_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_12_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja > 12 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_12_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceEvenly,
-                                            children: [
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_612_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_612_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja 6-12 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_612_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                              Container(
-                                                height: 120,
-                                                width: (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2.5),
-                                                child: Card(
-                                                  semanticContainer: true,
-                                                  elevation: 0,
-                                                  color: Colors.transparent,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            15),
-                                                  ),
-                                                  child: Stack(
-                                                    alignment: Alignment.center,
-                                                    children: [
-                                                      Container(
-                                                        width: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .center,
-                                                          children: [
-                                                            Container(
-                                                              padding: EdgeInsets
-                                                                  .only(
-                                                                      right:
-                                                                          30),
-                                                              child: Container(
-                                                                decoration:
-                                                                    BoxDecoration(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  shape: BoxShape
-                                                                      .circle,
-                                                                ),
-                                                                padding:
-                                                                    EdgeInsets
-                                                                        .all(
-                                                                            2.5),
-                                                                child:
-                                                                    CircleAvatar(
-                                                                  backgroundImage:
-                                                                      NetworkImage(
-                                                                    Endpoint.baseIp +
-                                                                        '/' +
-                                                                        response['data']
-                                                                            [
-                                                                            'ak_35_photo'],
-                                                                  ),
-                                                                  radius: 30,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  response[
-                                                                          'data']
-                                                                      [
-                                                                      'ak_35_nama'],
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 16,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Flexible(
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                  'Masa kerja 3-5 bulan',
-                                                                  overflow:
-                                                                      TextOverflow
-                                                                          .ellipsis,
-                                                                ),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontSize: 12,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                      Positioned(
-                                                        top: 10,
-                                                        right: 15,
-                                                        child: Stack(
-                                                          alignment:
-                                                              Alignment.center,
-                                                          children: [
-                                                            Container(
-                                                              child: Image(
-                                                                image: AssetImage(
-                                                                    'assets/gold-medal.png'),
-                                                                width: 70,
-                                                                height: 70,
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 10,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(
-                                                                    'Akad'),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black54,
-                                                                  fontSize: 8,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                            Positioned(
-                                                              top: 18,
-                                                              child:
-                                                                  DefaultTextStyle(
-                                                                child: Text(response[
-                                                                        'data'][
-                                                                    'ak_35_akad']),
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .black,
-                                                                  fontSize: 17,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                ),
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-
-                                SizedBox(
-                                  height: 20,
-                                ),
-
-                                // Booking
-                                Center(
-                                  child: DefaultTextStyle(
-                                    child: Text(
-                                      "Booking",
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                              ),
+                              Center(
+                                child: DefaultTextStyle(
+                                  child: Text(
+                                    prevMonthName,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ),
-                                Container(
-                                  margin: EdgeInsets.only(left: 16, right: 16),
-                                  child: Divider(
+                                  style: TextStyle(
                                     color: Colors.white,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.bold,
                                   ),
                                 ),
-
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Container(
-                                      height: 120,
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              2.5),
-                                      child: Card(
-                                        semanticContainer: true,
-                                        elevation: 0,
-                                        color: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  2.5,
-                                              padding: EdgeInsets.all(5),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        right: 30),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(2.5),
-                                                      child: CircleAvatar(
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                          Endpoint.baseIp +
-                                                              '/' +
-                                                              response['data'][
-                                                                  'b_12_photo'],
-                                                        ),
-                                                        radius: 30,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        response['data']
-                                                            ['b_12_nama'],
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        'Masa kerja > 12 bulan',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 10,
-                                              right: 15,
-                                              child: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Container(
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                          'assets/gold-medal.png'),
-                                                      width: 70,
-                                                      height: 70,
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 10,
-                                                    child: DefaultTextStyle(
-                                                      child: Text('Booking'),
-                                                      style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontSize: 8,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 18,
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                          response['data']
-                                                              ['b_12_booking']),
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 120,
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              2.5),
-                                      child: Card(
-                                        semanticContainer: true,
-                                        elevation: 0,
-                                        color: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Stack(
-                                          alignment: Alignment.center,
-                                          children: [
-                                            Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width /
-                                                  2.5,
-                                              padding: EdgeInsets.all(5),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        right: 30),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(2.5),
-                                                      child: CircleAvatar(
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                          Endpoint.baseIp +
-                                                              '/' +
-                                                              response['data'][
-                                                                  'b_612_photo'],
-                                                        ),
-                                                        radius: 30,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        response['data']
-                                                            ['b_612_nama'],
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        'Masa kerja 6-12 bulan',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 10,
-                                              right: 15,
-                                              child: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Container(
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                          'assets/gold-medal.png'),
-                                                      width: 70,
-                                                      height: 70,
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 10,
-                                                    child: DefaultTextStyle(
-                                                      child: Text('Booking'),
-                                                      style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontSize: 8,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 18,
-                                                    child: DefaultTextStyle(
-                                                      child: Text(response[
-                                                              'data']
-                                                          ['b_612_booking']),
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              // Akad
+                              Center(
+                                child: DefaultTextStyle(
+                                  child: Text(
+                                    "Akad",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 16, right: 16),
+                                child: Divider(
+                                  color: Colors.white,
+                                ),
+                              ),
 
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Container(
-                                      height: 120,
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              2.5),
-                                      child: Card(
-                                        semanticContainer: true,
-                                        elevation: 0,
-                                        color: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: Stack(
-                                          alignment: Alignment.center,
+                              (response['data']['ak_02_nama'] != '')
+                                  ? Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
                                           children: [
                                             Container(
-                                              width: MediaQuery.of(context)
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
                                                       .size
                                                       .width /
-                                                  2.5,
-                                              padding: EdgeInsets.all(5),
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        right: 30),
-                                                    child: Container(
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
-                                                      padding:
-                                                          EdgeInsets.all(2.5),
-                                                      child: CircleAvatar(
-                                                        backgroundImage:
-                                                            NetworkImage(
-                                                          Endpoint.baseIp +
-                                                              '/' +
-                                                              response['data'][
-                                                                  'b_35_photo'],
-                                                        ),
-                                                        radius: 30,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        response['data']
-                                                            ['b_35_nama'],
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Flexible(
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                        'Masa kerja 3-5 bulan',
-                                                        overflow: TextOverflow
-                                                            .ellipsis,
-                                                      ),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 12,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Positioned(
-                                              top: 10,
-                                              right: 15,
-                                              child: Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Container(
-                                                    child: Image(
-                                                      image: AssetImage(
-                                                          'assets/gold-medal.png'),
-                                                      width: 70,
-                                                      height: 70,
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 10,
-                                                    child: DefaultTextStyle(
-                                                      child: Text('Booking'),
-                                                      style: TextStyle(
-                                                        color: Colors.black54,
-                                                        fontSize: 8,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 18,
-                                                    child: DefaultTextStyle(
-                                                      child: Text(
-                                                          response['data']
-                                                              ['b_35_booking']),
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        fontSize: 17,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      height: 120,
-                                      width:
-                                          (MediaQuery.of(context).size.width /
-                                              2.5),
-                                      child: Card(
-                                        semanticContainer: true,
-                                        elevation: 0,
-                                        color: Colors.transparent,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(15),
-                                        ),
-                                        child: response['data']['b_02_photo'] !=
-                                                ''
-                                            ? Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Container(
-                                                    width:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            2.5,
-                                                    padding: EdgeInsets.all(5),
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.only(
-                                                                  right: 30),
-                                                          child: Container(
-                                                            decoration:
-                                                                BoxDecoration(
-                                                              color:
-                                                                  Colors.white,
-                                                              shape: BoxShape
-                                                                  .circle,
-                                                            ),
-                                                            padding:
-                                                                EdgeInsets.all(
-                                                                    2.5),
-                                                            child: CircleAvatar(
-                                                              backgroundImage:
-                                                                  NetworkImage(
-                                                                Endpoint.baseIp +
-                                                                    '/' +
-                                                                    response[
-                                                                            'data']
-                                                                        [
-                                                                        'b_02_photo'],
-                                                              ),
-                                                              radius: 30,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Flexible(
-                                                          child:
-                                                              DefaultTextStyle(
-                                                            child: Text(
-                                                              response['data']
-                                                                  ['b_02_nama'],
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 16,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Flexible(
-                                                          child:
-                                                              DefaultTextStyle(
-                                                            child: Text(
-                                                              'Masa kerja 0-2 bulan',
-                                                              overflow:
-                                                                  TextOverflow
-                                                                      .ellipsis,
-                                                            ),
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize: 12,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Positioned(
-                                                    top: 10,
-                                                    right: 15,
-                                                    child: Stack(
-                                                      alignment:
-                                                          Alignment.center,
-                                                      children: [
-                                                        Container(
-                                                          child: Image(
-                                                            image: AssetImage(
-                                                                'assets/gold-medal.png'),
-                                                            width: 70,
-                                                            height: 70,
-                                                          ),
-                                                        ),
-                                                        Positioned(
-                                                          top: 10,
-                                                          child:
-                                                              DefaultTextStyle(
-                                                            child:
-                                                                Text('Booking'),
-                                                            style: TextStyle(
-                                                              color: Colors
-                                                                  .black54,
-                                                              fontSize: 8,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Positioned(
-                                                          top: 18,
-                                                          child:
-                                                              DefaultTextStyle(
-                                                            child: Text(response[
-                                                                    'data'][
-                                                                'b_02_booking']),
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.black,
-                                                              fontSize: 17,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              )
-                                            : Padding(
-                                                padding:
-                                                    const EdgeInsets.all(5),
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
                                                   children: [
                                                     Container(
-                                                      decoration: BoxDecoration(
-                                                        color: Colors.white,
-                                                        shape: BoxShape.circle,
-                                                      ),
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
                                                       padding:
-                                                          EdgeInsets.all(2.5),
-                                                      child: CircleAvatar(
-                                                        backgroundColor:
-                                                            Colors.grey,
-                                                        child: Icon(
-                                                          Icons.person,
-                                                          size: 40,
-                                                          color: Colors.white,
-                                                        ),
-                                                        radius: 30,
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_12_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_12_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja > 12 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
-                                                    Flexible(
-                                                      child: DefaultTextStyle(
-                                                        child: Text(''),
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Flexible(
-                                                      child: DefaultTextStyle(
-                                                        child: Text(
-                                                          'Masa kerja 0-2 bulan',
-                                                          overflow: TextOverflow
-                                                              .ellipsis,
-                                                        ),
-                                                        style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 12,
-                                                        ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_12_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
                                                       ),
                                                     ),
                                                   ],
                                                 ),
                                               ),
+                                            ),
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_612_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_612_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja 6-12 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_612_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_35_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_35_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja 3-5 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_35_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_02_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_02_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja 0-2 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_02_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_12_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_12_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja > 12 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_12_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_612_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_612_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja 6-12 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_612_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              height: 120,
+                                              width: (MediaQuery.of(context)
+                                                      .size
+                                                      .width /
+                                                  2.5),
+                                              child: Card(
+                                                semanticContainer: true,
+                                                elevation: 0,
+                                                color: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          15),
+                                                ),
+                                                child: Stack(
+                                                  alignment: Alignment.center,
+                                                  children: [
+                                                    Container(
+                                                      width: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                      padding:
+                                                          EdgeInsets.all(5),
+                                                      child: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Container(
+                                                            padding: EdgeInsets
+                                                                .only(
+                                                                    right:
+                                                                        30),
+                                                            child: Container(
+                                                              decoration:
+                                                                  BoxDecoration(
+                                                                color: Colors
+                                                                    .white,
+                                                                shape: BoxShape
+                                                                    .circle,
+                                                              ),
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(
+                                                                          2.5),
+                                                              child:
+                                                                  CircleAvatar(
+                                                                backgroundImage:
+                                                                    NetworkImage(
+                                                                  Endpoint.baseIp +
+                                                                      '/' +
+                                                                      response['data']
+                                                                          [
+                                                                          'ak_35_photo'],
+                                                                ),
+                                                                radius: 30,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                response[
+                                                                        'data']
+                                                                    [
+                                                                    'ak_35_nama'],
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Flexible(
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                'Masa kerja 3-5 bulan',
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
+                                                              ),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .white,
+                                                                fontSize: 12,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Positioned(
+                                                      top: 10,
+                                                      right: 15,
+                                                      child: Stack(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        children: [
+                                                          Container(
+                                                            child: Image(
+                                                              image: AssetImage(
+                                                                  'assets/gold-medal.png'),
+                                                              width: 70,
+                                                              height: 70,
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 10,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(
+                                                                  'Akad'),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black54,
+                                                                fontSize: 8,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Positioned(
+                                                            top: 18,
+                                                            child:
+                                                                DefaultTextStyle(
+                                                              child: Text(response[
+                                                                      'data'][
+                                                                  'ak_35_akad']),
+                                                              style:
+                                                                  TextStyle(
+                                                                color: Colors
+                                                                    .black,
+                                                                fontSize: 17,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+
+                              SizedBox(
+                                height: 20,
+                              ),
+
+                              // Booking
+                              Center(
+                                child: DefaultTextStyle(
+                                  child: Text(
+                                    "Booking",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                margin: EdgeInsets.only(left: 16, right: 16),
+                                child: Divider(
+                                  color: Colors.white,
+                                ),
+                              ),
+
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    height: 120,
+                                    width:
+                                        (MediaQuery.of(context).size.width /
+                                            2.5),
+                                    child: Card(
+                                      semanticContainer: true,
+                                      elevation: 0,
+                                      color: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15),
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2.5,
+                                            padding: EdgeInsets.all(5),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(2.5),
+                                                    child: CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                        Endpoint.baseIp +
+                                                            '/' +
+                                                            response['data'][
+                                                                'b_12_photo'],
+                                                      ),
+                                                      radius: 30,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      response['data']
+                                                          ['b_12_nama'],
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      'Masa kerja > 12 bulan',
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            right: 15,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                        'assets/gold-medal.png'),
+                                                    width: 70,
+                                                    height: 70,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 10,
+                                                  child: DefaultTextStyle(
+                                                    child: Text('Booking'),
+                                                    style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 18,
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                        response['data']
+                                                            ['b_12_booking']),
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
+                                  ),
+                                  Container(
+                                    height: 120,
+                                    width:
+                                        (MediaQuery.of(context).size.width /
+                                            2.5),
+                                    child: Card(
+                                      semanticContainer: true,
+                                      elevation: 0,
+                                      color: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15),
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2.5,
+                                            padding: EdgeInsets.all(5),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(2.5),
+                                                    child: CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                        Endpoint.baseIp +
+                                                            '/' +
+                                                            response['data'][
+                                                                'b_612_photo'],
+                                                      ),
+                                                      radius: 30,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      response['data']
+                                                          ['b_612_nama'],
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      'Masa kerja 6-12 bulan',
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            right: 15,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                        'assets/gold-medal.png'),
+                                                    width: 70,
+                                                    height: 70,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 10,
+                                                  child: DefaultTextStyle(
+                                                    child: Text('Booking'),
+                                                    style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 18,
+                                                  child: DefaultTextStyle(
+                                                    child: Text(response[
+                                                            'data']
+                                                        ['b_612_booking']),
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                    height: 120,
+                                    width:
+                                        (MediaQuery.of(context).size.width /
+                                            2.5),
+                                    child: Card(
+                                      semanticContainer: true,
+                                      elevation: 0,
+                                      color: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15),
+                                      ),
+                                      child: Stack(
+                                        alignment: Alignment.center,
+                                        children: [
+                                          Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width /
+                                                2.5,
+                                            padding: EdgeInsets.all(5),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      right: 30),
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(2.5),
+                                                    child: CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                        Endpoint.baseIp +
+                                                            '/' +
+                                                            response['data'][
+                                                                'b_35_photo'],
+                                                      ),
+                                                      radius: 30,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      response['data']
+                                                          ['b_35_nama'],
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Flexible(
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                      'Masa kerja 3-5 bulan',
+                                                      overflow: TextOverflow
+                                                          .ellipsis,
+                                                    ),
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top: 10,
+                                            right: 15,
+                                            child: Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  child: Image(
+                                                    image: AssetImage(
+                                                        'assets/gold-medal.png'),
+                                                    width: 70,
+                                                    height: 70,
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 10,
+                                                  child: DefaultTextStyle(
+                                                    child: Text('Booking'),
+                                                    style: TextStyle(
+                                                      color: Colors.black54,
+                                                      fontSize: 8,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 18,
+                                                  child: DefaultTextStyle(
+                                                    child: Text(
+                                                        response['data']
+                                                            ['b_35_booking']),
+                                                    style: TextStyle(
+                                                      color: Colors.black,
+                                                      fontSize: 17,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    height: 120,
+                                    width:
+                                        (MediaQuery.of(context).size.width /
+                                            2.5),
+                                    child: Card(
+                                      semanticContainer: true,
+                                      elevation: 0,
+                                      color: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(15),
+                                      ),
+                                      child: response['data']['b_02_photo'] !=
+                                              ''
+                                          ? Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                Container(
+                                                  width:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width /
+                                                          2.5,
+                                                  padding: EdgeInsets.all(5),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Container(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                right: 30),
+                                                        child: Container(
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                Colors.white,
+                                                            shape: BoxShape
+                                                                .circle,
+                                                          ),
+                                                          padding:
+                                                              EdgeInsets.all(
+                                                                  2.5),
+                                                          child: CircleAvatar(
+                                                            backgroundImage:
+                                                                NetworkImage(
+                                                              Endpoint.baseIp +
+                                                                  '/' +
+                                                                  response[
+                                                                          'data']
+                                                                      [
+                                                                      'b_02_photo'],
+                                                            ),
+                                                            radius: 30,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Flexible(
+                                                        child:
+                                                            DefaultTextStyle(
+                                                          child: Text(
+                                                            response['data']
+                                                                ['b_02_nama'],
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.white,
+                                                            fontSize: 16,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Flexible(
+                                                        child:
+                                                            DefaultTextStyle(
+                                                          child: Text(
+                                                            'Masa kerja 0-2 bulan',
+                                                            overflow:
+                                                                TextOverflow
+                                                                    .ellipsis,
+                                                          ),
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.white,
+                                                            fontSize: 12,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                                Positioned(
+                                                  top: 10,
+                                                  right: 15,
+                                                  child: Stack(
+                                                    alignment:
+                                                        Alignment.center,
+                                                    children: [
+                                                      Container(
+                                                        child: Image(
+                                                          image: AssetImage(
+                                                              'assets/gold-medal.png'),
+                                                          width: 70,
+                                                          height: 70,
+                                                        ),
+                                                      ),
+                                                      Positioned(
+                                                        top: 10,
+                                                        child:
+                                                            DefaultTextStyle(
+                                                          child:
+                                                              Text('Booking'),
+                                                          style: TextStyle(
+                                                            color: Colors
+                                                                .black54,
+                                                            fontSize: 8,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Positioned(
+                                                        top: 18,
+                                                        child:
+                                                            DefaultTextStyle(
+                                                          child: Text(response[
+                                                                  'data'][
+                                                              'b_02_booking']),
+                                                          style: TextStyle(
+                                                            color:
+                                                                Colors.black,
+                                                            fontSize: 17,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            )
+                                          : Padding(
+                                              padding:
+                                                  const EdgeInsets.all(5),
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Container(
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                    ),
+                                                    padding:
+                                                        EdgeInsets.all(2.5),
+                                                    child: CircleAvatar(
+                                                      backgroundColor:
+                                                          Colors.grey,
+                                                      child: Icon(
+                                                        Icons.person,
+                                                        size: 40,
+                                                        color: Colors.white,
+                                                      ),
+                                                      radius: 30,
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    child: DefaultTextStyle(
+                                                      child: Text(''),
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Flexible(
+                                                    child: DefaultTextStyle(
+                                                      child: Text(
+                                                        'Masa kerja 0-2 bulan',
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                          Positioned(
-                            top: 5,
-                            right: 5,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  _profileBloc.add(InitialProfile());
-                                  getProfil(userID, date);
-                                },
-                                child: Container(
-                                  width: 20,
-                                  height: 20,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        Colors.lightBlue[50]!.withOpacity(0.25),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Icon(
-                                    Icons.close,
-                                    color: Colors.grey,
-                                    size: 17,
-                                  ),
+                        ),
+                        Positioned(
+                          top: 5,
+                          right: 5,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.pop(context);
+                                _profileBloc.add(InitialProfile());
+                                getProfil(userID, date);
+                              },
+                              child: Container(
+                                width: 20,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color:
+                                      Colors.lightBlue[50]!.withOpacity(0.25),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.close,
+                                  color: Colors.grey,
+                                  size: 17,
                                 ),
                               ),
                             ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );
@@ -4234,16 +4212,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       context: loadContext,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return PopScope(
-          onPopInvoked: (bool didPop) async {
-            if (didPop) {
-              return;
-            }
-            return Future.value(false);
-          },
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
+        return Center(
+          child: CircularProgressIndicator(),
         );
       },
     );
