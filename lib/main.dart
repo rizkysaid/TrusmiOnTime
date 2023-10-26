@@ -1,3 +1,4 @@
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:login_absen/core/config/endpoint.dart';
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     NotificationController.startListeningNotificationEvents();
     NotificationController.requestFirebaseToken();
+    AwesomeNotificationsFcm().subscribeToTopic("on-time");
 
     super.initState();
   }
