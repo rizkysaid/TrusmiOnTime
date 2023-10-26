@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "465054695886",
+    "project_id": "trusmiontime-notificatio-65e3d",
+    "storage_bucket": "trusmiontime-notificatio-65e3d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:465054695886:android:bd9cb6a1c7e1f804af6b9f",
+        "android_client_info": {
+          "package_name": "com.example.login_absen"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCFr3cUUOvfAFovrRMZk7UfgBUhjVwwLMg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

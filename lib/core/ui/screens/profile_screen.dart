@@ -14,7 +14,7 @@ import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/services/notification_controller.dart';
+import 'package:login_absen/core/services/NotificationController.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:login_absen/core/ui/screens/trusmiverse.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -4060,8 +4060,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       width: 80,
                       child: FloatingActionButton(
                         onPressed: () => {
-                          // checkStatus(userID),
-                          NotificationController.createNewNotification()
+                          checkStatus(userID),
+                          // NotificationController.createNewNotification()
                         },
                         tooltip: _toolTip,
                         backgroundColor: _colorButton,

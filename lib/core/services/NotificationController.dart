@@ -1,12 +1,39 @@
 import 'dart:isolate';
 import 'dart:ui';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:login_absen/main.dart';
 
-class NotificationController {
-  static ReceivedAction? initialAction;
+class NotificationController extends ChangeNotifier {
+
+  /// *********************************************
+  ///   SINGLETON PATTERN
+  /// *********************************************
+
+  static final NotificationController _instance =
+  NotificationController._internal();
+
+  factory NotificationController() {
+    return _instance;
+  }
+
+  NotificationController._internal();
+
+
+  /// *********************************************
+  ///  OBSERVER PATTERN
+  /// *********************************************
+
+  String _firebaseToken = '';
+  String get firebaseToken => _firebaseToken;
+
+  String _nativeToken = '';
+  String get nativeToken => _nativeToken;
+
+  ReceivedAction? initialAction;
 
   ///  *********************************************
   ///     INITIALIZATIONS
@@ -31,8 +58,20 @@ class NotificationController {
         debug: true);
 
     // Get initial notification action is optional
-    initialAction = await AwesomeNotifications()
+    _instance.initialAction = await AwesomeNotifications()
         .getInitialNotificationAction(removeFromActionEvents: false);
+  }
+
+  static Future<void> initializeRemoteNotifications(
+      {required bool debug}) async {
+    await Firebase.initializeApp();
+    await AwesomeNotificationsFcm().initialize(
+        onFcmTokenHandle: NotificationController.myFcmTokenHandle,
+        onNativeTokenHandle: NotificationController.myNativeTokenHandle,
+        onFcmSilentDataHandle: NotificationController.mySilentDataHandle,
+        licenseKeys:null,
+        debug: debug,
+    );
   }
 
   static ReceivePort? receivePort;
@@ -61,9 +100,21 @@ class NotificationController {
   }
 
   ///  *********************************************
-  ///     NOTIFICATION EVENTS
+  ///     LOCAL NOTIFICATION EVENTS
   ///  *********************************************
-  ///
+
+  static Future<void> getInitialNotificationAction() async {
+    ReceivedAction? receivedAction = await AwesomeNotifications()
+        .getInitialNotificationAction(removeFromActionEvents: true);
+    if (receivedAction == null) return;
+
+    // Fluttertoast.showToast(
+    //     msg: 'Notification action launched app: $receivedAction',
+    //   backgroundColor: Colors.deepPurple
+    // );
+    print('App launched by a notification action: $receivedAction');
+  }
+
   @pragma('vm:entry-point')
   static Future<void> onActionReceivedMethod(
       ReceivedAction receivedAction) async {
@@ -204,6 +255,67 @@ class NotificationController {
     // print(re.body);
     print("long task done");
   }
+
+
+  ///  *********************************************
+  ///     REMOTE NOTIFICATION EVENTS
+  ///  *********************************************
+
+  /// Use this method to execute on background when a silent data arrives
+  /// (even while terminated)
+  @pragma("vm:entry-point")
+  static Future<void> mySilentDataHandle(FcmSilentData silentData) async {
+
+    print('"SilentData": ${silentData.toString()}');
+
+    if (silentData.createdLifeCycle != NotificationLifeCycle.Foreground) {
+      print("bg");
+    } else {
+      print("FOREGROUND");
+    }
+
+    print('mySilentDataHandle received a FcmSilentData execution');
+    await executeLongTaskInBackground();
+  }
+
+  /// Use this method to detect when a new fcm token is received
+  @pragma("vm:entry-point")
+  static Future<void> myFcmTokenHandle(String token) async {
+    debugPrint('Firebase Token:"$token"');
+
+    _instance._firebaseToken = token;
+    _instance.notifyListeners();
+  }
+
+  /// Use this method to detect when a new native token is received
+  @pragma("vm:entry-point")
+  static Future<void> myNativeTokenHandle(String token) async {
+    debugPrint('Native Token:"$token"');
+
+    _instance._nativeToken = token;
+    _instance.notifyListeners();
+  }
+
+
+  ///  *********************************************
+  ///     REMOTE TOKEN REQUESTS
+  ///  *********************************************
+
+  static Future<String> requestFirebaseToken() async {
+    if (await AwesomeNotificationsFcm().isFirebaseAvailable) {
+      try {
+        return await AwesomeNotificationsFcm().requestFirebaseAppToken();
+      } catch (exception) {
+        debugPrint('$exception');
+      }
+    } else {
+      debugPrint('Firebase is not available on this project');
+    }
+    return '';
+  }
+
+
+
 
   ///  *********************************************
   ///     NOTIFICATION CREATION METHODS
