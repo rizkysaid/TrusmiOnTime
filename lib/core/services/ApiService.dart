@@ -228,4 +228,27 @@ class ApiServices {
     }
   }
   // TRUSMIVERSE
+
+
+  // FCM TOKEN
+  Future<dynamic> updateFcmToken(url, userId, fireBaseToken, apiToken) async {
+    final uri = Uri.parse('$url/fcm_token');
+    var map = new Map<String, dynamic>();
+    map['user_id'] = userId;
+    map['token'] = fireBaseToken;
+    return http.post(uri, body: map).then((response) {
+      try {
+        var data = json.decode(response.body);
+        // var question = QuestionModel(
+        //   id: data['id'],
+        //   question: data['question'],
+        //   options: Map.fromEntries(data['options']),
+        // );
+
+        return data;
+      } catch (e) {
+        throw e.toString();
+      }
+    });
+  }
 }

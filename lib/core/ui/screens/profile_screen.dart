@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -79,9 +80,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _hariTanggal = '';
   String departmentId = '';
 
+  String fcmToken = '';
+
   String prevMonthName = '';
 
   int responseTime = 15;
+
+  bool isShowSuccessCheckin = false;
+  bool isShowSuccessCheckout = false;
+
+  late bool isQuizPasses;
 
   String dateId = formatDate(DateTime.now(), [dd, '/', mm, '/', yy]);
 
@@ -120,11 +128,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       }
     }
   }
-
-  bool isShowSuccessCheckin = false;
-  bool isShowSuccessCheckout = false;
-
-  late bool isQuizPasses;
 
   Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
       String idShift, String shift) async {
@@ -4037,9 +4040,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       height: 80,
                       width: 80,
                       child: FloatingActionButton(
-                        onPressed: () => {
-                          // checkStatus(userID),
-                          NotificationController.createNewNotification(context)
+                        onPressed: () async {
+                          checkStatus(userID);
+                          // NotificationController.createNewNotification(context),
+                          // var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+                          // print('token: $firebaseAppToken');
+                          // print('fcmToken: $fcmToken');
                         },
                         tooltip: _toolTip,
                         backgroundColor: _colorButton,
@@ -4199,13 +4205,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : isQuizPasses = true;
     });
 
+
+    // FCM TOKEN
+    setState(() {
+      fcmToken = state.fcmToken.toString();
+    });
+
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool('isQuizPasses', isQuizPasses);
 
     print('state.quizRequired : ${state.quizRequired.toString()}');
     print('state.quizStatus : ${state.quizStatus.toString()}');
     print('isQuizPasses : ${isQuizPasses.toString()}');
+    print('fcmToken : $fcmToken');
+
+
+    if(fcmToken == ''){
+      var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+      updateFcmToken(userID, firebaseAppToken);
+      setState(() {
+        fcmToken = firebaseAppToken;
+      });
+    }else{
+      print('fcmToken already updated');
+    }
+
   }
+
+  Future<void> updateFcmToken(userId, firebaseAppToken) async {
+    // showProgressDialog(context);
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    print(ip);
+
+    var response = await services.updateFcmToken(ip, userId, firebaseAppToken, apiToken);
+    print(response.toString());
+
+    // print('ip: ${ip.toString()}');
+    print('userId: $userId');
+    print('firebaseAppToken: $firebaseAppToken');
+    return;
+  }
+
 
   Future showProgressDialog(BuildContext loadContext) {
     return showDialog(

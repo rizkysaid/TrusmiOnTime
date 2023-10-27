@@ -61,6 +61,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         message: profile['message'],
         quizStatus: profile['quiz_status'],
         quizRequired: profile['quiz_required'],
+        fcmToken: profile['fcm_token'],
         responseTime: profile['response_time'],
       ));
     } catch (e) {

@@ -314,8 +314,6 @@ class NotificationController extends ChangeNotifier {
   }
 
 
-
-
   ///  *********************************************
   ///     NOTIFICATION CREATION METHODS
   ///  *********************************************
