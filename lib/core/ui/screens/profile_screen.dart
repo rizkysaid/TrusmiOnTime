@@ -15,7 +15,6 @@ import 'package:login_absen/core/config/about.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
-import 'package:login_absen/core/services/NotificationController.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:login_absen/core/ui/screens/trusmiverse.dart';
 import 'package:login_absen/core/utils/toast_util.dart';
@@ -79,8 +78,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _timeString = '';
   String _hariTanggal = '';
   String departmentId = '';
+  String departmentName = '';
 
-  String fcmToken = '';
+  String fcmTokenExist = '';
+  String firebaseAppToken = '';
 
   String prevMonthName = '';
 
@@ -369,6 +370,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> getPref() async {
+
+    var requestToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    setState(() {
+      firebaseAppToken = requestToken;
+    });
+    print('token: $firebaseAppToken');
+
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
     if (pref.getString('username') == null) {
@@ -379,7 +387,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         password = pref.getString('password')!;
         userID = pref.getString('userID').toString();
         departmentId = pref.getString('departmentId').toString();
+        departmentName = pref.getString('departmentName').toString();
       });
+
+      print('departmentName $departmentName');
+
+
 
       getProfil(userID, date);
     }
@@ -3137,12 +3150,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         create: (BuildContext context) => ProfileBloc(),
         child: BlocListener<ProfileBloc, ProfileState>(
           bloc: _profileBloc,
-          listener: (context, state) {
+          listener: (context, state) async {
             // print('listener status =>' + state.status.toString());
             switch (state.status) {
               case ProfileStatus.success:
                 // Navigator.of(context, rootNavigator: true).pop(context);
                 setKondisi(state);
+
+                // if(deleteToken == true){
+                  updateFcmToken(userID, firebaseAppToken, state);
+                // }
+
 
                 break;
               case ProfileStatus.failure:
@@ -4043,9 +4061,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         onPressed: () async {
                           checkStatus(userID);
                           // NotificationController.createNewNotification(context),
-                          // var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
-                          // print('token: $firebaseAppToken');
-                          // print('fcmToken: $fcmToken');
                         },
                         tooltip: _toolTip,
                         backgroundColor: _colorButton,
@@ -4208,7 +4223,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     // FCM TOKEN
     setState(() {
-      fcmToken = state.fcmToken.toString();
+      fcmTokenExist = state.fcmToken.toString();
     });
 
     SharedPreferences pref = await SharedPreferences.getInstance();
@@ -4217,22 +4232,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print('state.quizRequired : ${state.quizRequired.toString()}');
     print('state.quizStatus : ${state.quizStatus.toString()}');
     print('isQuizPasses : ${isQuizPasses.toString()}');
-    print('fcmToken : $fcmToken');
+    // print('fcmToken : $fcmToken');
 
 
-    if(fcmToken == ''){
-      var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
-      updateFcmToken(userID, firebaseAppToken);
-      setState(() {
-        fcmToken = firebaseAppToken;
-      });
-    }else{
-      print('fcmToken already updated');
-    }
+
+    // if(fcmTokenExist == '' || fcmTokenExist!=fcmTokenNew){
+    //
+    //   setState(() {
+    //     fcmTokenExist = fcmTokenNew;
+    //   });
+    // }else{
+    //   print('fcmToken already updated');
+    // }
 
   }
 
-  Future<void> updateFcmToken(userId, firebaseAppToken) async {
+  Future<void> updateFcmToken(userId, firebaseAppToken, state) async {
     // showProgressDialog(context);
     String ip;
     final dbHelper = DatabaseHelper.instance;
@@ -4245,15 +4260,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ip = Endpoint.baseUrl;
     }
 
-    print(ip);
+    // print(ip);
 
     var response = await services.updateFcmToken(ip, userId, firebaseAppToken, apiToken);
     print(response.toString());
+    if(response['status'] == true){
 
-    // print('ip: ${ip.toString()}');
-    print('userId: $userId');
-    print('firebaseAppToken: $firebaseAppToken');
-    return;
+      // print('ip: ${ip.toString()}');
+      // print('userId: $userId');
+      // print('firebaseAppToken: $firebaseAppToken');
+
+      RegExp pattern = RegExp(r'[!@#$%^&*()_+={}|\[\]:;"<>,.?/~` \t\n\r\f\v]');
+      // state.allDepartments.forEach((dept) async {
+      //   // print(dept.replaceAll(pattern, ''));
+      //   await AwesomeNotificationsFcm().unsubscribeToTopic(dept.replaceAll(pattern, ''));
+      // });
+
+      await AwesomeNotificationsFcm().subscribeToTopic(state.departmentName.replaceAll(pattern, ''));
+      // print('departmentName: ${state.departmentName.replaceAll(pattern, '')}');
+
+    }
+
   }
 
 
@@ -4422,6 +4449,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       pref.remove('clock_in');
       pref.remove('isQuizPasses');
     });
+
+    await AwesomeNotificationsFcm().deleteToken();
+
   }
 
   Future<void> checkStatus(userId) async {

@@ -22,10 +22,12 @@ class ProfileState extends Equatable {
   final String breakOut;
   final String breakIn;
   final String departmentId;
+  final String departmentName;
   final String message;
   final String quizStatus;
   final String quizRequired;
   final String fcmToken;
+  final List<dynamic> allDepartments;
   final int responseTime;
 
   const ProfileState({
@@ -48,10 +50,12 @@ class ProfileState extends Equatable {
     this.breakOut = '',
     this.breakIn = '',
     this.departmentId = '',
+    this.departmentName = '',
     this.message = '',
     this.quizStatus = '',
     this.quizRequired = '',
     this.fcmToken = '',
+    this.allDepartments = const [],
     this.responseTime = 10,
   });
 
@@ -75,10 +79,12 @@ class ProfileState extends Equatable {
     String? breakOut,
     String? breakIn,
     String? departmentId,
+    String? departmentName,
     String? message,
     String? quizStatus,
     String? quizRequired,
     String? fcmToken,
+    List<dynamic>? allDepartments,
     int? responseTime,
   }) {
     return ProfileState(
@@ -101,10 +107,12 @@ class ProfileState extends Equatable {
       breakOut: breakOut ?? this.breakOut,
       breakIn: breakIn ?? this.breakIn,
       departmentId: departmentId ?? this.departmentId,
+      departmentName: departmentName ?? this.departmentName,
       message: message ?? this.message,
       quizStatus: quizStatus ?? this.quizStatus,
       quizRequired: quizRequired ?? this.quizRequired,
       fcmToken: fcmToken ?? this.fcmToken,
+      allDepartments: allDepartments ?? this.allDepartments,
       responseTime: responseTime ?? this.responseTime,
     );
   }
@@ -130,10 +138,12 @@ class ProfileState extends Equatable {
         this.breakOut,
         this.breakIn,
         this.departmentId,
+        this.departmentName,
         this.message,
         this.quizStatus,
         this.quizRequired,
         this.fcmToken,
+        this.allDepartments,
         this.responseTime
       ];
 }

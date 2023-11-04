@@ -6,6 +6,8 @@
          FlutterApplication and put your custom class here. -->
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+
     <application android:label="Trusmi OnTime" android:icon="@mipmap/ic_launcher" android:usesCleartextTraffic="true">
         <activity 
         android:name=".MainActivity" 

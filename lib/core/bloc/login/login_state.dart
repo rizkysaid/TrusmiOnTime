@@ -9,6 +9,8 @@ class LoginState extends Equatable {
   final String userId;
   final String officeShiftId;
   final String departmentId;
+  final String departmentName;
+  final String fcmToken;
   final String message;
 
   const LoginState({
@@ -18,6 +20,8 @@ class LoginState extends Equatable {
     this.userId = '',
     this.officeShiftId = '',
     this.departmentId = '',
+    this.fcmToken = '',
+    this.departmentName = '',
     this.message = '',
   });
 
@@ -28,6 +32,8 @@ class LoginState extends Equatable {
     String? userId,
     String? officeShiftId,
     String? departmentId,
+    String? fcmToken,
+    String? departmentName,
     String? message,
   }) {
     return LoginState(
@@ -37,6 +43,8 @@ class LoginState extends Equatable {
       userId: userId ?? this.userId,
       officeShiftId: officeShiftId ?? this.officeShiftId,
       departmentId: departmentId ?? this.departmentId,
+      fcmToken: fcmToken ?? this.fcmToken,
+      departmentName: departmentName ?? this.departmentName,
       message: message ?? this.message,
     );
   }
@@ -49,6 +57,8 @@ class LoginState extends Equatable {
         this.userId,
         this.officeShiftId,
         this.departmentId,
+        this.fcmToken,
+        this.departmentName,
         this.message
       ];
 }

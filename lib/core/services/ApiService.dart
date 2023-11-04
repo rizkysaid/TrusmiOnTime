@@ -72,11 +72,12 @@ class ApiServices {
     }
   }
 
-  Future<dynamic> login(ip, username, password, apiToken) async {
+  Future<dynamic> login(ip, username, password, fcmToken, apiToken) async {
     String url = ip + '/login';
     var postData = {
       'username': username,
       'password': password,
+      'fcmToken': fcmToken,
     };
     // try {
     var response = await dio.post(url, data: postData, cancelToken: apiToken);

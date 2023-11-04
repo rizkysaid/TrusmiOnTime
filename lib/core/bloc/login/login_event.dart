@@ -9,13 +9,14 @@ abstract class LoginEvent extends Equatable {
 }
 
 class CheckAuth extends LoginEvent {
-  final String ip, username, password;
+  final String ip, username, password, fcmToken;
   final apiToken;
 
   CheckAuth({
     required this.ip,
     required this.username,
     required this.password,
+    required this.fcmToken,
     required this.apiToken,
   });
 }

@@ -89,6 +89,13 @@ class NotificationController extends ChangeNotifier {
   ///  *********************************************
   ///  Notifications events are only delivered after call this method
   static Future<void> startListeningNotificationEvents() async {
+    await AwesomeNotifications().isNotificationAllowed().then(
+        (isAllowed) async {
+          if(!isAllowed) {
+            await AwesomeNotifications().requestPermissionToSendNotifications();
+          }
+        }
+    );
     AwesomeNotifications()
         .setListeners(
         onActionReceivedMethod: onActionReceivedMethod, // JIka user reply message

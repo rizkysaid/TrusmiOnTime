@@ -58,10 +58,12 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         breakOut: profile['break_out'],
         breakIn: profile['break_in'],
         departmentId: profile['department_id'],
+        departmentName: profile['department_name'],
         message: profile['message'],
         quizStatus: profile['quiz_status'],
         quizRequired: profile['quiz_required'],
         fcmToken: profile['fcm_token'],
+        allDepartments: profile['all_departments'],
         responseTime: profile['response_time'],
       ));
     } catch (e) {

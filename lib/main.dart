@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 import 'core/ui/screens/login_config.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,16 +39,18 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
 
   @override
-  void initState() {
+  void initState(){
+
     NotificationController.startListeningNotificationEvents();
     NotificationController.requestFirebaseToken();
-    AwesomeNotificationsFcm().subscribeToTopic("on-time");
+    AwesomeNotificationsFcm().subscribeToTopic("TrusmiOntime");
 
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+
     return GetMaterialApp(
       title: "Trusmi Ontime",
       debugShowCheckedModeBanner: false,
@@ -100,42 +103,50 @@ class _CekLoginState extends State<CekLogin> {
   }
 
   void getPref() async {
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
 
-    if (allRows.length != 0) {
-      allRows.forEach((row) => print(row));
-      ip = allRows[0]['ip_address'];
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      setState(() {
-        username = pref.getString('username')!;
-        userID = pref.getString('userID')!;
-      });
+    PermissionStatus status = await Permission.notification.status;
 
-      Future.delayed(const Duration(seconds: 2), () {
-        if (username != null) {
-          Future.delayed(const Duration(microseconds: 2000), () {
-            Navigator.pushNamedAndRemoveUntil(
-                context, "/login", (Route<dynamic> routes) => false);
-          });
-        } else {
-          Future.delayed(const Duration(microseconds: 2000), () {
-            Navigator.pushNamedAndRemoveUntil(
-                context, "/profile", (Route<dynamic> routes) => false);
-          });
-        }
-        precacheImage(AssetImage('assets/background.png'), context);
-        precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
-      });
-    } else {
-      ip = Endpoint.baseUrl;
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/profile", (Route<dynamic> routes) => false);
-      });
+    if (!status.isGranted) {
+      await Permission.notification.request();
+    }else{
+
+      final dbHelper = DatabaseHelper.instance;
+      final allRows = await dbHelper.queryAllRows();
+
+      if (allRows.length != 0) {
+        allRows.forEach((row) => print(row));
+        ip = allRows[0]['ip_address'];
+        SharedPreferences pref = await SharedPreferences.getInstance();
+        setState(() {
+          username = pref.getString('username')!;
+          userID = pref.getString('userID')!;
+        });
+
+        Future.delayed(const Duration(seconds: 2), () {
+          if (username != null) {
+            Future.delayed(const Duration(microseconds: 2000), () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/login", (Route<dynamic> routes) => false);
+            });
+          } else {
+            Future.delayed(const Duration(microseconds: 2000), () {
+              Navigator.pushNamedAndRemoveUntil(
+                  context, "/profile", (Route<dynamic> routes) => false);
+            });
+          }
+          precacheImage(AssetImage('assets/background.png'), context);
+          precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
+        });
+      } else {
+        ip = Endpoint.baseUrl;
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/profile", (Route<dynamic> routes) => false);
+        });
+      }
+
     }
 
-    // Navigator.pushNamed(context, "/quiz");
   }
 
   @override

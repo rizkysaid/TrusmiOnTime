@@ -17,7 +17,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     emit(state.copyWith(status: LoginStatus.loading));
     try {
       final response = await apiServices.login(
-          event.ip, event.username, event.password, event.apiToken);
+          event.ip, event.username, event.password, event.fcmToken, event.apiToken);
       print(response[0]['username']);
       if (response[0]['username'] != '') {
         return emit(state.copyWith(
@@ -27,6 +27,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           userId: response[0]['user_id'],
           officeShiftId: response[0]['office_shift_id'],
           departmentId: response[0]['department_id'],
+          departmentName: response[0]['department_name'],
+          fcmToken: response[0]['fcm_token'],
           message: "Welcome " + response[0]['name'],
         ));
       } else {

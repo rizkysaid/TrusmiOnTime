@@ -1,3 +1,4 @@
+import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +24,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
-    // getPref();
+    deleteToken();
     super.initState();
   }
 
@@ -54,36 +55,25 @@ class _LoginScreenState extends State<LoginScreen> {
   String password = '';
 
   savePref(
-      String username, String userID, String pass, String departmentId) async {
+      String username, String userID, String pass, String departmentId, String departmentName, String fcmToken) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
       pref.setString('username', username);
       pref.setString('userID', userID);
       pref.setString('password', pass);
       pref.setString('departmentId', departmentId);
+      pref.setString('departmentName', departmentName);
+      pref.setString('fcmToken', fcmToken);
       pref.setString('id_shift', '1');
     });
   }
 
-  getPref() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    var username = pref.getString('username');
-    if (username != null) {
-      Future.delayed(const Duration(microseconds: 2000), () {
-        Navigator.pushNamedAndRemoveUntil(
-            context, "/profile", (Route<dynamic> routes) => false);
-      });
-    }
-  }
 
   Future<void> prosesLogin() async {
     if (usernameController.text != '' && passwordController.text != '') {
       String ip;
-      // ToastUtils.show("Check Login ...");
       final dbHelper = DatabaseHelper.instance;
       final allRows = await dbHelper.queryAllRows();
-      // print('query all rows: ' + allRows.toList().toString());
-      // print('Length = ' + allRows.length.toString());
 
       if (allRows.length != 0) {
         allRows.forEach((row) => print(row));
@@ -92,12 +82,16 @@ class _LoginScreenState extends State<LoginScreen> {
         ip = Endpoint.baseUrl;
       }
 
+      var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+      print('token: $firebaseAppToken');
+
       _loginBloc.add(LoadLogin());
 
       _loginBloc.add(CheckAuth(
           ip: ip,
           username: usernameController.text,
           password: passwordController.text,
+          fcmToken: firebaseAppToken,
           apiToken: apiToken));
     } else {
       ToastUtils.show("Please Input All Fields");
@@ -228,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
             // print(state.message);
             Navigator.pop(context);
             savePref(usernameController.text.toString(), state.userId,
-                passwordController.text, state.departmentId);
+                passwordController.text, state.departmentId, state.departmentName, state.fcmToken);
             Future.delayed(const Duration(microseconds: 2000), () {
               Navigator.pushNamedAndRemoveUntil(
                   context, "/profile", (Route<dynamic> routes) => false);
@@ -289,15 +283,15 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       barrierDismissible: false,
       builder: (BuildContext context) {
-        return WillPopScope(
-          onWillPop: () {
-            return Future.value(false);
-          },
-          child: Center(
-            child: CircularProgressIndicator(),
-          ),
+        return Center(
+          child: CircularProgressIndicator(),
         );
       },
     );
   }
+}
+
+void deleteToken() async {
+  var deleteToken = await AwesomeNotificationsFcm().deleteToken();
+  print('deleteToken $deleteToken');
 }
