@@ -80,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String departmentId = '';
   String departmentName = '';
 
-  String fcmTokenExist = '';
+  // String fcmTokenExist = '';
   String firebaseAppToken = '';
 
   String prevMonthName = '';
@@ -269,35 +269,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> initConnectivity() async {
-    late ConnectivityResult result;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      result = await _connectivity.checkConnectivity();
 
-      if (result == ConnectivityResult.none) {
-        Navigator.pushReplacementNamed(context, "/no_connection");
-      } else if (result == ConnectivityResult.mobile) {
-        if (Endpoint.baseIp == 'http://192.168.23.23') {
+    var pref = await SharedPreferences.getInstance();
+    if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
+      logout();
+
+    } else {
+
+      late ConnectivityResult result;
+      // Platform messages may fail, so we use a try/catch PlatformException.
+      try {
+        result = await _connectivity.checkConnectivity();
+
+        if (result == ConnectivityResult.none) {
           Navigator.pushReplacementNamed(context, "/no_connection");
+        } else if (result == ConnectivityResult.mobile) {
+          if (Endpoint.baseIp == 'http://192.168.23.23') {
+            Navigator.pushReplacementNamed(context, "/no_connection");
+          } else {
+            getPref();
+          }
         } else {
           getPref();
         }
-      } else {
-        getPref();
+      } on PlatformException catch (e) {
+        print(e.toString());
+        return;
       }
-    } on PlatformException catch (e) {
-      print(e.toString());
-      return;
-    }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) {
-      return Future.value(null);
-    }
+      // If the widget was removed from the tree while the asynchronous platform
+      // message was in flight, we want to discard the reply rather than calling
+      // setState to update our non-existent appearance.
+      if (!mounted) {
+        return Future.value(null);
+      }
 
-    return _updateConnectionStatus(result);
+      return _updateConnectionStatus(result);
+
+    }
   }
 
   Future<void> _updateConnectionStatus(ConnectivityResult result) async {
@@ -379,7 +388,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
-    if (pref.getString('username') == null) {
+    if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
       logout();
     } else {
       setState(() {
@@ -4220,30 +4229,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           : isQuizPasses = true;
     });
 
-
-    // FCM TOKEN
-    setState(() {
-      fcmTokenExist = state.fcmToken.toString();
-    });
-
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setBool('isQuizPasses', isQuizPasses);
 
     print('state.quizRequired : ${state.quizRequired.toString()}');
     print('state.quizStatus : ${state.quizStatus.toString()}');
     print('isQuizPasses : ${isQuizPasses.toString()}');
-    // print('fcmToken : $fcmToken');
-
-
-
-    // if(fcmTokenExist == '' || fcmTokenExist!=fcmTokenNew){
-    //
-    //   setState(() {
-    //     fcmTokenExist = fcmTokenNew;
-    //   });
-    // }else{
-    //   print('fcmToken already updated');
-    // }
 
   }
 
@@ -4279,6 +4270,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await AwesomeNotificationsFcm().subscribeToTopic(state.departmentName.replaceAll(pattern, ''));
       // print('departmentName: ${state.departmentName.replaceAll(pattern, '')}');
 
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString('fcmToken', firebaseAppToken);
     }
 
   }
@@ -4444,6 +4437,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   removePref() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     setState(() {
+      pref.remove('fcmToken');
       pref.remove('username');
       pref.remove('password');
       pref.remove('clock_in');

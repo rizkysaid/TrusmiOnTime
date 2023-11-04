@@ -1,7 +1,6 @@
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/database/database_config.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/services/NotificationController.dart';
@@ -13,11 +12,9 @@ import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
 import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 import 'core/ui/screens/login_config.dart';
-import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,6 +81,7 @@ class _CekLoginState extends State<CekLogin> {
   String? ip;
   String? userID;
   String? username;
+  String? fcmToken;
   // static String date = new DateTime.now().toIso8601String().substring(0, 10);
   final dbHelper = DatabaseHelper.instance;
   final dbConfig = DatabaseConfigHelper.instance;
@@ -104,80 +102,78 @@ class _CekLoginState extends State<CekLogin> {
 
   void getPref() async {
 
-    PermissionStatus status = await Permission.notification.status;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
 
-    if (!status.isGranted) {
-      await Permission.notification.request();
-    }else{
+    print('allRows ${allRows.length}');
 
-      final dbHelper = DatabaseHelper.instance;
-      final allRows = await dbHelper.queryAllRows();
+    // if (allRows.length != 0) {
+    //   allRows.forEach((row) => print(row));
+    //   ip = allRows[0]['ip_address'];
+    //   SharedPreferences pref = await SharedPreferences.getInstance();
+    //   setState(() {
+    //     fcmToken = pref.getString('fcmToken')!;
+    //     username = pref.getString('username')!;
+    //     userID = pref.getString('userID')!;
+    //   });
 
-      if (allRows.length != 0) {
-        allRows.forEach((row) => print(row));
-        ip = allRows[0]['ip_address'];
-        SharedPreferences pref = await SharedPreferences.getInstance();
-        setState(() {
-          username = pref.getString('username')!;
-          userID = pref.getString('userID')!;
-        });
+      print('fcmToken $fcmToken');
 
-        Future.delayed(const Duration(seconds: 2), () {
-          if (username != null) {
-            Future.delayed(const Duration(microseconds: 2000), () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, "/login", (Route<dynamic> routes) => false);
-            });
-          } else {
-            Future.delayed(const Duration(microseconds: 2000), () {
-              Navigator.pushNamedAndRemoveUntil(
-                  context, "/profile", (Route<dynamic> routes) => false);
-            });
-          }
-          precacheImage(AssetImage('assets/background.png'), context);
-          precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
-        });
-      } else {
-        ip = Endpoint.baseUrl;
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/profile", (Route<dynamic> routes) => false);
-        });
-      }
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        if (fcmToken != null || fcmToken == '') {
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/login", (Route<dynamic> routes) => false);
+          });
+        } else {
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            Navigator.pushNamedAndRemoveUntil(
+                context, "/profile", (Route<dynamic> routes) => false);
+          });
+        }
+        precacheImage(AssetImage('assets/background.png'), context);
+        precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
+      });
+    // } else {
+    //   Future.delayed(const Duration(milliseconds: 1500), () {
+    //     Navigator.pushNamedAndRemoveUntil(
+    //         context, "/login", (Route<dynamic> routes) => false);
+    //   });
+    // }
 
-    }
 
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: splashscreen(),
-    );
-  }
-
-  Widget splashscreen() {
-    return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
-      decoration: BoxDecoration(
-          image: DecorationImage(
-              image: AssetImage('assets/background.png'), fit: BoxFit.cover)),
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Image(
+      body: Container(
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        decoration: BoxDecoration(
+        image: DecorationImage(
+        image: AssetImage('assets/background.png'), fit: BoxFit.cover)),
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Image(
                 alignment: Alignment.center,
                 height: MediaQuery.of(context).size.height / 4,
                 width: MediaQuery.of(context).size.width / 2,
-                image: AssetImage("assets/logo_png_ontime.png"))
-          ],
+                image: AssetImage("assets/logo_png_ontime.png"),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
+
+  // Widget splashscreen() {
+  //
+  // }
 
   void _deleteConfig() async {
 //     Assuming that the number of rows is the id for the last row.
@@ -190,8 +186,8 @@ class _CekLoginState extends State<CekLogin> {
   void _insertConfig() async {
     // row to insert
     Map<String, dynamic> row = {
-      DatabaseConfigHelper.instance.columnUsername: 'admintrusmi',
-      DatabaseConfigHelper.instance.columnPassword: 'trusmiadmin'
+      DatabaseConfigHelper.instance.columnUsername: 'ittrusmi',
+      DatabaseConfigHelper.instance.columnPassword: 'trusmiit'
     };
     await dbConfig.insert(row);
     // print('inserted row id: $id');
