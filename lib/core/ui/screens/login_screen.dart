@@ -83,7 +83,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
-      print('token: $firebaseAppToken');
+      print('login token: $firebaseAppToken');
 
       _loginBloc.add(LoadLogin());
 

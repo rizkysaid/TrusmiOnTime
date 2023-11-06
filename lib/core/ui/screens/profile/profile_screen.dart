@@ -12,20 +12,20 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:login_absen/core/bloc/profile/profile_bloc.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/config/about.dart';
+import 'package:login_absen/core/controller/ProfileController.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:login_absen/core/ui/screens/trusmiverse.dart';
-import 'package:login_absen/core/utils/toast_util.dart';
+import 'package:login_absen/core/ui/widget/prodevBestEmployee.dart';
+import 'package:login_absen/core/ui/widget/singleBestEmployee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import 'PassParams.dart';
+import '../PassParams.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:http/http.dart' as http;
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:material_dialogs/material_dialogs.dart';
 import 'package:material_dialogs/widgets/buttons/icon_button.dart';
@@ -96,147 +96,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   File? imageFile;
 
-  void _openCamera() async {
-    // Capture a photo
-    final ImagePicker _picker = ImagePicker();
-    final XFile? pickedFile = await _picker.pickImage(
-      source: ImageSource.camera,
-      imageQuality: 50,
-      maxWidth: 500,
-      maxHeight: 500,
-      preferredCameraDevice: CameraDevice.front,
-    );
-
-    // setState(() {
-    // imageFile!.copy(pickedFile!.path);
-
-    var picker = pickedFile;
-    if (picker != null) {
-      imageFile = File(pickedFile!.path);
-    } else {
-      imageFile = null;
-      getProfil(userID, date);
-    }
-
-    // PROSES CHECKIN / CHECKOUT
-    var image = imageFile;
-    if (image != null) {
-      _profileBloc.add(InitialProfile());
-      if (_status == 'checkin') {
-        prosesCheckin(userID, '${DateTime.now()}', imageFile!, idShift, shift);
-      } else {
-        prosesCheckout(userID, '${DateTime.now()}', imageFile!, idShift, shift);
-      }
-    }
-  }
-
-  Future<void> prosesCheckin(String usrId, String clockIn, File imageFile,
-      String idShift, String shift) async {
-    var uri = Uri.parse(Endpoint.checkin);
-    // print('Endpoint.checkin => ' + Endpoint.checkin);
-    var request = new http.MultipartRequest("POST", uri);
-    var multiPartFile = new http.MultipartFile.fromBytes(
-      "foto",
-      imageFile.readAsBytesSync(),
-      filename: imageFile.path,
-    );
-
-    request.files.add(multiPartFile);
-    request.fields['employee_id'] = usrId;
-    request.fields['clock_in'] = clockIn;
-    request.fields['id_shift'] = idShift;
-    request.fields['shift'] = shift;
-
-    var response = await request.send();
-
-    if (response.statusCode == 201) {
-      showSuccessDialog(context, 'checkin');
-    } else {
-      showErrorDialog(context, 'checkin');
-    }
-  }
-
-  Future<void> prosesCheckout(String usrId, String clockOut, File imageFile,
-      String idShift, String shift) async {
-    showProgressDialog(context);
-
-    var uri = Uri.parse(Endpoint.checkout);
-    var request = new http.MultipartRequest("POST", uri);
-
-    var multiPartFile = new http.MultipartFile.fromBytes(
-      "foto",
-      imageFile.readAsBytesSync(),
-      filename: imageFile.path,
-    );
-
-    request.files.add(multiPartFile);
-    request.fields['employee_id'] = usrId;
-    request.fields['clock_out'] = clockOut;
-    request.fields['id_shift'] = idShift;
-    request.fields['shift'] = shift;
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      // hide pop up
-      Navigator.pop(context);
-      showSuccessDialog(context, 'checkout');
-    } else {
-      showErrorDialog(context, 'checkout');
-    }
-  }
-
-  // BREAK OUT
-  Future<void> prosesBreakOut(
-      String usrId, String breakOut, String idShift, String shift) async {
-    _profileBloc.add(InitialProfile());
-
-    var uri = Uri.parse(Endpoint.breakout);
-    var request = new http.MultipartRequest("POST", uri);
-
-    request.fields['employee_id'] = usrId;
-    request.fields['break_out'] = breakOut;
-    request.fields['id_shift'] = idShift;
-    request.fields['shift'] = shift;
-
-    var response = await request.send();
-
-    if (response.statusCode == 200) {
-      // timer = new Timer(new Duration(seconds: 2), () {
-      getProfil(usrId, date);
-      ToastUtils.show(
-          "Selamat istirahat, manfaatkan waktu istirahatmu dengan baik");
-      // });
-    } else {
-      print(response.statusCode);
-    }
-  }
-
-  // BREAK OUT
-  Future<void> prosesBreakIn(
-      String usrId, String breakIn, String idShift, String shift) async {
-    _profileBloc.add(InitialProfile());
-    var uri = Uri.parse(Endpoint.breakin);
-    var request = new http.MultipartRequest("POST", uri);
-
-    request.fields['employee_id'] = usrId;
-    request.fields['break_in'] = breakIn;
-    request.fields['id_shift'] = idShift;
-    request.fields['shift'] = shift;
-
-    var response = await request.send();
-
-    print('response.status.breakout => ' + response.statusCode.toString());
-
-    if (response.statusCode == 200) {
-      // timer = new Timer(new Duration(seconds: 2), () {
-      getProfil(usrId, date);
-      ToastUtils.show("Selamat bekerja kembali");
-      // });
-    } else {
-      print(response.statusCode);
-    }
-  }
+  bool isShowHariBesar = false;
+  bool statusHariBesar = false;
+  String title = '';
+  String msg = '';
+  String gif = '';
+  bool hariBesar = false;
 
   List<ProfileModel> productProfile = [];
   final ProfileBloc _profileBloc = ProfileBloc();
@@ -347,35 +212,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await Future.delayed(Duration(milliseconds: 2000));
     _refreshController.refreshCompleted();
     _profileBloc.add(InitialProfile());
-    getProfil(userID, date);
+    ProfileController().getProfil(userID, date, _profileBloc, apiToken);
   }
 
   void _onLoading() async {
     await Future.delayed(Duration(milliseconds: 2000));
 
     _refreshController.loadComplete();
-  }
-
-  Future<void> getProfil(userID, date) async {
-    _profileBloc.add(InitialProfile());
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-
-    if (allRows.length != 0) {
-      ip = allRows[0]['ip_address'];
-    } else {
-      ip = Endpoint.baseUrl;
-    }
-
-    _profileBloc.add(
-      GetProfile(
-        ip: ip,
-        userID: userID,
-        date: date,
-        apiToken: apiToken,
-      ),
-    );
   }
 
   Future<void> getPref() async {
@@ -401,9 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       print('departmentName $departmentName');
 
-
-
-      getProfil(userID, date);
+      ProfileController().getProfil(userID, date, _profileBloc, apiToken);
     }
 
     if (clockin.isEmpty) {
@@ -425,13 +266,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     precacheImage(AssetImage('assets/gold-medal.png'), context);
     precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
   }
-
-  bool isShowHariBesar = false;
-  bool statusHariBesar = false;
-  String title = '';
-  String msg = '';
-  String gif = '';
-  bool hariBesar = false;
 
   Future<void> checkHolidays() async {
     String ip;
@@ -504,16 +338,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _displayBestBadEmployees(context, response);
       } else {
         _profileBloc.add(InitialProfile());
-        getProfil(userID, date);
+        ProfileController().getProfil(userID, date, _profileBloc, apiToken);
       }
     } else {
       _profileBloc.add(InitialProfile());
-      getProfil(userID, date);
+      ProfileController().getProfil(userID, date, _profileBloc, apiToken);
     }
   }
 
-  void _displayBestBadEmployees(BuildContext context, response) {
-    showGeneralDialog(
+  Future<void> _displayBestBadEmployees(BuildContext context, response) {
+    return showGeneralDialog(
         context: context,
         barrierDismissible: false,
         transitionDuration: Duration(milliseconds: 500),
@@ -542,8 +376,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           response['data']['best'].length == 1
-                              ? _singleBestEmployee(response)
-                              : _prodevBestEmployee(response),
+                              ? SingleBestEmployee(response: response, userID: userID, date: date)
+                              : ProdevBestEmployee(response: response, userID: userID, date: date),
                         ],
                       ),
                     ),
@@ -577,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       onTap: () {
                         Navigator.pop(context);
                         _profileBloc.add(InitialProfile());
-                        getProfil(userID, date);
+                        ProfileController().getProfil(userID, date, _profileBloc, apiToken);
                       },
                     ),
                   ),
@@ -586,636 +420,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           );
         });
-  }
-
-  Widget _singleBestEmployee(response) {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                  image: AssetImage('assets/background_new.png'),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(30),
-                  bottomLeft: Radius.circular(30),
-                ),
-              ),
-              child: Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.3,
-                child: Column(
-                  children: [
-                    Container(
-                      margin: EdgeInsets.only(top: 15),
-                      width: double.infinity,
-                      child: Center(
-                        child: DefaultTextStyle(
-                          child: Text('Best Employee Of The Month'),
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      margin: EdgeInsets.only(top: 15, bottom: 10),
-                      alignment: Alignment.center,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: Center(
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 5),
-                                child: Column(
-                                  children: [
-                                    DefaultTextStyle(
-                                      child: Text("Periode"),
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    SizedBox(height: 5),
-                                    Container(
-                                      child: Column(
-                                        children: [
-                                          DefaultTextStyle(
-                                            child:
-                                                Text(DateFormat('MMMM').format(
-                                              DateTime(
-                                                0,
-                                                int.parse(
-                                                  response['periode']
-                                                      .substring(5, 7),
-                                                ),
-                                              ),
-                                            )),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          DefaultTextStyle(
-                                            child: Text(response['periode']
-                                                .substring(0, 4)),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: const EdgeInsets.fromLTRB(
-                              20,
-                              5,
-                              20,
-                              0,
-                            ),
-                            padding: EdgeInsets.all(2.5),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: NetworkImage(
-                                Endpoint.baseIp +
-                                    '/' +
-                                    response['data']['best'][0]
-                                        ['profile_picture'],
-                              ),
-                              radius: 45.0,
-                              // child: CachedNetworkImage(
-                              //     imageUrl:
-                              //         '${Endpoint.baseIp}/${response['data']['best'][0]['profile_picture']}'),
-                            ),
-                          ),
-                          Expanded(
-                            child: Padding(
-                              padding: const EdgeInsets.only(top: 5),
-                              child: Center(
-                                child: Column(
-                                  children: [],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    DefaultTextStyle(
-                      child: Text(response['data']['best'][0]['employee']),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    DefaultTextStyle(
-                      child: Text(response['data']['best'][0]['jabatan']),
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: 5,
-              right: 5,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _profileBloc.add(InitialProfile());
-                    getProfil(userID, date);
-                  },
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue[50]!.withOpacity(0.25),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.grey,
-                      size: 17,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              top: 70,
-              right: 15,
-              child: Stack(
-                alignment: Alignment.center,
-                children: [
-                  Column(
-                    children: [
-                      DefaultTextStyle(
-                        child: Text("KPI"),
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      Image(
-                        image: AssetImage('assets/gold-medal.png'),
-                        width: 80,
-                        height: 80,
-                      ),
-                    ],
-                  ),
-                  Positioned(
-                    top: 32,
-                    // left: 25,
-                    child: Center(
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        textAlign: TextAlign.center,
-                        child: Text(
-                          response['data']['best'][0]['score'],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 20,
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(bottom: 5),
-                width: double.infinity,
-                child: Center(
-                  child: Column(
-                    children: [
-                      DefaultTextStyle(
-                        child: Text('Bad Employee Of The Month'),
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: response['data']['bad'].length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    // elevation: 5,
-                    // shape: RoundedRectangleBorder(
-                    //   borderRadius: BorderRadius.circular(20),
-                    // ),
-                    child: ListTile(
-                      // contentPadding: EdgeInsets.all(10),
-                      // minVerticalPadding: 5,
-                      leading: Container(
-                        padding: EdgeInsets.all(2.5),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          shape: BoxShape.circle,
-                        ),
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            Endpoint.baseIp +
-                                '/' +
-                                response['data']['bad'][index]
-                                    ['profile_picture'],
-                          ),
-                          radius: 30,
-                        ),
-                      ),
-                      title: Text(response['data']['bad'][index]['employee']),
-                      subtitle: Text(response['data']['bad'][index]['jabatan']),
-                      trailing: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Chip(
-                              label: Text(
-                                response['data']['bad'][index]['score'],
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'KPI',
-                                textAlign: TextAlign.center,
-                                style:
-                                    TextStyle(fontSize: 9, color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _prodevBestEmployee(response) {
-    return Column(
-      children: [
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                image: DecorationImage(
-                  image: AssetImage('assets/background_new.png'),
-                  fit: BoxFit.cover,
-                ),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(10),
-                  topRight: Radius.circular(10),
-                  bottomRight: Radius.circular(30),
-                  bottomLeft: Radius.circular(30),
-                ),
-              ),
-              child: Container(
-                width: double.infinity,
-                height: MediaQuery.of(context).size.height * 0.4,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(child: Container()),
-                    Container(
-                      width: double.infinity,
-                      child: Center(
-                        child: Column(
-                          children: [
-                            DefaultTextStyle(
-                              child: Text('Best Employee Of The Month'),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            DefaultTextStyle(
-                              child: Text(
-                                DateFormat('MMMM').format(
-                                      DateTime(
-                                        0,
-                                        int.parse(
-                                          response['periode'].substring(5, 7),
-                                        ),
-                                      ),
-                                    ) +
-                                    ' ' +
-                                    response['periode'].substring(0, 4),
-                              ),
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Container()),
-                    Container(
-                      padding: EdgeInsets.fromLTRB(15, 10, 15, 10),
-                      child: GridView.count(
-                        crossAxisCount: 2,
-                        shrinkWrap: true,
-                        scrollDirection: Axis.vertical,
-                        childAspectRatio: 1.5,
-                        children: List.generate(
-                          response['data']['best'].length,
-                          (index) {
-                            return Card(
-                              elevation: 0,
-                              color: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(15),
-                              ),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width / 2.5,
-                                    padding: EdgeInsets.all(5),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          padding: EdgeInsets.only(right: 30),
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              shape: BoxShape.circle,
-                                            ),
-                                            padding: EdgeInsets.all(2.5),
-                                            child: CircleAvatar(
-                                              backgroundImage: NetworkImage(
-                                                Endpoint.baseIp +
-                                                    '/' +
-                                                    response['data']['best']
-                                                            [index]
-                                                        ['profile_picture'],
-                                              ),
-                                              radius: 30,
-                                            ),
-                                          ),
-                                        ),
-                                        DefaultTextStyle(
-                                          child: Text(
-                                            response['data']['best'][index]
-                                                ['employee'],
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        Flexible(
-                                          child: DefaultTextStyle(
-                                            child: Text(
-                                              response['data']['best'][index]
-                                                  ['jabatan'],
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 10,
-                                    right: 15,
-                                    child: Stack(
-                                      alignment: Alignment.center,
-                                      children: [
-                                        Container(
-                                          child: Image(
-                                            image: AssetImage(
-                                                'assets/gold-medal.png'),
-                                            width: 70,
-                                            height: 70,
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 10,
-                                          child: DefaultTextStyle(
-                                            child: Text('KPI'),
-                                            style: TextStyle(
-                                              color: Colors.black54,
-                                              fontSize: 8,
-                                            ),
-                                          ),
-                                        ),
-                                        Positioned(
-                                          top: 18,
-                                          child: DefaultTextStyle(
-                                            child: Text(response['data']['best']
-                                                [index]['score']),
-                                            style: TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                    Expanded(child: Container()),
-                  ],
-                ),
-              ),
-            ),
-            Positioned(
-              top: 5,
-              right: 5,
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  onTap: () {
-                    Navigator.pop(context);
-                    _profileBloc.add(InitialProfile());
-                    getProfil(userID, date);
-                  },
-                  child: Container(
-                    width: 20,
-                    height: 20,
-                    decoration: BoxDecoration(
-                      color: Colors.lightBlue[50]!.withOpacity(0.25),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      Icons.close,
-                      color: Colors.grey,
-                      size: 17,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          padding: EdgeInsets.symmetric(horizontal: 5),
-          child: Column(
-            children: [
-              Container(
-                // margin: EdgeInsets.only(bottom: 5),
-                width: double.infinity,
-                child: Center(
-                  child: Column(
-                    children: [
-                      DefaultTextStyle(
-                        child: Text('Bad Employee Of The Month'),
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: response['data']['bad'].length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    // elevation: 3,
-                    // shape: RoundedRectangleBorder(
-                    //   borderRadius: BorderRadius.circular(20),
-                    // ),
-                    child: ListTile(
-                      leading: Container(
-                        padding: EdgeInsets.all(1.5),
-                        decoration: BoxDecoration(
-                          color: Colors.grey,
-                          shape: BoxShape.circle,
-                        ),
-                        child: CircleAvatar(
-                          backgroundImage: NetworkImage(
-                            Endpoint.baseIp +
-                                '/' +
-                                response['data']['bad'][index]
-                                    ['profile_picture'],
-                          ),
-                          radius: 20,
-                        ),
-                      ),
-                      title: Text(response['data']['bad'][index]['employee']),
-                      subtitle: Text(response['data']['bad'][index]['jabatan']),
-                      trailing: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(top: 5.0),
-                            child: Chip(
-                              label: Text(
-                                response['data']['bad'][index]['score'],
-                                style: TextStyle(
-                                  color: Colors.red,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'KPI',
-                                textAlign: TextAlign.center,
-                                style:
-                                    TextStyle(fontSize: 9, color: Colors.grey),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 
   Future<void> getBestMktRsp(context) async {
@@ -1235,20 +439,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (response == null) {
       Navigator.pop(context);
       _profileBloc.add(InitialProfile());
-      getProfil(userID, date);
+      ProfileController().getProfil(userID, date, _profileBloc, apiToken);
     } else {
       _displayBestMktRsp(context, response);
     }
   }
 
-  void _displayBestMktRsp(BuildContext context, response) {
+  Future<void> _displayBestMktRsp(BuildContext context, response) {
     Navigator.pop(context);
     setState(() {
       prevMonthName = DateFormat('MMMM yyyy')
           .format(DateTime.now().subtract(Duration(days: 30)));
     });
 
-    showGeneralDialog(
+    return showGeneralDialog(
         context: context,
         barrierDismissible: false,
         transitionDuration: Duration(milliseconds: 500),
@@ -3113,7 +2317,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               onTap: () {
                                 Navigator.pop(context);
                                 _profileBloc.add(InitialProfile());
-                                getProfil(userID, date);
+                                ProfileController().getProfil(userID, date, _profileBloc, apiToken);
                               },
                               child: Container(
                                 width: 20,
@@ -3593,29 +2797,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       );
                     }),
-                    bottomNavigationBar: BottomAppBar(
-                      shape: const CircularNotchedRectangle(),
-                      child: Container(height: 50.0),
-                    ),
+
                     floatingActionButton: Visibility(
                       visible: _visibleButton,
                       child: Shimmer.fromColors(
                         baseColor: Colors.grey,
                         highlightColor: Colors.white,
-                        child: Container(
-                            height: 80,
-                            width: 80,
-                            child: FloatingActionButton(
-                              onPressed: () => {},
-                              tooltip: _toolTip,
-                              backgroundColor: _colorButton,
-                              child: Icon(Icons.alarm_on,
-                                  color: Colors.white, size: 40),
-                            )),
+                        child: FloatingActionButton(
+                          onPressed: () => {},
+                          tooltip: _toolTip,
+                          backgroundColor: _colorButton,
+                          child: Icon(Icons.alarm_on,
+                              color: Colors.white, size: 40),
+                        ),
                       ),
                     ),
                     floatingActionButtonLocation:
                         FloatingActionButtonLocation.centerDocked,
+                    bottomNavigationBar: BottomAppBar(
+                      shape: const CircularNotchedRectangle(),
+                      child: Container(height: 50.0),
+                    ),
                   );
                 default:
               }
@@ -4382,7 +3584,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // btnCancelOnPress: () {},
       btnCancelOnPress: () {
         _profileBloc.add(InitialProfile());
-        getProfil(userID, date);
+        ProfileController().getProfil(userID, date, _profileBloc, apiToken);
       },
     )..show();
   }
@@ -4478,13 +3680,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (response.data.achive == true) {
             if (clockin != '--:--') {
               if (isQuizPasses) {
-                _openCamera();
+                ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
               } else {
                 _showQuiz();
                 // Get.offAll(() => QuizScreen());
               }
             } else {
-              _openCamera();
+              ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
             }
           } else {
             AwesomeDialog(
@@ -4552,7 +3754,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
     if (isQuizPasses) {
-      _openCamera();
+      ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
     }
   }
 }

@@ -10,7 +10,7 @@ import 'package:login_absen/core/ui/screens/invalid_ip.dart';
 import 'package:login_absen/core/ui/screens/ip_config.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
-import 'package:login_absen/core/ui/screens/profile_screen.dart';
+import 'package:login_absen/core/ui/screens/profile/profile_screen.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
@@ -51,7 +51,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       title: "Trusmi Ontime",
       debugShowCheckedModeBanner: false,
-      home: CekLogin(),
+      home: SplashScreen(),
       routes: {
         "/login": (context) => LoginScreen(),
         "/profile": (context) => ProfileScreen(),
@@ -68,12 +68,12 @@ class _MyAppState extends State<MyApp> {
   }
 }
 
-class CekLogin extends StatefulWidget {
+class SplashScreen extends StatefulWidget {
   @override
-  _CekLoginState createState() => _CekLoginState();
+  _SplashScreenState createState() => _SplashScreenState();
 }
 
-class _CekLoginState extends State<CekLogin> {
+class _SplashScreenState extends State<SplashScreen> {
   // ConnectivityResult _connectionStatus = ConnectivityResult.none;
   // final Connectivity _connectivity = Connectivity();
   // late StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -102,45 +102,21 @@ class _CekLoginState extends State<CekLogin> {
 
   void getPref() async {
 
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-
-    print('allRows ${allRows.length}');
-
-    // if (allRows.length != 0) {
-    //   allRows.forEach((row) => print(row));
-    //   ip = allRows[0]['ip_address'];
-    //   SharedPreferences pref = await SharedPreferences.getInstance();
-    //   setState(() {
-    //     fcmToken = pref.getString('fcmToken')!;
-    //     username = pref.getString('username')!;
-    //     userID = pref.getString('userID')!;
-    //   });
-
-      print('fcmToken $fcmToken');
-
-      Future.delayed(const Duration(milliseconds: 1500), () {
-        if (fcmToken != null || fcmToken == '') {
-          Future.delayed(const Duration(milliseconds: 1500), () {
-            Navigator.pushNamedAndRemoveUntil(
-                context, "/login", (Route<dynamic> routes) => false);
-          });
-        } else {
-          Future.delayed(const Duration(milliseconds: 1500), () {
+      Future.delayed(const Duration(seconds: 1), () {
+        // if (fcmToken != null || fcmToken == '') {
+        //   Future.delayed(const Duration(seconds: 1), () {
+        //     Navigator.pushNamedAndRemoveUntil(
+        //         context, "/login", (Route<dynamic> routes) => false);
+        //   });
+        // } else {
+          Future.delayed(const Duration(seconds: 1), () {
             Navigator.pushNamedAndRemoveUntil(
                 context, "/profile", (Route<dynamic> routes) => false);
           });
-        }
+        // }
         precacheImage(AssetImage('assets/background.png'), context);
         precacheImage(AssetImage('assets/logo_png_ontime.png'), context);
       });
-    // } else {
-    //   Future.delayed(const Duration(milliseconds: 1500), () {
-    //     Navigator.pushNamedAndRemoveUntil(
-    //         context, "/login", (Route<dynamic> routes) => false);
-    //   });
-    // }
-
 
   }
 
