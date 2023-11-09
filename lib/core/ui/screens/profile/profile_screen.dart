@@ -33,6 +33,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:crypto/crypto.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -40,6 +41,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+
   ConnectivityResult _connectionStatus = ConnectivityResult.none;
   final Connectivity _connectivity = Connectivity();
   late StreamSubscription<ConnectivityResult> _connectivitySubscription;
@@ -105,6 +107,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   List<ProfileModel> productProfile = [];
   final ProfileBloc _profileBloc = ProfileBloc();
+
+  RefreshController _refreshController =
+  RefreshController(initialRefresh: false);
+
 
   @override
   void initState() {
@@ -196,26 +202,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     print(_connectionStatus);
   }
 
-  @override
-  void dispose() {
-    if (!mounted) {
-      _connectivitySubscription.cancel();
-      timer.cancel();
-    }
-    super.dispose();
-  }
-
-  RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
-
-  void _onRefresh() async {
+  Future<void> _onRefresh() async {
     await Future.delayed(Duration(milliseconds: 2000));
     _refreshController.refreshCompleted();
     _profileBloc.add(InitialProfile());
     ProfileController().getProfil(userID, date, _profileBloc, apiToken);
   }
 
-  void _onLoading() async {
+  Future<void> _onLoading() async {
     await Future.delayed(Duration(milliseconds: 2000));
 
     _refreshController.loadComplete();
@@ -231,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
-    if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
+    if (pref.getString('username') == null || pref.getString('username') == '') {
       logout();
     } else {
       setState(() {
@@ -2346,6 +2340,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
   }
 
+
+  @override
+  void dispose() {
+    if (!mounted) {
+      _connectivitySubscription.cancel();
+      timer.cancel();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     String version = About.version;
@@ -3177,110 +3181,127 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   );
                 }),
-                bottomNavigationBar: BottomAppBar(
-                  shape: const CircularNotchedRectangle(),
-                  child: Container(height: 60.0),
-                  // child: Padding(
-                  //   padding: const EdgeInsets.all(8.0),
-                  //   child: Row(
-                  //     mainAxisSize: MainAxisSize.max,
-                  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  //     children: [
-                  //       Wrap(
-                  //         crossAxisAlignment: WrapCrossAlignment.center,
-                  //         direction: Axis.vertical,
-                  //         children: [
-                  //           IconButton(
-                  //             onPressed: () {},
-                  //             icon: Icon(
-                  //               Icons.add_to_home_screen_outlined,
-                  //               size: 30,
-                  //             ),
-                  //             color: Colors.grey,
-                  //           ),
-                  //           Text(
-                  //             "HR System",
-                  //             style: TextStyle(fontSize: 10),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       Wrap(
-                  //         crossAxisAlignment: WrapCrossAlignment.center,
-                  //         direction: Axis.vertical,
-                  //         children: [
-                  //           IconButton(
-                  //             onPressed: () {},
-                  //             icon: Icon(
-                  //               Icons.group_work_outlined,
-                  //               size: 30,
-                  //             ),
-                  //             color: Colors.grey,
-                  //           ),
-                  //           Text(
-                  //             "Trusmiverse",
-                  //             style: TextStyle(fontSize: 10),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       Padding(padding: EdgeInsets.symmetric(horizontal: 25)),
-                  //       Wrap(
-                  //         crossAxisAlignment: WrapCrossAlignment.center,
-                  //         direction: Axis.vertical,
-                  //         children: [
-                  //           IconButton(
-                  //             onPressed: () {},
-                  //             icon: Icon(
-                  //               Icons.account_balance,
-                  //               size: 30,
-                  //             ),
-                  //             color: Colors.grey,
-                  //           ),
-                  //           Text(
-                  //             "WFH",
-                  //             style: TextStyle(fontSize: 10),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //       Wrap(
-                  //         crossAxisAlignment: WrapCrossAlignment.center,
-                  //         direction: Axis.vertical,
-                  //         children: [
-                  //           IconButton(
-                  //             onPressed: () {},
-                  //             icon: Icon(
-                  //               Icons.exit_to_app,
-                  //               size: 30,
-                  //             ),
-                  //             color: Colors.grey,
-                  //           ),
-                  //           Text(
-                  //             "Logout",
-                  //             style: TextStyle(fontSize: 10),
-                  //           ),
-                  //         ],
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                ),
                 floatingActionButton: Visibility(
                   visible: _visibleButton,
-                  child: Container(
-                      height: 80,
-                      width: 80,
-                      child: FloatingActionButton(
-                        onPressed: () async {
-                          checkStatus(userID);
-                          // NotificationController.createNewNotification(context),
-                        },
-                        tooltip: _toolTip,
-                        backgroundColor: _colorButton,
-                        child:
-                            Icon(Icons.alarm_on, color: Colors.white, size: 40),
-                      )),
+                  child: FloatingActionButton(
+                    onPressed: () async {
+                      checkStatus(userID);
+                      // NotificationController.createNewNotification(context),
+                    },
+                    tooltip: _toolTip,
+                    backgroundColor: _colorButton,
+                    child:
+                        Icon(Icons.alarm_on, color: Colors.white, size: 30),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(30.0))
+                    ),
+                  ),
                 ),
                 floatingActionButtonLocation:
                     FloatingActionButtonLocation.centerDocked,
+                bottomNavigationBar: AnimatedBottomNavigationBar(
+                    icons: [
+                      // Icon(Icons.alarm_on, color: Colors.white, size: 40),
+                      Icons.logout,
+                      Icons.notifications_active_rounded,
+                    ],
+                  activeIndex: 1,
+                  onTap: (int ) {
+                    checkStatus(userID);
+                    setState(() {
+
+                    });
+                  },
+                  gapLocation: GapLocation.center,
+                  notchSmoothness: NotchSmoothness.defaultEdge,
+                ),
+
+                // BottomAppBar(
+                //   shape: const CircularNotchedRectangle(),
+                //   child: Container(height: 60.0),
+                //   // child: Padding(
+                //   //   padding: const EdgeInsets.all(8.0),
+                //   //   child: Row(
+                //   //     mainAxisSize: MainAxisSize.max,
+                //   //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //   //     children: [
+                //   //       Wrap(
+                //   //         crossAxisAlignment: WrapCrossAlignment.center,
+                //   //         direction: Axis.vertical,
+                //   //         children: [
+                //   //           IconButton(
+                //   //             onPressed: () {},
+                //   //             icon: Icon(
+                //   //               Icons.add_to_home_screen_outlined,
+                //   //               size: 30,
+                //   //             ),
+                //   //             color: Colors.grey,
+                //   //           ),
+                //   //           Text(
+                //   //             "HR System",
+                //   //             style: TextStyle(fontSize: 10),
+                //   //           ),
+                //   //         ],
+                //   //       ),
+                //   //       Wrap(
+                //   //         crossAxisAlignment: WrapCrossAlignment.center,
+                //   //         direction: Axis.vertical,
+                //   //         children: [
+                //   //           IconButton(
+                //   //             onPressed: () {},
+                //   //             icon: Icon(
+                //   //               Icons.group_work_outlined,
+                //   //               size: 30,
+                //   //             ),
+                //   //             color: Colors.grey,
+                //   //           ),
+                //   //           Text(
+                //   //             "Trusmiverse",
+                //   //             style: TextStyle(fontSize: 10),
+                //   //           ),
+                //   //         ],
+                //   //       ),
+                //   //       Padding(padding: EdgeInsets.symmetric(horizontal: 25)),
+                //   //       Wrap(
+                //   //         crossAxisAlignment: WrapCrossAlignment.center,
+                //   //         direction: Axis.vertical,
+                //   //         children: [
+                //   //           IconButton(
+                //   //             onPressed: () {},
+                //   //             icon: Icon(
+                //   //               Icons.account_balance,
+                //   //               size: 30,
+                //   //             ),
+                //   //             color: Colors.grey,
+                //   //           ),
+                //   //           Text(
+                //   //             "WFH",
+                //   //             style: TextStyle(fontSize: 10),
+                //   //           ),
+                //   //         ],
+                //   //       ),
+                //   //       Wrap(
+                //   //         crossAxisAlignment: WrapCrossAlignment.center,
+                //   //         direction: Axis.vertical,
+                //   //         children: [
+                //   //           IconButton(
+                //   //             onPressed: () {},
+                //   //             icon: Icon(
+                //   //               Icons.exit_to_app,
+                //   //               size: 30,
+                //   //             ),
+                //   //             color: Colors.grey,
+                //   //           ),
+                //   //           Text(
+                //   //             "Logout",
+                //   //             style: TextStyle(fontSize: 10),
+                //   //           ),
+                //   //         ],
+                //   //       ),
+                //   //     ],
+                //   //   ),
+                //   // ),
+                // ),
               );
             },
           ),

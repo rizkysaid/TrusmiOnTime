@@ -136,8 +136,7 @@ class ProfileController{
   }
 
   // BREAK OUT
-  Future<dynamic> prosesBreakOut(
-      String usrId, String breakOut, String idShift, String shift, profileBloc, apiToken) async {
+  Future<dynamic> prosesBreakOut(String usrId, String breakOut, String idShift, String shift, profileBloc, apiToken) async {
     profileBloc.add(InitialProfile());
 
     var uri = Uri.parse(Endpoint.breakout);
@@ -165,8 +164,7 @@ class ProfileController{
   }
 
   // BREAK OUT
-  Future<dynamic> prosesBreakIn(
-      String usrId, String breakIn, String idShift, String shift, profileBloc, apiToken) async {
+  Future<dynamic> prosesBreakIn(String usrId, String breakIn, String idShift, String shift, profileBloc, apiToken) async {
     profileBloc.add(InitialProfile());
     var uri = Uri.parse(Endpoint.breakin);
     var request = new http.MultipartRequest("POST", uri);
@@ -192,6 +190,7 @@ class ProfileController{
     return response.statusCode;
 
   }
+
 
 
 }
