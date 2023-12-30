@@ -111,6 +111,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   RefreshController _refreshController =
   RefreshController(initialRefresh: false);
 
+  final DateTime now = DateTime.now();
+  final DateTime htNow = DateTime.now();
+
 
   @override
   void initState() {
@@ -121,13 +124,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _connectivitySubscription =
         _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
 
-    _timeString = _formatDateTime(DateTime.now());
-    _hariTanggal = _formatHariTanggal(DateTime.now());
+    _timeString = _formatDateTime(now).toString();
+    _hariTanggal = _formatHariTanggal(now).toString();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
-      final DateTime now = DateTime.now();
-      final DateTime htNow = DateTime.now();
-      final String formattedDateTime = _formatDateTime(now);
-      final String formattedHariTanggal = _formatHariTanggal(htNow);
+
+      final String formattedDateTime = _formatDateTime(now).toString();
+      final String formattedHariTanggal = _formatHariTanggal(htNow).toString();
 
       _hariTanggal = formattedHariTanggal;
       _timeString = formattedDateTime;
@@ -137,6 +139,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
         });
       }
     });
+  }
+
+  _formatDateTime(DateTime dateTime) {
+    return DateFormat('HH:mm:ss').format(dateTime);
+  }
+
+  _formatHariTanggal(DateTime dateTime) {
+    return DateFormat('EEE, dd MMM yyyy').format(dateTime);
   }
 
   Future<void> initConnectivity() async {
@@ -2341,6 +2351,468 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
 
+  Future<void> setKondisi(state) async {
+    setState(() {
+      userID = state.userId;
+      idShift = state.idShift;
+      responseTime = state.responseTime;
+    });
+    if (state.idShift != '3') {
+      // Selain Security
+      if (state.clockIn != dateId) {
+        if (state.clockIn == "--:--") {
+          setState(() {
+            _isCheckin = false;
+          });
+
+          setState(() {
+            statusPhoto = false;
+            statusIcon = true;
+            imageUrl = "";
+            _colorButton = Colors.red;
+            clockout = state.clockOut;
+            clockin = state.clockIn;
+            _visibleButton = true;
+            _status = "checkin";
+            shift = state.shiftIn;
+          });
+
+          //kondisi belum checkin
+        } else if (state.clockOut == "--:--") {
+          if (_isCheckin == true) {
+            setState(() {
+              // _isCheckout = false;
+            });
+          }
+
+          setState(() {
+            clockin = state.clockIn;
+            clockout = state.clockOut;
+            statusPhoto = true;
+            statusIcon = false;
+            imageUrl = state.photoIn;
+            _colorButton = Colors.deepOrange;
+            _visibleButton = true;
+            _status = "checkout";
+            shift = state.shiftOut;
+          });
+        } else {
+          //kondisi sudah checkin & belum checkout
+          if (state.clockIn != "--:--" && state.clockOut != "--:--") {
+            //kondisi sudah checkin & sudah checkout
+            setState(() {
+              clockin = state.clockIn;
+              clockout = state.clockOut;
+              statusPhoto = true;
+              statusIcon = false;
+              imageUrl = state.photoIn;
+              _colorButton = Colors.red;
+              _visibleButton = false;
+              _status = "checkin";
+              shift = state.shiftIn;
+            });
+          }
+        }
+      }
+    } else {
+      //KONDISI SIFT 3
+
+      if (state.clockIn == "--:--" && state.clockOut == "--:--") {
+        setState(() {
+          _isCheckin = false;
+          // _isCheckout = false;
+        });
+
+        setState(() {
+          statusPhoto = false;
+          statusIcon = true;
+          imageUrl = "";
+          _colorButton = Colors.red;
+          clockout = state.clockOut;
+          clockin = state.clockIn;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+
+        //kondisi belum checkin
+      } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
+        if (_isCheckin == true) {
+          setState(() {
+            // _isCheckout = false;
+          });
+        }
+
+        setState(() {
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = state.photoIn;
+          _colorButton = Colors.deepOrange;
+          _visibleButton = true;
+          _status = "checkout";
+          shift = state.shiftOut;
+        });
+      } else if (dateOut != dateId) {
+        //kondisi sudah checkin & belum checkout
+        setState(() {
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          dateOut = "";
+          dateIn = "";
+          statusPhoto = true;
+          statusIcon = false;
+          imageUrl = state.photoIn;
+          _colorButton = Colors.red;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+      } else {
+        //kondisi tanggal checkout tidak sama dengan tgl hari ini
+        setState(() {
+          statusPhoto = true;
+          statusIcon = false;
+          clockin = state.clockIn;
+          clockout = state.clockOut;
+          imageUrl = state.photoIn;
+          _visibleButton = true;
+          _status = "checkin";
+          shift = state.shiftIn;
+        });
+      }
+    }
+
+    // QUIZ
+    setState(() {
+      state.quizRequired == "1"
+          ? state.quizStatus == '1'
+          ? isQuizPasses = true
+          : isQuizPasses = false
+          : isQuizPasses = true;
+    });
+
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    pref.setBool('isQuizPasses', isQuizPasses);
+
+    print('state.quizRequired : ${state.quizRequired.toString()}');
+    print('state.quizStatus : ${state.quizStatus.toString()}');
+    print('isQuizPasses : ${isQuizPasses.toString()}');
+
+  }
+
+  Future<void> updateFcmToken(userId, firebaseAppToken, state) async {
+    // showProgressDialog(context);
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      allRows.forEach((row) => print(row));
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    // print(ip);
+
+    var response = await services.updateFcmToken(ip, userId, firebaseAppToken, apiToken);
+    print(response.toString());
+    if(response['status'] == true){
+
+      // print('ip: ${ip.toString()}');
+      // print('userId: $userId');
+      // print('firebaseAppToken: $firebaseAppToken');
+
+      RegExp pattern = RegExp(r'[!@#$%^&*()_+={}|\[\]:;"<>,.?/~` \t\n\r\f\v]');
+      // state.allDepartments.forEach((dept) async {
+      //   // print(dept.replaceAll(pattern, ''));
+      //   await AwesomeNotificationsFcm().unsubscribeToTopic(dept.replaceAll(pattern, ''));
+      // });
+
+      await AwesomeNotificationsFcm().subscribeToTopic(state.departmentName.replaceAll(pattern, ''));
+      // print('departmentName: ${state.departmentName.replaceAll(pattern, '')}');
+
+      SharedPreferences pref = await SharedPreferences.getInstance();
+      pref.setString('fcmToken', firebaseAppToken);
+    }
+
+  }
+
+  Future showProgressDialog(BuildContext loadContext) {
+    return showDialog(
+      context: loadContext,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Center(
+          child: CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+
+  Future<void> showSuccessDialog(context, status) async {
+    String title = '';
+    if (status == 'checkin') {
+      title = "Check In Success ";
+    } else {
+      title = "Check Out Success ";
+    }
+
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.success,
+      animType: AnimType.bottomSlide,
+      title: title,
+      // desc: 'Ingin istirahat sekarang?',
+      // btnCancelText: "Nanti",
+      // btnOkText: "Ya",
+      // btnCancelOnPress: () {},
+      btnOkOnPress: () {
+        if (status == 'checkin') {
+          setState(() {
+            isShowSuccessCheckin = true;
+          });
+          checkHolidays();
+        } else {
+          setState(() {
+            isShowSuccessCheckout = true;
+          });
+
+          // 120 = Departement Marketing RSP
+          if (departmentId == '120') {
+            getBestMktRsp(context);
+          } else {
+            checkBestBadEmployee(context);
+          }
+        }
+      },
+      dismissOnBackKeyPress: false,
+      dismissOnTouchOutside: false,
+    )..show();
+
+  }
+
+  Future<void> showHariBesar(lottie, title, message) async {
+    isShowHariBesar = true;
+    return Dialogs.materialDialog(
+      color: Colors.white,
+      msg: message,
+      title: title,
+      lottieBuilder: Lottie.network(
+        Endpoint.urlLottie + lottie,
+        fit: BoxFit.contain,
+      ),
+      context: context,
+      actions: [
+        IconsButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+
+            // 120 = Departement Marketing RSP
+            if (departmentId == '120') {
+              getBestMktRsp(context);
+            } else {
+              checkBestBadEmployee(context);
+            }
+          },
+          text: '',
+          iconData: Icons.done,
+          color: Colors.blue,
+          textStyle: TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+        ),
+      ],
+    );
+  }
+
+  Future<void> showErrorDialog(context, status) async {
+    String title = '';
+    if (status == 'checkin') {
+      title = "Check In Failed";
+    } else {
+      title = "Check Out Failed";
+    }
+
+    AwesomeDialog(
+      context: context,
+      dialogType: DialogType.error,
+      animType: AnimType.bottomSlide,
+      title: title,
+      // desc: 'Ingin istirahat sekarang?',
+      // btnCancelText: "Nanti",
+      // btnOkText: "Ya",
+      // btnCancelOnPress: () {},
+      btnCancelOnPress: () {
+        _profileBloc.add(InitialProfile());
+        ProfileController().getProfil(userID, date, _profileBloc, apiToken);
+      },
+    )..show();
+  }
+
+  Future<void> logout() async {
+    _profileBloc.add(InitialProfile());
+    removePref();
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/login", (Route<dynamic> routes) => false);
+    });
+  }
+
+  Future<void> absen() async {
+    Future.delayed(const Duration(microseconds: 2000), () {
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/profile", (Route<dynamic> routes) => false);
+    });
+  }
+
+  Future<void> goToHR(context) async {
+    Navigator.pushNamed(context, "/hrsystem",
+        arguments: PassParams(username, password));
+  }
+
+  Future<void> goToTrusmiverse(context) async {
+    String pwd = md5.convert(utf8.encode(password)).toString();
+    try {
+      final response = await services.trusmiverseLogin(username, pwd, apiToken);
+      print(jsonDecode(response.data)['link'].toString());
+      String url = jsonDecode(response.data)['link'].toString();
+      String token = jsonDecode(response.data)['token'].toString();
+      Get.to(() => Trusmiverse(url: url, token: token));
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
+  Future<void> wfh(context) async {
+    Navigator.pushNamed(context, "/wfh",
+        arguments: PassParams(username, password));
+  }
+
+  Future<void> removePref() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      pref.remove('fcmToken');
+      pref.remove('username');
+      pref.remove('password');
+      pref.remove('clock_in');
+      pref.remove('isQuizPasses');
+    });
+
+    await AwesomeNotificationsFcm().deleteToken();
+
+  }
+
+  Future<void> checkStatus(userId) async {
+    showProgressDialog(context);
+
+    String ip;
+    final dbHelper = DatabaseHelper.instance;
+    final allRows = await dbHelper.queryAllRows();
+
+    if (allRows.length != 0) {
+      ip = allRows[0]['ip_address'];
+    } else {
+      ip = Endpoint.baseUrl;
+    }
+
+    try {
+      var response = await services.checkStatus(ip, userID, responseTime);
+
+      // print('responseTime = ' + responseTime.toString());
+
+      if (response.data.aktif.isEmpty) {
+        Future.delayed(const Duration(microseconds: 2000), () {
+          Navigator.pushNamedAndRemoveUntil(
+              context, "/no_connection", (Route<dynamic> routes) => false);
+        });
+      } else {
+        Navigator.of(context, rootNavigator: true).pop(context);
+
+        if (response.data.aktif == '1') {
+          if (response.data.achive == true) {
+            if (clockin != '--:--') {
+              if (isQuizPasses) {
+                ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+              } else {
+                _showQuiz();
+                // Get.offAll(() => QuizScreen());
+              }
+            } else {
+              ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+            }
+          } else {
+            AwesomeDialog(
+              context: context,
+              dialogType: DialogType.error,
+              title: "Anda tidak bisa melakukan absen!",
+              desc: response.data.message,
+              btnOkText: "Kembali",
+              btnOkOnPress: () {
+                Future.delayed(const Duration(microseconds: 2000), () {
+                  Navigator.pushNamedAndRemoveUntil(
+                      context, "/profile", (Route<dynamic> routes) => false);
+                });
+              },
+            )..show();
+          }
+        } else {
+          AwesomeDialog(
+            context: context,
+            dialogType: DialogType.error,
+            title: "Anda tidak bisa melakukan absen!",
+            desc: "Akun anda telah dinonaktifkan.",
+            btnOkText: "Logout",
+            btnOkOnPress: () {
+              logout();
+            },
+          )..show();
+        }
+      }
+    } catch (_) {
+      // ToastUtils.show('Request Time Out. Please try again!');
+      Fluttertoast.showToast(
+        msg: 'Request Time Out. Please try again!',
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        // backgroundColor: Colors.red,
+        // textColor: Colors.white,
+        // fontSize: 16.0,
+      );
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _showQuiz() async {
+    Future<void> future = showModalBottomSheet(
+      isScrollControlled: true,
+      context: context,
+      enableDrag: true,
+      builder: (context) => QuizScreen(),
+    );
+
+    future.then((value) => _closeQuiz(value));
+  }
+
+  Future<void> _closeQuiz(void value) async {
+    var pref = await SharedPreferences.getInstance();
+    if (pref.containsKey('isQuizPasses')) {
+      setState(() {
+        isQuizPasses = pref.getBool('isQuizPasses')!;
+      });
+    } else {
+      setState(() {
+        isQuizPasses = false;
+      });
+    }
+    if (isQuizPasses) {
+      ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+    }
+  }
+
+
   @override
   void dispose() {
     if (!mounted) {
@@ -3310,472 +3782,4 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  setKondisi(state) async {
-    setState(() {
-      userID = state.userId;
-      idShift = state.idShift;
-      responseTime = state.responseTime;
-    });
-    if (state.idShift != '3') {
-      // Selain Security
-      if (state.clockIn != dateId) {
-        if (state.clockIn == "--:--") {
-          setState(() {
-            _isCheckin = false;
-          });
-
-          setState(() {
-            statusPhoto = false;
-            statusIcon = true;
-            imageUrl = "";
-            _colorButton = Colors.red;
-            clockout = state.clockOut;
-            clockin = state.clockIn;
-            _visibleButton = true;
-            _status = "checkin";
-            shift = state.shiftIn;
-          });
-
-          //kondisi belum checkin
-        } else if (state.clockOut == "--:--") {
-          if (_isCheckin == true) {
-            setState(() {
-              // _isCheckout = false;
-            });
-          }
-
-          setState(() {
-            clockin = state.clockIn;
-            clockout = state.clockOut;
-            statusPhoto = true;
-            statusIcon = false;
-            imageUrl = state.photoIn;
-            _colorButton = Colors.deepOrange;
-            _visibleButton = true;
-            _status = "checkout";
-            shift = state.shiftOut;
-          });
-        } else {
-          //kondisi sudah checkin & belum checkout
-          if (state.clockIn != "--:--" && state.clockOut != "--:--") {
-            //kondisi sudah checkin & sudah checkout
-            setState(() {
-              clockin = state.clockIn;
-              clockout = state.clockOut;
-              statusPhoto = true;
-              statusIcon = false;
-              imageUrl = state.photoIn;
-              _colorButton = Colors.red;
-              _visibleButton = false;
-              _status = "checkin";
-              shift = state.shiftIn;
-            });
-          }
-        }
-      }
-    } else {
-      //KONDISI SIFT 3
-
-      if (state.clockIn == "--:--" && state.clockOut == "--:--") {
-        setState(() {
-          _isCheckin = false;
-          // _isCheckout = false;
-        });
-
-        setState(() {
-          statusPhoto = false;
-          statusIcon = true;
-          imageUrl = "";
-          _colorButton = Colors.red;
-          clockout = state.clockOut;
-          clockin = state.clockIn;
-          _visibleButton = true;
-          _status = "checkin";
-          shift = state.shiftIn;
-        });
-
-        //kondisi belum checkin
-      } else if (state.clockIn != "--:--" && state.clockOut == "--:--") {
-        if (_isCheckin == true) {
-          setState(() {
-            // _isCheckout = false;
-          });
-        }
-
-        setState(() {
-          clockin = state.clockIn;
-          clockout = state.clockOut;
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = state.photoIn;
-          _colorButton = Colors.deepOrange;
-          _visibleButton = true;
-          _status = "checkout";
-          shift = state.shiftOut;
-        });
-      } else if (dateOut != dateId) {
-        //kondisi sudah checkin & belum checkout
-        setState(() {
-          clockin = state.clockIn;
-          clockout = state.clockOut;
-          dateOut = "";
-          dateIn = "";
-          statusPhoto = true;
-          statusIcon = false;
-          imageUrl = state.photoIn;
-          _colorButton = Colors.red;
-          _visibleButton = true;
-          _status = "checkin";
-          shift = state.shiftIn;
-        });
-      } else {
-        //kondisi tanggal checkout tidak sama dengan tgl hari ini
-        setState(() {
-          statusPhoto = true;
-          statusIcon = false;
-          clockin = state.clockIn;
-          clockout = state.clockOut;
-          imageUrl = state.photoIn;
-          _visibleButton = true;
-          _status = "checkin";
-          shift = state.shiftIn;
-        });
-      }
-    }
-
-    // QUIZ
-    setState(() {
-      state.quizRequired == "1"
-          ? state.quizStatus == '1'
-              ? isQuizPasses = true
-              : isQuizPasses = false
-          : isQuizPasses = true;
-    });
-
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.setBool('isQuizPasses', isQuizPasses);
-
-    print('state.quizRequired : ${state.quizRequired.toString()}');
-    print('state.quizStatus : ${state.quizStatus.toString()}');
-    print('isQuizPasses : ${isQuizPasses.toString()}');
-
-  }
-
-  Future<void> updateFcmToken(userId, firebaseAppToken, state) async {
-    // showProgressDialog(context);
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-
-    if (allRows.length != 0) {
-      allRows.forEach((row) => print(row));
-      ip = allRows[0]['ip_address'];
-    } else {
-      ip = Endpoint.baseUrl;
-    }
-
-    // print(ip);
-
-    var response = await services.updateFcmToken(ip, userId, firebaseAppToken, apiToken);
-    print(response.toString());
-    if(response['status'] == true){
-
-      // print('ip: ${ip.toString()}');
-      // print('userId: $userId');
-      // print('firebaseAppToken: $firebaseAppToken');
-
-      RegExp pattern = RegExp(r'[!@#$%^&*()_+={}|\[\]:;"<>,.?/~` \t\n\r\f\v]');
-      // state.allDepartments.forEach((dept) async {
-      //   // print(dept.replaceAll(pattern, ''));
-      //   await AwesomeNotificationsFcm().unsubscribeToTopic(dept.replaceAll(pattern, ''));
-      // });
-
-      await AwesomeNotificationsFcm().subscribeToTopic(state.departmentName.replaceAll(pattern, ''));
-      // print('departmentName: ${state.departmentName.replaceAll(pattern, '')}');
-
-      SharedPreferences pref = await SharedPreferences.getInstance();
-      pref.setString('fcmToken', firebaseAppToken);
-    }
-
-  }
-
-
-  Future showProgressDialog(BuildContext loadContext) {
-    return showDialog(
-      context: loadContext,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Center(
-          child: CircularProgressIndicator(),
-        );
-      },
-    );
-  }
-
-  showSuccessDialog(context, status) {
-    String title = '';
-    if (status == 'checkin') {
-      title = "Check In Success ";
-    } else {
-      title = "Check Out Success ";
-    }
-
-    return AwesomeDialog(
-      context: context,
-      dialogType: DialogType.success,
-      animType: AnimType.bottomSlide,
-      title: title,
-      // desc: 'Ingin istirahat sekarang?',
-      // btnCancelText: "Nanti",
-      // btnOkText: "Ya",
-      // btnCancelOnPress: () {},
-      btnOkOnPress: () {
-        if (status == 'checkin') {
-          setState(() {
-            isShowSuccessCheckin = true;
-          });
-          checkHolidays();
-        } else {
-          setState(() {
-            isShowSuccessCheckout = true;
-          });
-
-          // 120 = Departement Marketing RSP
-          if (departmentId == '120') {
-            getBestMktRsp(context);
-          } else {
-            checkBestBadEmployee(context);
-          }
-        }
-      },
-      dismissOnBackKeyPress: false,
-      dismissOnTouchOutside: false,
-    )..show();
-  }
-
-  showHariBesar(lottie, title, message) {
-    isShowHariBesar = true;
-    return Dialogs.materialDialog(
-      color: Colors.white,
-      msg: message,
-      title: title,
-      lottieBuilder: Lottie.network(
-        Endpoint.urlLottie + lottie,
-        fit: BoxFit.contain,
-      ),
-      context: context,
-      actions: [
-        IconsButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-
-            // 120 = Departement Marketing RSP
-            if (departmentId == '120') {
-              getBestMktRsp(context);
-            } else {
-              checkBestBadEmployee(context);
-            }
-          },
-          text: '',
-          iconData: Icons.done,
-          color: Colors.blue,
-          textStyle: TextStyle(color: Colors.white),
-          iconColor: Colors.white,
-        ),
-      ],
-    );
-  }
-
-  showErrorDialog(context, status) {
-    String title = '';
-    if (status == 'checkin') {
-      title = "Check In Failed";
-    } else {
-      title = "Check Out Failed";
-    }
-
-    return AwesomeDialog(
-      context: context,
-      dialogType: DialogType.error,
-      animType: AnimType.bottomSlide,
-      title: title,
-      // desc: 'Ingin istirahat sekarang?',
-      // btnCancelText: "Nanti",
-      // btnOkText: "Ya",
-      // btnCancelOnPress: () {},
-      btnCancelOnPress: () {
-        _profileBloc.add(InitialProfile());
-        ProfileController().getProfil(userID, date, _profileBloc, apiToken);
-      },
-    )..show();
-  }
-
-  String _formatDateTime(DateTime dateTime) {
-    return DateFormat('HH:mm:ss').format(dateTime);
-  }
-
-  String _formatHariTanggal(DateTime dateTime) {
-    return DateFormat('EEE, dd MMM yyyy').format(dateTime);
-  }
-
-  logout() {
-    _profileBloc.add(InitialProfile());
-    removePref();
-    Future.delayed(const Duration(seconds: 1), () {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/login", (Route<dynamic> routes) => false);
-    });
-  }
-
-  absen() {
-    Future.delayed(const Duration(microseconds: 2000), () {
-      Navigator.pushNamedAndRemoveUntil(
-          context, "/profile", (Route<dynamic> routes) => false);
-    });
-  }
-
-  goToHR(context) async {
-    Navigator.pushNamed(context, "/hrsystem",
-        arguments: PassParams(username, password));
-  }
-
-  goToTrusmiverse(context) async {
-    String pwd = md5.convert(utf8.encode(password)).toString();
-    try {
-      final response = await services.trusmiverseLogin(username, pwd, apiToken);
-      print(jsonDecode(response.data)['link'].toString());
-      String url = jsonDecode(response.data)['link'].toString();
-      String token = jsonDecode(response.data)['token'].toString();
-      Get.to(() => Trusmiverse(url: url, token: token));
-    } catch (e) {
-      print(e.toString());
-    }
-  }
-
-  wfh(context) async {
-    Navigator.pushNamed(context, "/wfh",
-        arguments: PassParams(username, password));
-  }
-
-  removePref() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    setState(() {
-      pref.remove('fcmToken');
-      pref.remove('username');
-      pref.remove('password');
-      pref.remove('clock_in');
-      pref.remove('isQuizPasses');
-    });
-
-    await AwesomeNotificationsFcm().deleteToken();
-
-  }
-
-  Future<void> checkStatus(userId) async {
-    showProgressDialog(context);
-
-    String ip;
-    final dbHelper = DatabaseHelper.instance;
-    final allRows = await dbHelper.queryAllRows();
-
-    if (allRows.length != 0) {
-      ip = allRows[0]['ip_address'];
-    } else {
-      ip = Endpoint.baseUrl;
-    }
-
-    try {
-      var response = await services.checkStatus(ip, userID, responseTime);
-
-      // print('responseTime = ' + responseTime.toString());
-
-      if (response.data.aktif.isEmpty) {
-        Future.delayed(const Duration(microseconds: 2000), () {
-          Navigator.pushNamedAndRemoveUntil(
-              context, "/no_connection", (Route<dynamic> routes) => false);
-        });
-      } else {
-        Navigator.of(context, rootNavigator: true).pop(context);
-
-        if (response.data.aktif == '1') {
-          if (response.data.achive == true) {
-            if (clockin != '--:--') {
-              if (isQuizPasses) {
-                ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
-              } else {
-                _showQuiz();
-                // Get.offAll(() => QuizScreen());
-              }
-            } else {
-              ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
-            }
-          } else {
-            AwesomeDialog(
-              context: context,
-              dialogType: DialogType.error,
-              title: "Anda tidak bisa melakukan absen!",
-              desc: response.data.message,
-              btnOkText: "Kembali",
-              btnOkOnPress: () {
-                Future.delayed(const Duration(microseconds: 2000), () {
-                  Navigator.pushNamedAndRemoveUntil(
-                      context, "/profile", (Route<dynamic> routes) => false);
-                });
-              },
-            )..show();
-          }
-        } else {
-          AwesomeDialog(
-            context: context,
-            dialogType: DialogType.error,
-            title: "Anda tidak bisa melakukan absen!",
-            desc: "Akun anda telah dinonaktifkan.",
-            btnOkText: "Logout",
-            btnOkOnPress: () {
-              logout();
-            },
-          )..show();
-        }
-      }
-    } catch (_) {
-      // ToastUtils.show('Request Time Out. Please try again!');
-      Fluttertoast.showToast(
-        msg: 'Request Time Out. Please try again!',
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.CENTER,
-        timeInSecForIosWeb: 1,
-        // backgroundColor: Colors.red,
-        // textColor: Colors.white,
-        // fontSize: 16.0,
-      );
-      Navigator.pop(context);
-    }
-  }
-
-  void _showQuiz() {
-    Future<void> future = showModalBottomSheet(
-      isScrollControlled: true,
-      context: context,
-      enableDrag: true,
-      builder: (context) => QuizScreen(),
-    );
-
-    future.then((value) => _closeQuiz(value));
-  }
-
-  void _closeQuiz(void value) async {
-    var pref = await SharedPreferences.getInstance();
-    if (pref.containsKey('isQuizPasses')) {
-      setState(() {
-        isQuizPasses = pref.getBool('isQuizPasses')!;
-      });
-    } else {
-      setState(() {
-        isQuizPasses = false;
-      });
-    }
-    if (isQuizPasses) {
-      ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
-    }
-  }
 }
