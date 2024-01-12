@@ -82,6 +82,8 @@ class _LoginScreenState extends State<LoginScreen> {
         ip = Endpoint.baseUrl;
       }
 
+      // print('ip: ${ip}');
+
       var firebaseAppToken = await AwesomeNotificationsFcm().requestFirebaseAppToken();
       print('login token: $firebaseAppToken');
 

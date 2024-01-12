@@ -10,7 +10,7 @@ import 'package:login_absen/core/ui/screens/invalid_ip.dart';
 import 'package:login_absen/core/ui/screens/ip_config.dart';
 import 'package:login_absen/core/ui/screens/login_screen.dart';
 import 'package:login_absen/core/ui/screens/no_connection.dart';
-import 'package:login_absen/core/ui/screens/profile/profile_screen.dart';
+import 'package:login_absen/core/ui/screens/profile_screen.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';

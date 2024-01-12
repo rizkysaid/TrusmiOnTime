@@ -22,7 +22,7 @@ import 'package:login_absen/core/ui/widget/prodevBestEmployee.dart';
 import 'package:login_absen/core/ui/widget/singleBestEmployee.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
-import '../PassParams.dart';
+import 'PassParams.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:date_format/date_format.dart';
@@ -152,10 +152,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> initConnectivity() async {
 
     var pref = await SharedPreferences.getInstance();
-    if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
-      logout();
-
-    } else {
+    // if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
+    //   print('initConnectivityz');
+    //   print(pref.getString('fcmToken'));
+    //   logout();
+    //
+    // } else {
 
       late ConnectivityResult result;
       // Platform messages may fail, so we use a try/catch PlatformException.
@@ -187,7 +189,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       return _updateConnectionStatus(result);
 
-    }
+    // }
   }
 
   Future<void> _updateConnectionStatus(ConnectivityResult result) async {
@@ -231,11 +233,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       firebaseAppToken = requestToken;
     });
-    print('token: $firebaseAppToken');
+    print('getPref() token: $firebaseAppToken');
 
     _profileBloc.add(InitialProfile());
     var pref = await SharedPreferences.getInstance();
     if (pref.getString('username') == null || pref.getString('username') == '') {
+    // if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
+      print('getPref() fcmToken:  ${pref.getString('fcmToken')}');
       logout();
     } else {
       setState(() {
