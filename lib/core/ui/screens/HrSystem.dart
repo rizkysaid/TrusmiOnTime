@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
-import 'package:flutter_webview_pro/webview_flutter.dart';
+// import 'package:flutter_webview_pro/webview_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +22,7 @@ class _HrSystemState extends State<HrSystem> {
 
   @override
   void initState() {
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+    // if (Platform.isAndroid) WebView.platform = AndroidWebView();
     super.initState();
   }
 
@@ -43,56 +43,58 @@ class _HrSystemState extends State<HrSystem> {
         password.toString();
     print("ip=" + urlAbsen);
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          WebView(
-            initialUrl: urlAbsen,
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureNavigationEnabled: true,
-            onPageStarted: (String url) {
-              print('Page started loading: $url');
-              setState(() {
-                loadingPrecentage = 0;
-              });
-            },
-            onProgress: (int progress) {
-              print('Page progress: $progress');
-              setState(() {
-                loadingPrecentage = progress;
-              });
-            },
-            onPageFinished: (String url) {
-              setState(() {
-                loadingPrecentage = 100;
-              });
-              print('Page finished loading: $url');
-            },
-          ),
-          loadingPrecentage < 100
-              ? Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        CircularProgressIndicator(),
-                        SizedBox(height: 15),
-                        Text('${loadingPrecentage.toString()}%'),
-                        SizedBox(height: 10),
-                        Text('Loading, please wait...'),
-                      ],
-                    ),
-                  ),
-                )
-              : SizedBox.shrink(),
-        ],
-      ),
-    );
+    return Scaffold();
+
+    // return Scaffold(
+    //   backgroundColor: Colors.white,
+    //   resizeToAvoidBottomInset: false,
+    //   body: Stack(
+    //     children: [
+    //       WebView(
+    //         initialUrl: urlAbsen,
+    //         javascriptMode: JavascriptMode.unrestricted,
+    //         gestureNavigationEnabled: true,
+    //         onPageStarted: (String url) {
+    //           print('Page started loading: $url');
+    //           setState(() {
+    //             loadingPrecentage = 0;
+    //           });
+    //         },
+    //         onProgress: (int progress) {
+    //           print('Page progress: $progress');
+    //           setState(() {
+    //             loadingPrecentage = progress;
+    //           });
+    //         },
+    //         onPageFinished: (String url) {
+    //           setState(() {
+    //             loadingPrecentage = 100;
+    //           });
+    //           print('Page finished loading: $url');
+    //         },
+    //       ),
+    //       loadingPrecentage < 100
+    //           ? Container(
+    //               width: MediaQuery.of(context).size.width,
+    //               height: MediaQuery.of(context).size.height,
+    //               color: Colors.grey[100],
+    //               child: Center(
+    //                 child: Column(
+    //                   mainAxisAlignment: MainAxisAlignment.center,
+    //                   children: [
+    //                     CircularProgressIndicator(),
+    //                     SizedBox(height: 15),
+    //                     Text('${loadingPrecentage.toString()}%'),
+    //                     SizedBox(height: 10),
+    //                     Text('Loading, please wait...'),
+    //                   ],
+    //                 ),
+    //               ),
+    //             )
+    //           : SizedBox.shrink(),
+    //     ],
+    //   ),
+    // );
 
     // return MaterialApp(
     //   debugShowCheckedModeBanner: false,

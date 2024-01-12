@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:login_absen/core/config/endpoint.dart';
 import 'package:login_absen/core/ui/screens/PassParams.dart';
-import 'package:flutter_webview_pro/webview_flutter.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +24,7 @@ class _WfhState extends State<Wfh> {
   @override
   void initState() {
     super.initState();
-    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+    // if (Platform.isAndroid) WebView.platform = AndroidWebView();
   }
 
   @override
@@ -44,38 +43,40 @@ class _WfhState extends State<Wfh> {
 //  static String _baseIP = "http://192.168.23.195"; //wfh - local
 //     String urlAbsen = "http://192.168.23.195/wfh/login/auth/"+username.toString()+"/"+password.toString();
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          WebView(
-            initialUrl: urlAbsen,
-            javascriptMode: JavascriptMode.unrestricted,
-            gestureNavigationEnabled: true,
-            onPageStarted: (String url) {
-              print('Page started loading: $url');
-            },
-            onPageFinished: (String url) {
-              setState(() {
-                _loading = false;
-              });
-              print('Page finished loading: $url');
-            },
-          ),
-          (_loading)
-              ? Container(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  color: Colors.grey[100],
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-              : SizedBox.shrink(),
-        ],
-      ),
-    );
+
+    return Scaffold();
+    // return Scaffold(
+    //   backgroundColor: Colors.white,
+    //   resizeToAvoidBottomInset: false,
+    //   body: Stack(
+    //     children: [
+    //       WebView(
+    //         initialUrl: urlAbsen,
+    //         javascriptMode: JavascriptMode.unrestricted,
+    //         gestureNavigationEnabled: true,
+    //         onPageStarted: (String url) {
+    //           print('Page started loading: $url');
+    //         },
+    //         onPageFinished: (String url) {
+    //           setState(() {
+    //             _loading = false;
+    //           });
+    //           print('Page finished loading: $url');
+    //         },
+    //       ),
+    //       (_loading)
+    //           ? Container(
+    //               width: MediaQuery.of(context).size.width,
+    //               height: MediaQuery.of(context).size.height,
+    //               color: Colors.grey[100],
+    //               child: Center(
+    //                 child: CircularProgressIndicator(),
+    //               ),
+    //             )
+    //           : SizedBox.shrink(),
+    //     ],
+    //   ),
+    // );
 
     // return MaterialApp(
     //   debugShowCheckedModeBanner: false,

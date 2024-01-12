@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 
@@ -63,7 +64,14 @@ class NotificationController extends ChangeNotifier {
 
   static Future<void> initializeRemoteNotifications(
       {required bool debug}) async {
-    await Firebase.initializeApp();
+    Platform.isAndroid ? await Firebase.initializeApp(
+      options: const FirebaseOptions(
+          apiKey: 'AIzaSyCFr3cUUOvfAFovrRMZk7UfgBUhjVwwLMg',
+          appId: '1:465054695886:android:bd9cb6a1c7e1f804af6b9f',
+          messagingSenderId: '465054695886',
+          projectId: 'trusmiontime-notificatio-65e3d'
+      )
+    ) : await Firebase.initializeApp();
     await AwesomeNotificationsFcm().initialize(
         onFcmTokenHandle: NotificationController.myFcmTokenHandle,
         onNativeTokenHandle: NotificationController.myNativeTokenHandle,
