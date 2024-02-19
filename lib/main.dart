@@ -15,6 +15,7 @@ import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'core/ui/screens/camera_screen.dart';
 import 'dart:async';
 import 'core/ui/screens/login_config.dart';
+import 'package:face_camera/face_camera.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,6 +23,7 @@ void main() async {
   await NotificationController.initializeRemoteNotifications(debug: true);
   // await NotificationController.initializeIsolateReceivePort();
   await NotificationController.getInitialNotificationAction();
+  await FaceCamera.initialize();
   runApp(MyApp());
 }
 
@@ -51,6 +53,7 @@ class _MyAppState extends State<MyApp> {
     return GetMaterialApp(
       title: "Trusmi Ontime",
       debugShowCheckedModeBanner: false,
+      theme: ThemeData.light(),
       home: SplashScreen(),
       routes: {
         "/login": (context) => LoginScreen(),

@@ -16,6 +16,7 @@ import 'package:login_absen/core/controller/ProfileController.dart';
 import 'package:login_absen/core/database/database_helper.dart';
 import 'package:login_absen/core/models/ProfileModel.dart';
 import 'package:login_absen/core/services/ApiService.dart';
+import 'package:login_absen/core/services/face_camera.dart';
 import 'package:login_absen/core/ui/screens/quiz_screen.dart';
 import 'package:login_absen/core/ui/screens/trusmiverse.dart';
 import 'package:login_absen/core/ui/widget/prodevBestEmployee.dart';
@@ -128,21 +129,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _hariTanggal = _formatHariTanggal(now).toString();
     timer = Timer.periodic(Duration(seconds: 1), (Timer t) {
 
-      final String formattedDateTime = _formatDateTime(now).toString();
+      _getTime();
+
       final String formattedHariTanggal = _formatHariTanggal(htNow).toString();
 
       _hariTanggal = formattedHariTanggal;
-      _timeString = formattedDateTime;
-      if (this.mounted) {
-        setState(() {
-          _timeString = formattedDateTime;
-        });
-      }
+      // _timeString = formattedDateTime;
+      // if (mounted) {
+      //   setState(() {
+      //     _timeString = formattedDateTime;
+      //   });
+      // }
     });
+
   }
 
   _formatDateTime(DateTime dateTime) {
     return DateFormat('HH:mm:ss').format(dateTime);
+  }
+
+  void _getTime() {
+    final DateTime now = DateTime.now();
+    final String formattedDateTime = _formatDateTime(now);
+    if(mounted){
+      setState(() {
+        _timeString = formattedDateTime;
+      });
+    }
   }
 
   _formatHariTanggal(DateTime dateTime) {
@@ -151,7 +164,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> initConnectivity() async {
 
-    var pref = await SharedPreferences.getInstance();
+    // var pref = await SharedPreferences.getInstance();
     // if (pref.getString('fcmToken') == null || pref.getString('fcmToken') == '') {
     //   print('initConnectivityz');
     //   print(pref.getString('fcmToken'));
@@ -2738,13 +2751,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
           if (response.data.achive == true) {
             if (clockin != '--:--') {
               if (isQuizPasses) {
-                ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+                // ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+                Get.to(FaceCameraWidget(statusCheckin: _status, userId: userID, idShift: idShift, shift: shift));
               } else {
                 _showQuiz();
                 // Get.offAll(() => QuizScreen());
               }
             } else {
-              ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+              // ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+              // Navigator.pushNamed(context, '/face_camera');
+              Get.to(FaceCameraWidget(statusCheckin: _status, userId: userID, idShift: idShift, shift: shift));
             }
           } else {
             AwesomeDialog(
@@ -2812,7 +2828,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       });
     }
     if (isQuizPasses) {
-      ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+      // ProfileController().openCamera(_status, userID, date, idShift, shift, _profileBloc, apiToken);
+      Get.to(FaceCameraWidget(statusCheckin: _status, userId: userID, idShift: idShift, shift: shift));
     }
   }
 
@@ -3010,11 +3027,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               style: TextStyle(
                                                   color: Colors.white)),
                                           SizedBox(height: 20),
+
+                                          // StreamBuilder<DateTime>(
+                                          //   stream: Stream.periodic(Duration(seconds: 1)),
+                                          //   builder: (context, snapshot) {
+                                          //     if (snapshot.hasData) {
+                                          //       return Text(
+                                          //         '${snapshot.data!.hour}:${snapshot.data!.minute}:${snapshot.data!.second}',
+                                          //         style: TextStyle(color: Colors.white,
+                                          //         fontSize: 25,
+                                          //         fontWeight: FontWeight.bold),
+                                          //       );
+                                          //     } else {
+                                          //       return Text('Loading...');
+                                          //     }
+                                          //   },
+                                          // ),
+
                                           Text(_timeString.toString(),
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 25,
-                                                  fontWeight: FontWeight.bold)),
+                                                  fontWeight: FontWeight.bold
+                                                ),
+                                              ),
+                                          
                                           Text(_hariTanggal.toString(),
                                               style: TextStyle(
                                                   color: Colors.white,
@@ -3584,11 +3621,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           style:
                                               TextStyle(color: Colors.white)),
                                       SizedBox(height: 20),
+
+                                      
                                       Text(_timeString.toString(),
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 25,
                                               fontWeight: FontWeight.bold)),
+                                      
                                       Text(_hariTanggal.toString(),
                                           style: TextStyle(
                                               color: Colors.white,

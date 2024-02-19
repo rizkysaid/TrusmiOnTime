@@ -76,6 +76,10 @@ class ProfileController{
             shift: shift);
       }
     }
+
+
+
+
   }
 
   Future<dynamic> prosesCheckin({required String usrId, required String clockIn, required File imageFile, required String idShift, required String shift, profileBloc, apiToken}) async {
